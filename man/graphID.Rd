@@ -1,0 +1,78 @@
+\name{graphID}
+\alias{graphID}
+\title{Identifiability of Linear Structural Equation Models}
+\description{
+  This function checks global and generic identifiability of linear
+  structural equation models.  For generic identifiability the function
+  checks a sufficient criterion as well as a necessary criterion but this
+  check may be inconclusive.
+}
+\usage{graphID(L,O, output.type = 'matrix', file.name = NULL,
+decomp.if.acyclic = TRUE, test.globalID = TRUE, test.genericID = TRUE,
+test.nonID = TRUE)}
+\arguments{
+  \item{L}{Adjacency matrix for the directed part of the path
+    diagram/mixed graph; an edge pointing from i to j is encoded as L[i,j]=1.}
+  \item{O}{Adjacency matrix for the bidirected part of the path
+    diagram/mixed graph.}
+  \item{output.type}{A character string indicating whether output is
+    printed ('matrix'), saved to a file ('file'), or returned as a list
+    ('list') for further processing in R.}
+  \item{file.name}{A character string naming the output file.}
+  \item{decomp.if.acyclic}{A logical value indicating whether an input graph
+    that is acyclic is to be decomposed before applying identifiability criteria.}
+  \item{test.globalID}{A logical value indicating whether or not global
+    identifiability is checked.}
+  \item{test.genericID}{A logical value indicating whether or not a
+    sufficient condition for generic identifiability is checked.}
+  \item{test.nonID}{A logical value indicating whether or not a
+    condition implying generic non-identifiability is checked.}
+}
+\value{
+  A list or printed matrix indicating the identifiability status of the
+  linear SEM given by the input graph.  Optionally the graph's
+  components are listed.
+
+  With output.type = 'list', the function returns a list of components
+  for the graph.  Each list entry is again a list that indicates first
+  which nodes form the component and second whether the component forms
+  a mixed graph that is acyclic.  The next entries in the list show
+  HTC-identifiable nodes, meaning nodes v for which the coefficients for
+  all the directed edges pointing to v can be identified using the
+  methods from Foygel et al. (2012).  The HTC-identifiable nodes are
+  listed in the order in which they are found by the recursive
+  identification algorithm.  The last three list entries are
+  logical values that indicate whether or not the graph component is
+  generically identifiable, globally identifiable or not identifiable;
+  compare Drton et al. (2011) and Foygel et al. (2012).  In the latter
+  case the Jacobian of the parametrization does not have full rank.
+
+  With output.type = 'matrix', a summary of the above
+  information is printed. 
+}
+\references{
+  Drton, M., Foygel, R., and Sullivant, S.  (2011) Global identifiability
+  of linear structural equation models. \emph{Ann. Statist.}  39(2): 865-886.
+  \cr\cr
+  Foygel, R., Draisma, J., and Drton, M.  (2012) Half-trek criterion for
+  generic identifiability of linear structural equation models.  \emph{Ann. Statist.}
+  40(3): 1682-1713.
+}
+\examples{
+L = t(matrix(
+  c(0, 1, 0, 0, 0,
+    0, 0, 1, 0, 0,
+    0, 0, 0, 1, 0,
+    0, 0, 0, 0, 1,
+    0, 0, 0, 0, 0), 5, 5))
+O = t(matrix(
+  c(0, 0, 1, 1, 0,
+    0, 0, 0, 1, 1,
+    0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0), 5, 5)); O=O+t(O)
+graphID(L,O)
+
+## Examples from Foygel, Draisma & Drton (2012)
+demo(SEMID)
+}
