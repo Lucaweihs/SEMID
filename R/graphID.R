@@ -399,7 +399,7 @@ graphID.genericID <- function(L, O, ILinv=0){
   L <- (L != 0)
   diag(L) <- 0
   if (is.dag(graph.adjacency(L, mode="directed"))) {
-    return graphID.ancestral(L, O)
+    return(graphID.ancestral(L, O))
   }
   O <- O + t(O)
   O <- (O != 0)
@@ -476,7 +476,10 @@ graphID.genericID <- function(L, O, ILinv=0){
 # Get the ancestors of a collection of nodes in a graph g, the ancestors DO
 # include the the nodes themselves.
 ###
-ancestors = function(g, nodes) {
+ancestors <- function(g, nodes) {
+  if (length(V(g)) == 0 || length(nodes) == 0) {
+    return(numeric(0))
+  }
   sort(unique(unlist(neighborhood(g, length(V(g)), nodes=nodes, mode="in"))))
 }
 
@@ -484,7 +487,10 @@ ancestors = function(g, nodes) {
 # Get the parents of a collection of nodes in a graph g, the parents DO include
 # the input nodes themselves.
 ###
-parents = function(g, nodes) {
+parents <- function(g, nodes) {
+  if (length(V(g)) == 0 || length(nodes) == 0) {
+    return(numeric(0))
+  }
   sort(unique(unlist(neighborhood(g, 1, nodes=nodes, mode="in"))))
 }
 
@@ -493,19 +499,23 @@ parents = function(g, nodes) {
 # include the input nodes themselves.
 ###
 siblings = function(g, nodes) {
+  if (length(V(g)) == 0 || length(nodes) == 0) {
+    return(numeric(0))
+  }
   sort(unique(unlist(neighborhood(g, 1, nodes=nodes, mode="all"))))
 }
 
 ###
-# Returns the mixed component of a mixed graph containing a specified node
-# relative a specified set of ancestral nodes.
+# For an input mixed graph H and set of nodes A, let GA be the subgraph of
+# H on the nodes A. This function returns the mixed component of GA containing
+# a specified node.
 #
 # @param dG a directed graph representing the directed part of the mixed graph.
 #        Here dG is expected to have vertices with names 1,...,m where m is the
 #        number of vertices in the graph.
 # @param bG an undirected graph representing the undirected part of the mixed
 #        graph. The names of vertices in bG should correspond to those in dG
-# @param ancNodes an ancestral set of nodes in the mixed graph, this set should
+# @param subNodes an ancestral set of nodes in the mixed graph, this set should
 #        include the special node nodeName
 # @param nodeName the node for which the mixed component is found.
 # @returns a list with two named elements:
@@ -514,10 +524,14 @@ siblings = function(g, nodes) {
 #          inNodes - the nodes in the graph which are not part of biNodes
 #                    but which are a parent of some node in biNodes.
 ###
-getMixedCompForNode = function(dG, bG, ancNodes, nodeName) {
+getMixedCompForNode <- function(dG, bG, subNodes, nodeName) {
   m = length(V(dG))
+  if (is.null(V(dG)$names) || is.null(V(bG)) ||
+      any(V(dG)$names != 1:m) || any(V(bG)$names != 1:m)) {
+    stop("Input graphs to getMixedCompForNode must have vertices named 1:m in order.")
+  }
 
-  nodesToDelete = setdiff(1:m, ancNodes)
+  nodesToDelete = setdiff(1:m, subNodes)
   bG = delete.vertices(bG, nodesToDelete)
 
   nodeNum = which(V(bG)$names == nodeName)
@@ -527,7 +541,9 @@ getMixedCompForNode = function(dG, bG, ancNodes, nodeName) {
   bidirectedComp = which(clustMember == nodeMember)
   bidirectedComp = (V(bG)$names)[bidirectedComp]
 
-  incomingNodes = setdiff(parents(dG, bidirectedComp), bidirectedComp)
+  incomingNodes = intersect(setdiff(parents(dG, bidirectedComp),
+                                    bidirectedComp),
+                            subNodes)
 
   return(list(biNodes=bidirectedComp, inNodes=incomingNodes))
 }
@@ -551,38 +567,42 @@ getMixedCompForNode = function(dG, bG, ancNodes, nodeName) {
 # @param node the node (as an integer) for which the maxflow should be computed.
 ###
 getMaxFlow = function(L, O, allowedNodes, biNodes, inNodes, node) {
+  if (!(node %in% biNodes) || any(O[biNodes, inNodes] != 0)) {
+    stop("When getting max flow either some in-nodes were connected to some bi-nodes or node was not in biNodes.")
+  }
   m = length(biNodes) + length(inNodes)
-  rearranger = numeric(nrow(L))
-  rearranger[biNodes] = 1:length(biNodes)
-  rearranger[inNodes] = (length(biNodes)+1):m
+
+  oldNumToNewNum = numeric(m)
+  oldNumToNewNum[biNodes] = 1:length(biNodes)
+  oldNumToNewNum[inNodes] = (length(biNodes)+1):m
 
   nodesToUse = c(biNodes, inNodes)
-  allowedNodes = union(intersect(allowedNodes, nodesToUse), inNodes)
-  L[biNodes,inNodes] = 0
-  O[inNodes,inNodes] = 0
-  L = L[nodesToUse,nodesToUse]
-  O = O[nodesToUse,nodesToUse]
+  allowedNodes = intersect(allowedNodes, nodesToUse)
+  L[c(inNodes, biNodes), inNodes] = 0
+  O[inNodes, inNodes] = 0
+  L = L[nodesToUse, nodesToUse]
+  O = O[nodesToUse, nodesToUse]
 
   # 1 & 2 = source & target
   # 2 + {1,...,m} = L(i) for i=1,...,m
-  # 2+m + {1,...,m} = R(i)-in for i=1,...,m
-  # 2+2*m + {1,...,m} = R(i)-out for i=1,...,m
+  # 2 + m + {1,...,m} = R(i)-in for i=1,...,m
+  # 2 + 2*m + {1,...,m} = R(i)-out for i=1,...,m
 
-  Cap.matrix <- matrix(0, 2+3*m, 2+3*m)
+  Cap.matrix <- matrix(0, 2 + 3*m, 2 + 3*m)
 
   for (i in 1:m){
     # edge from L(i) to R(i)-in, and to R(j)-in for all siblings j of i
-    Cap.matrix[2+i, 2+m+c(i, which(O[i,] == 1))] <- 1
+    Cap.matrix[2 + i, 2 + m + c(i, which(O[i,] == 1))] <- 1
     # edge from R(i)-in to R(i)-out
-    Cap.matrix[2+m+i, 2+2*m+i] <- 1
+    Cap.matrix[2 + m + i, 2 + 2*m + i] <- 1
     # edge from R(i)-out to R(j)-in for all directed edges i->j
-    Cap.matrix[2+2*m+i, 2+m + which(L[i,] == 1)] <- 1
+    Cap.matrix[2 + 2*m + i, 2 + m + which(L[i,] == 1)] <- 1
   }
 
-  allowedNodes = rearranger[allowedNodes]
-  node = rearranger[node]
-  Cap.matrix[1, 2+allowedNodes] = 1
-  Cap.matrix[2+2*m + which(L[,node] == 1), 2] = 1
+  allowedNodes = oldNumToNewNum[allowedNodes]
+  node = oldNumToNewNum[node]
+  Cap.matrix[1, 2 + allowedNodes] = 1
+  Cap.matrix[2 + 2*m + which(L[,node] == 1), 2] = 1
 
   return(graph.maxflow(graph.adjacency(Cap.matrix), source=1, target=2)$value)
 }
