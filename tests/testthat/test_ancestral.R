@@ -1,5 +1,26 @@
 library(SEMID)
-context("Testing components related to generic identifiability by ancestor decomposition.")
+context("Components related to generic identifiability by ancestor decomposition.")
+
+rUndirectedAdjMat = function(n, p) {
+  mat = matrix(runif(n^2), ncol=n) < p
+  mat = mat * upper.tri(mat)
+  return(mat + t(mat))
+}
+rConnectedAdjMatrix = function(n, p) {
+  weights = runif(n*(n-1)/2)
+  g = minimum.spanning.tree(graph.full(n), weights=weights)
+  adjMatrix = as.matrix(get.adjacency(g))
+  adjMatrix = (upper.tri(matrix(0,n,n)) & matrix(sample(c(T, F), n^2, replace=T, prob=c(p, 1-p)), ncol=n)) | adjMatrix
+  adjMatrix = 1*(adjMatrix | t(adjMatrix))
+  return(adjMatrix)
+}
+rDirectedAdjMatrix = function(n,p) {
+  return(1*(upper.tri(matrix(0,n,n)) & matrix(sample(c(T, F), n^2, replace=T, prob=c(p, 1-p)), ncol=n)))
+}
+rDirectedAdjMatrix = function(n, p) {
+  return(1*(upper.tri(matrix(0,n,n)) & matrix(sample(c(T, F), n^2, replace=T, prob=c(p, 1-p)), ncol=n)))
+}
+getAdjMat = function(g) { as.matrix(get.adjacency(g)) }
 
 test_that("ancestors function works as expected.", {
   ## Output should be empty
@@ -86,12 +107,8 @@ test_that("getMixedCompForNode function works as expected.", {
 
   compList = getMixedCompForNode(dG, bG, 1, 1)
   expect_equal(compList, list(biNodes=1, inNodes=numeric(0)))
-
-  compList = getMixedCompForNode(dG, bG, 1, 2)
-  expect_equal(compList, list(biNodes=numeric(0), inNodes=numeric(0)))
-
-  compList = getMixedCompForNode(dG, bG, 2, 1)
-  expect_equal(compList, list(biNodes=numeric(0), inNodes=numeric(0)))
+  expect_error(getMixedCompForNode(dG, bG, 1, 2))
+  expect_error(getMixedCompForNode(dG, bG, 2, 1))
 
   # Graph with 2 nodes
   dG = graph.empty(2, directed=T)
@@ -138,4 +155,84 @@ test_that("getMixedCompForNode function works as expected.", {
 })
 
 test_that("getMaxFlow function works as expected.", {
+  ## Graph with single node
+  dG = graph.empty(1, directed=T)
+  bG = graph.empty(1, directed=F)
+  expect_equal(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(), c(1), numeric(0), 1), 0)
+
+  ## Graph with two disconnected nodes
+  dG = graph.empty(2, directed=T)
+  bG = graph.empty(2, directed=F)
+  expect_error(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(1), c(1), numeric(0), 1))
+  expect_error(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(2), c(2), numeric(0), 2))
+  expect_equal(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(2), c(1), numeric(0), 1), 0)
+  expect_equal(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(), c(2), numeric(0), 2), 0)
+  expect_equal(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(), c(1), numeric(0), 1), 0)
+  expect_error(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(), c(1), numeric(0), 2))
+
+  ## Two connected nodes
+  dG = graph.edgelist(t(c(1,2)), directed=T)
+  bG = graph.empty(2, directed=F)
+  expect_equal(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(), c(2), numeric(0), 2), 0)
+  expect_equal(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(1), c(2), numeric(0), 2), 0)
+  expect_equal(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(1), c(2), c(1), 2), 1)
+
+  bG = add.edges(bG, c(1,2))
+  expect_error(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(), c(2), c(1), 2))
+  expect_error(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(1), c(1,2), c(), 2))
+  expect_error(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(2), c(2), c(), 2))
+  expect_equal(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(), c(2), c(), 2), 0)
+
+  dG = add.edges(add.vertices(dG, 1), c(3,1))
+  bG = add.vertices(bG, 1)
+  expect_equal(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(3), c(1,2), c(3), 2), 1)
+  expect_equal(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(3), c(1,2), c(3), 1), 1)
+  expect_equal(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(3), c(1), c(3), 1), 1)
+  expect_error(getMaxFlow(getAdjMat(dG), getAdjMat(bG), c(3), c(2,3), c(1), 2))
+
+  ## The sink marginalization example
+  dG = graph.edgelist(matrix(c(1,2, 1,3, 1,6, 2,3, 2,4, 2,5, 2,6, 3,4, 4,5),
+                             ncol=2, byrow=T))
+  bG = graph.edgelist(matrix(c(1,6, 1,4, 2,3, 2,5, 2,6),
+                             ncol=2, byrow=T), directed=F)
+  L = getAdjMat(dG)
+  O = getAdjMat(bG)
+  expect_equal(getMaxFlow(L, O, allowedNodes=c(1,3), biNodes=1:6, inNodes=c(), node=5), 2)
+  expect_equal(getMaxFlow(L, O, allowedNodes=c(1), biNodes=1:6, inNodes=c(), node=5), 1)
+  expect_equal(getMaxFlow(L, O, allowedNodes=c(6), biNodes=1:6, inNodes=c(), node=5), 1)
+  L1 = L; L1[1,3] = 0
+  O1 = O; O1[2,c(3,5)] = 0; O1[c(3,5), 2] = 0
+  expect_equal(getMaxFlow(L1, O1, allowedNodes=c(2,6), biNodes=1:6, inNodes=c(), node=5), 1)
 })
+
+test_that("graphID.ancestral function works as expected.", {
+  # Random test
+  set.seed(23231)
+  ps = c(.2, .4, .6, .8)
+  sims = 20
+  ns = c(2, 4, 6)
+  for(p in ps) {
+    for(n in ns) {
+      for(i in 1:sims) {
+        L = rDirectedAdjMatrix(n, p)
+        O = rConnectedAdjMatrix(n, p)
+        gia = graphID.ancestral(L, O)
+        gig = graphID.HTC(L, O)
+        gin = graphID.nonID(L, O)
+        expect_true(length(gia) >= length(gig))
+        expect_true(all(gig %in% gia))
+        expect_true((length(gia) != n) || !gin)
+      }
+    }
+  }
+
+  dG = graph.edgelist(matrix(c(1,2, 1,3, 1,6, 2,3, 2,4, 2,5, 2,6, 3,4, 4,5),
+                             ncol=2, byrow=T))
+  bG = graph.edgelist(matrix(c(1,6, 1,4, 2,3, 2,5, 2,6),
+                             ncol=2, byrow=T), directed=F)
+  expect_equal(as.numeric(sort(graphID.ancestral(getAdjMat(dG), getAdjMat(bG)))), 1:6)
+})
+
+
+
+

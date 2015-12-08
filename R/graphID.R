@@ -1,7 +1,7 @@
 ###
 # Wrapper function --- this is the one that gets called
 ###
-graphID <- function(L, O, output.type = 'matrix', file.name = NULL, decomp.if.acyclic = TRUE, test.globalID = TRUE, test.genericID = TRUE, test.nonID = TRUE){
+graphID <- function(L, O, output.type = 'matrix', file.name = NULL, decomp.if.acyclic = TRUE, test.globalID = TRUE, test.genericID = TRUE, test.nonID = TRUE) {
   ## L = directed edge matrix
   ## O = bidirected edge matrix
 
@@ -32,7 +32,7 @@ graphID <- function(L, O, output.type = 'matrix', file.name = NULL, decomp.if.ac
 ###
 # Function to format the output when all tests have been run.
 ###
-graphID.output.alltests <- function(Graph.components, Decomp, output.type, file.name){
+graphID.output.alltests <- function(Graph.components, Decomp, output.type, file.name) {
   if(output.type == 'list'){
     return(Graph.components)
   }else{
@@ -90,7 +90,7 @@ graphID.output.alltests <- function(Graph.components, Decomp, output.type, file.
 ###
 # Function to format the output when not all tests have been run
 ###
-graphID.output.notalltests <- function(Graph.components, Decomp, output.type, file.name, test.globalID, test.genericID, test.nonID){
+graphID.output.notalltests <- function(Graph.components, Decomp, output.type, file.name, test.globalID, test.genericID, test.nonID) {
   if(output.type == 'list'){
     return(Graph.components)
   }else{
@@ -168,7 +168,7 @@ graphID.output.notalltests <- function(Graph.components, Decomp, output.type, fi
 # Tian decomposition: Split a graph into bidirected connected components & then
 # solve each separately
 ###
-graphID.decompose <- function(L, O, decomp.if.acyclic = TRUE, test.globalID = TRUE, test.genericID = TRUE, test.nonID = TRUE){
+graphID.decompose <- function(L, O, decomp.if.acyclic = TRUE, test.globalID = TRUE, test.genericID = TRUE, test.nonID = TRUE) {
   m <- dim(L)[1]
   L <- (L != 0) ; diag(L) <- 0
   O <- O + t(O) ; O <- (O != 0) ; diag(O) <- 0
@@ -244,7 +244,7 @@ graphID.decompose <- function(L, O, decomp.if.acyclic = TRUE, test.globalID = TR
 # Main function to handle a graph component: calls the other functions that
 # determine identifiability status
 ###
-graphID.main <- function(L, O, test.globalID = TRUE, test.genericID = TRUE, test.nonID = TRUE){
+graphID.main <- function(L, O, test.globalID = TRUE, test.genericID = TRUE, test.nonID = TRUE) {
   m <- dim(L)[1]
   L <- (L != 0) ; diag(L) <- 0
   O <- O + t(O) ; O <- (O != 0) ; diag(O) <- 0
@@ -300,7 +300,7 @@ graphID.main <- function(L, O, test.globalID = TRUE, test.genericID = TRUE, test
 ###
 # Check for global identifiability (see arXiv:1003:1146).
 ###
-graphID.globalID <- function(L, O){  # for acyclic graphs only
+graphID.globalID <- function(L, O) {  # for acyclic graphs only
   m <- dim(L)[1]
   L <- (L != 0) ; diag(L) <- 0
   O <- O + t(O) ; O <- (O != 0) ; diag(O) <- 0
@@ -394,13 +394,18 @@ graphID.nonID <- function(L, O){
 # will use the a slightly stronger version of the half-trek criterion using
 # ancestor decompositions (see arXiv:1504.02992).
 ###
-graphID.genericID <- function(L, O, ILinv=0){
+graphID.genericID <- function(L, O, ILinv=0) {
+  if (is.dag(graph.adjacency(L, mode="directed"))) {
+    return(graphID.ancestral(L, O))
+  } else {
+    return(graphID.HTC(L, O, ILinv))
+  }
+}
+
+graphID.HTC <- function(L, O, ILinv = 0) {
   m <- nrow(L)
   L <- (L != 0)
   diag(L) <- 0
-  if (is.dag(graph.adjacency(L, mode="directed"))) {
-    return(graphID.ancestral(L, O))
-  }
   O <- O + t(O)
   O <- (O != 0)
   diag(O) <- 0
@@ -477,10 +482,11 @@ graphID.genericID <- function(L, O, ILinv=0){
 # include the the nodes themselves.
 ###
 ancestors <- function(g, nodes) {
-  if (length(V(g)) == 0 || length(nodes) == 0) {
+  if (vcount(g) == 0 || length(nodes) == 0) {
     return(numeric(0))
   }
-  sort(unique(unlist(neighborhood(g, length(V(g)), nodes=nodes, mode="in"))))
+  as.numeric(sort(graph.bfs(g, nodes, neimode = "in", unreachable = F)$order, na.last = NA))
+  #sort(unique(unlist(neighborhood(g, vcount(g), nodes=nodes, mode="in"))))
 }
 
 ###
@@ -488,7 +494,7 @@ ancestors <- function(g, nodes) {
 # the input nodes themselves.
 ###
 parents <- function(g, nodes) {
-  if (length(V(g)) == 0 || length(nodes) == 0) {
+  if (vcount(g) == 0 || length(nodes) == 0) {
     return(numeric(0))
   }
   sort(unique(unlist(neighborhood(g, 1, nodes=nodes, mode="in"))))
@@ -499,10 +505,36 @@ parents <- function(g, nodes) {
 # include the input nodes themselves.
 ###
 siblings = function(g, nodes) {
-  if (length(V(g)) == 0 || length(nodes) == 0) {
+  if (vcount(g) == 0 || length(nodes) == 0) {
     return(numeric(0))
   }
   sort(unique(unlist(neighborhood(g, 1, nodes=nodes, mode="all"))))
+}
+
+###
+# Gets the descendants of a collection of nodes in a graph (all nodes that can
+# be reached by following directed edges from those nodes). Descendants DO
+# include the nodes themselves.
+###
+descendants = function(g, nodes) {
+  if (vcount(g) == 0 || length(nodes) == 0) {
+    return(numeric(0))
+  }
+  as.numeric(sort(graph.bfs(g, nodes, neimode = "out", unreachable = F)$order, na.last = NA))
+  #sort(unique(unlist(neighborhood(g, vcount(g), nodes=nodes, mode="out"))))
+}
+
+###
+# Gets all vertices in a graph that are half-trek reachable from a set of nodes.
+###
+htr = function(dG, bG, nodes) {
+  if(!is.directed(dG) || is.directed(bG)) {
+    stop("dG is undirected or bG is directed.")
+  }
+  if (vcount(g) == 0 || length(nodes) == 0) {
+    return(numeric(0))
+  }
+  return(descendants(dG, siblings(bG, nodes)))
 }
 
 ###
@@ -525,27 +557,40 @@ siblings = function(g, nodes) {
 #                    but which are a parent of some node in biNodes.
 ###
 getMixedCompForNode <- function(dG, bG, subNodes, nodeName) {
-  m = length(V(dG))
-  if (is.null(V(dG)$names) || is.null(V(bG)) ||
-      any(V(dG)$names != 1:m) || any(V(bG)$names != 1:m)) {
+  VdG = V(dG)
+  VbG = V(bG)
+  m = vcount(dG)
+  if (is.null(VdG$names) || is.null(VbG$names) ||
+      any(VdG$names != 1:m) || any(VbG$names != 1:m)) {
     stop("Input graphs to getMixedCompForNode must have vertices named 1:m in order.")
   }
 
-  nodesToDelete = setdiff(1:m, subNodes)
-  bG = delete.vertices(bG, nodesToDelete)
-
-  nodeNum = which(V(bG)$names == nodeName)
-  clustMember = clusters(bG)$membership
-  nodeMember = clustMember[nodeNum]
-
-  bidirectedComp = which(clustMember == nodeMember)
-  bidirectedComp = (V(bG)$names)[bidirectedComp]
-
-  incomingNodes = intersect(setdiff(parents(dG, bidirectedComp),
-                                    bidirectedComp),
+  bidirectedComp = as.numeric(na.omit(graph.bfs(bG, root = nodeName, restricted = subNodes - 1,
+                                      neimode = "total", unreachable=F)$order))
+  incomingNodes = intersect(setdiff(parents(dG, bidirectedComp), bidirectedComp),
                             subNodes)
-
   return(list(biNodes=bidirectedComp, inNodes=incomingNodes))
+
+#   VdG = V(dG)
+#   VbG = V(bG)
+#   m = length(V(dG))
+#
+#   nodesToDelete = setdiff(1:m, subNodes)
+#   bG = delete.vertices(bG, nodesToDelete)
+#   VbG = V(bG)
+#
+#   nodeNum = which(VbG$names == nodeName)
+#   clustMember = clusters(bG)$membership
+#   nodeMember = clustMember[nodeNum]
+#
+#   bidirectedComp = which(clustMember == nodeMember)
+#   bidirectedComp = (VbG$names)[bidirectedComp]
+#
+#   incomingNodes = intersect(setdiff(parents(dG, bidirectedComp),
+#                                     bidirectedComp),
+#                             subNodes)
+#
+#   return(list(biNodes=bidirectedComp, inNodes=incomingNodes))
 }
 
 ###
@@ -570,7 +615,15 @@ getMaxFlow = function(L, O, allowedNodes, biNodes, inNodes, node) {
   if (!(node %in% biNodes) || any(O[biNodes, inNodes] != 0)) {
     stop("When getting max flow either some in-nodes were connected to some bi-nodes or node was not in biNodes.")
   }
+  if (length(intersect(allowedNodes, c(node, which(O[node,] == 1)))) != 0) {
+    stop("Allowed nodes contained siblings of input node or the node itself.")
+  }
+  allowedNodes = union(allowedNodes, inNodes)
   m = length(biNodes) + length(inNodes)
+
+  if (m == 1) {
+    return(0)
+  }
 
   oldNumToNewNum = numeric(m)
   oldNumToNewNum[biNodes] = 1:length(biNodes)
@@ -620,8 +673,8 @@ graphID.ancestral <- function(L, O) {
 
   dG = graph.adjacency(L)
   newOrder = topological.sort(dG)
-  L = L[newOrder,newOrder]
-  O = O[newOrder,newOrder]
+  L = L[newOrder, newOrder]
+  O = O[newOrder, newOrder]
 
   dG = graph.adjacency(L)
   bG = graph.adjacency(O)
@@ -636,13 +689,13 @@ graphID.ancestral <- function(L, O) {
     halfTrekSources[[i]] = siblings(bG, ancestors(dG, i))
   }
 
-  # A matrix determining which nodes are htr from each node
+  # A matrix determining which nodes are half-trek reachable from each node
   Dependence.matrix <- O + diag(m)
   for (i in 1:m) {
     Dependence.matrix <- ((Dependence.matrix + Dependence.matrix %*% L) > 0)
   }
 
-  Solved.nodes <- rep(0,m)
+  Solved.nodes <- rep(0, m)
   Solved.nodes[which(colSums(L) == 0)] <- 1 # nodes with no parents
   change <- 1
   count <- 1
@@ -652,7 +705,7 @@ graphID.ancestral <- function(L, O) {
     Unsolved.nodes <- which(Solved.nodes == 0)
     for (i in Unsolved.nodes) {
       # A <- (Solved Nodes 'union' nodes not htr from i) \ ({i} 'union' siblings(i))
-      A = setdiff(c(which(Solved.nodes > 0), which(Dependence.matrix[i, ] == 0)),
+      A = setdiff(c(which(Solved.nodes > 0), which(Dependence.matrix[i,] == 0)),
                   c(i, which(O[i,] == 1)))
       # A <- A intersect (nodes that can ever be in a HT system for i)
       A = intersect(A, halfTrekSources[[i]])
@@ -667,7 +720,7 @@ graphID.ancestral <- function(L, O) {
       }
 
       mixedCompList = getMixedCompForNode(dG, bG, ancestors(dG, i), i)
-      A = union(intersect(A, unlist(mixedCompList)), mixedCompList$inNodes)
+      A = intersect(A, unlist(mixedCompList))
       flow = getMaxFlow(L, O, A, mixedCompList$biNodes, mixedCompList$inNodes, i)
       if (flow == sum(L[,i])){
         change <- 1
