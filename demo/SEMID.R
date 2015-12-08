@@ -1,5 +1,4 @@
-## Empty graph 
-
+## Empty graph
 L = t(matrix(
   c(0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,

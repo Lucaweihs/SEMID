@@ -66,12 +66,12 @@
 #'     0, 0, 0, 1, 1,
 #'     0, 0, 0, 0, 0,
 #'     0, 0, 0, 0, 0,
-#'     0, 0, 0, 0, 0), 5, 5)); O=O+t(O)
+#'     0, 0, 0, 0, 0), 5, 5))
+#' O=O+t(O)
 #' graphID(L,O)
 #'
 #' ## Examples from Foygel, Draisma & Drton (2012)
 #' demo(SEMID)
-#'
 graphID <- function(L, O, output.type = 'matrix', file.name = NULL,
                     decomp.if.acyclic = TRUE, test.globalID = TRUE,
                     test.genericID = TRUE, test.nonID = TRUE) {
@@ -384,7 +384,7 @@ graphID.main <- function(L, O, test.globalID = TRUE, test.genericID = TRUE,
 
   if (test.genericID) {
 
-    Output$HTC.ID.nodes <- graphID.genericID(L,O)
+    Output$HTC.ID.nodes <- graphID.HTC(L,O)
 
     if (length(Output$HTC.ID.nodes) < m) {
       Output$GenericID <- FALSE
@@ -484,9 +484,12 @@ graphID.globalID <- function(L, O) {  # for acyclic graphs only
 #' generic identifiability of linear structural equation models.
 #' \emph{Ann. Statist.} 40(3): 1682-1713.
 graphID.nonID <- function(L, O) {
-  m <- dim(L)[1]
-  L <- (L != 0) ; diag(L) <- 0
-  O <- O + t(O) ; O <- (O != 0) ; diag(O) <- 0
+  m <- nrow(L)
+  L <- (L != 0)
+  diag(L) <- 0
+  O <- O + t(O)
+  O <- (O != 0)
+  diag(O) <- 0
 
   # 1 & 2 = source & target
   # 2 + {1,...,N} = L{i_n,j_n} for the n-th nonsibling pair, n=1,...,N
@@ -494,36 +497,44 @@ graphID.nonID <- function(L, O) {
   #         where (2+N) + (i-1)*m + j    = R_i(j) in copy
   #         & (2+N+m^2) + (i-1)*m + j    = R_i(j) out copy
 
-  nonsibs <- NULL; N <- 0
-  for (i in 1:(m-1)) { for (j in (i+1):m) {
-    if (O[i,j] == 0) {
-      N <- N+1
-      nonsibs <- rbind(nonsibs, c(i, j))
+  nonsibs <- NULL
+  N <- 0
+  for (i in 1:(m-1)) {
+    for (j in (i+1):m) {
+      if (O[i,j] == 0) {
+        N <- N + 1
+        nonsibs <- rbind(nonsibs, c(i, j))
+      }
     }
-  }}
+  }
 
-  Cap.matrix <- matrix(0,2*m^2+N+2,2*m^2+N+2)
-  Cap.matrix[1, 2 + (1:N)] <- 1 # edges from source to L{i,j} for each
-                                # nonsibling pair
-  for (n in 1:N) {  #{i,j} = nonsibs[n,1:2]
-    # edge from L{i,j} to R_i(j), and to R_i(k)-in for all siblings k of node j
-    Cap.matrix[2+n, 2+N +
-                 (nonsibs[n,1] - 1)*m +
-                 c(nonsibs[n,2], which(O[nonsibs[n,2], ] == 1))] <- 1
-    # edge from L{i,j} to R_j(i), and to R_j(i)-in for all siblings k of node i
-    Cap.matrix[2+n, 2+N +
-                 (nonsibs[n,2] - 1)*m +
-                 c(nonsibs[n,1], which(O[nonsibs[n,1], ] == 1))] <- 1
+  Cap.matrix <- matrix(0, 2*m^2+N+2, 2*m^2+N+2)
+  if (N != 0) {
+    Cap.matrix[1, 2 + (1:N)] <- 1 # edges from source to L{i,j} for each
+                                  # nonsibling pair
+    for (n in 1:N) {  #{i,j} = nonsibs[n,1:2]
+      # edge from L{i,j} to R_i(j), and to R_i(k)-in for all siblings k of
+      # node j
+      Cap.matrix[2+n, 2+N +
+                   (nonsibs[n,1] - 1)*m +
+                   c(nonsibs[n,2], which(O[nonsibs[n,2], ] == 1))] <- 1
+      # edge from L{i,j} to R_j(i), and to R_j(i)-in for all siblings k of
+      # node i
+      Cap.matrix[2+n, 2+N +
+                   (nonsibs[n,2] - 1)*m +
+                   c(nonsibs[n,1], which(O[nonsibs[n,1], ] == 1))] <- 1
+    }
   }
   for (i in 1:m) {
     # edge from R_i(j)-out to target when j is a parent of i
     Cap.matrix[2+N+m^2 + (i-1)*m + which(L[, i] == 1), 2] <- 1
     for (j in 1:m) {
       # edge from R_i(j)-in to R_i(j)-out
-      Cap.matrix[2+N + (i-1)*m + j,2+N+m^2 + (i-1)*m + j] <- 1
+      Cap.matrix[2+N + (i-1)*m + j, 2+N+m^2 + (i-1)*m + j] <- 1
       # edge from R_i(j)-out to R_i(k)-in where j->k is a directed edge
-      Cap.matrix[2+N+m^2 + (i-1)*m + j,2+N + (i-1)*m + which(L[j, ] == 1)] <- 1
-    }}
+      Cap.matrix[2+N+m^2 + (i-1)*m + j, 2+N + (i-1)*m + which(L[j, ] == 1)] <- 1
+    }
+  }
 
   HTC.nonID <-
     graph.maxflow(graph.adjacency(Cap.matrix), source=1, target=2)$value
@@ -869,7 +880,7 @@ graphID.ancestral <- function(L, O) {
   diag(O) <- 0
 
   dG = graph.adjacency(L)
-  newOrder = topological.sort(dG)
+  newOrder = as.numeric(topological.sort(dG))
   L = L[newOrder, newOrder]
   O = O[newOrder, newOrder]
 
