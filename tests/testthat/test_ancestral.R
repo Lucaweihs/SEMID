@@ -209,7 +209,7 @@ test_that("graphID.ancestral function works as expected.", {
   # Random test
   set.seed(23231)
   ps = c(.2, .4, .6, .8)
-  sims = 20
+  sims = 10
   ns = c(2, 4, 6)
   for(p in ps) {
     for(n in ns) {
@@ -232,7 +232,3 @@ test_that("graphID.ancestral function works as expected.", {
                              ncol=2, byrow=T), directed=F)
   expect_equal(as.numeric(sort(graphID.ancestral(getAdjMat(dG), getAdjMat(bG)))), 1:6)
 })
-
-
-
-

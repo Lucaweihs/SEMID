@@ -4,9 +4,10 @@
 \name{SEMID-package}
 \alias{SEMID}
 \alias{SEMID-package}
-\title{Test package documentation.}
+\title{SEMID package documentation.}
 \description{
-Test package documentation description.
+SEMID provides a number of methods for testing the global/generic
+identifiability of mixed graphs.
 }
 \details{
 The only function you're likely to need from \pkg{SEMID} is

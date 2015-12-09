@@ -73,12 +73,12 @@ O = t(matrix(
     0, 0, 0, 1, 1,
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0), 5, 5)); O=O+t(O)
+    0, 0, 0, 0, 0), 5, 5))
+O=O+t(O)
 graphID(L,O)
 
 ## Examples from Foygel, Draisma & Drton (2012)
 demo(SEMID)
-
 }
 \references{
 Drton, M., Foygel, R., and Sullivant, S.  (2011) Global

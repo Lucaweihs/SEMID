@@ -433,7 +433,10 @@ graphID.main <- function(L, O, test.globalID = TRUE, test.genericID = TRUE,
 #' Drton, Mathias; Foygel, Rina; Sullivant, Seth. Global identifiability of
 #' linear structural equation models. \emph{Ann. Statist.}  39 (2011), no. 2,
 #' 865--886.
-graphID.globalID <- function(L, O) {  # for acyclic graphs only
+graphID.globalID <- function(L, O) {
+  if (!is.dag(graph.adjacency(L))) {
+    return(F)
+  }
   m <- dim(L)[1]
   L <- (L != 0) ; diag(L) <- 0
   O <- O + t(O) ; O <- (O != 0) ; diag(O) <- 0
