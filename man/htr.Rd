@@ -20,5 +20,8 @@ a sorted list of all half-trek reachable nodes.
 \description{
 Gets all vertices in a graph that are half-trek reachable from a set of
 nodes.
+WARNING: Often the half-trek reachable nodes from a vertex v are defined to
+not include the vertex v or its siblings. We DO NOT follow this convention,
+the returned set will include input nodes and their siblings.
 }
 

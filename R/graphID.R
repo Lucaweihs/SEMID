@@ -148,8 +148,8 @@ graphID.output.alltests <- function(Graph.components, Decomp, output.type,
       }
 
       Comp.row <- c(comp,
-                    paste(Graph.components[[comp]]$Nodes,collapse=','),
-                    paste(Graph.components[[comp]]$HTC.ID.nodes,collapse=','),
+                    paste(Graph.components[[comp]]$Nodes,collapse = ','),
+                    paste(Graph.components[[comp]]$HTC.ID.nodes,collapse = ','),
                     Comp.status)
       Graph.output.matrix <- rbind(Graph.output.matrix, Comp.row)
     }
@@ -157,7 +157,7 @@ graphID.output.alltests <- function(Graph.components, Decomp, output.type,
     Graph.output.matrix <- rbind(c('Component', 'Nodes', 'HTC-ID\'able nodes',
                                    'Identifiability'), Graph.output.matrix)
     colnames(Graph.output.matrix) <- rep('',4)
-    rownames(Graph.output.matrix) <- rep('',length(Graph.components)+1)
+    rownames(Graph.output.matrix) <- rep('',length(Graph.components) + 1)
 
     if (!Decomp) {
       Graph.output.matrix <- Graph.output.matrix[, -(1:2)]
@@ -169,14 +169,14 @@ graphID.output.alltests <- function(Graph.components, Decomp, output.type,
         Graph.output.matrix[i,j] <-
           paste(c(Graph.output.matrix[i,j],
                   rep(' ', 5 + Max.string - nchar(Graph.output.matrix[i,j]))),
-                collapse='')
+                collapse = '')
       }
     }
 
-    if (output.type=='file') {
-      write.table(Graph.output.matrix, file=file.name, quote=FALSE)
+    if (output.type == 'file') {
+      write.table(Graph.output.matrix, file = file.name, quote = FALSE)
     } else {
-      print(Graph.output.matrix, quote=FALSE)
+      print(Graph.output.matrix, quote = FALSE)
     }
   }
 }
@@ -229,8 +229,8 @@ graphID.output.notalltests <- function(Graph.components, Decomp, output.type,
       }
 
       Comp.row <- c(comp,
-                    paste(Graph.components[[comp]]$Nodes,collapse=','),
-                    paste(Graph.components[[comp]]$HTC.ID.nodes,collapse=','),
+                    paste(Graph.components[[comp]]$Nodes,collapse = ','),
+                    paste(Graph.components[[comp]]$HTC.ID.nodes,collapse = ','),
                     Comp.status.GlobalID, Comp.status.GenericID,
                     Comp.status.NonID)
       Graph.output.matrix <- rbind(Graph.output.matrix, Comp.row)
@@ -241,8 +241,8 @@ graphID.output.notalltests <- function(Graph.components, Decomp, output.type,
                                    'Generically ID\'able?',
                                    'Generically non-ID\'able?'),
                                  Graph.output.matrix)
-    colnames(Graph.output.matrix) <- rep('',6)
-    rownames(Graph.output.matrix) <- rep('',length(Graph.components)+1)
+    colnames(Graph.output.matrix) <- rep('', 6)
+    rownames(Graph.output.matrix) <- rep('', length(Graph.components) + 1)
 
     if (!Decomp) {
       Graph.output.matrix <- Graph.output.matrix[, -(1:2)]
@@ -254,15 +254,15 @@ graphID.output.notalltests <- function(Graph.components, Decomp, output.type,
         Graph.output.matrix[i,j] <-
           paste(c(Graph.output.matrix[i,j],
                   rep(' ', 3 + Max.string - nchar(Graph.output.matrix[i,j]))),
-                collapse='')
+                collapse = '')
       }
     }
 
 
-    if (output.type=='file') {
-      write.table(Graph.output.matrix, file=file.name, quote=FALSE)
+    if (output.type == 'file') {
+      write.table(Graph.output.matrix, file = file.name, quote = FALSE)
     } else {
-      print(Graph.output.matrix, quote=FALSE)
+      print(Graph.output.matrix, quote = FALSE)
     }
   }
 }
@@ -298,10 +298,10 @@ graphID.decompose <- function(L, O, decomp.if.acyclic = TRUE,
     test.acyclic <- TRUE
     nodes.acyclic <- 1:m
     while (test.acyclic && !Decomp) {
-      if (any(colSums(L[nodes.acyclic, nodes.acyclic, drop=FALSE]) == 0)) {
+      if (any(colSums(L[nodes.acyclic, nodes.acyclic, drop = FALSE]) == 0)) {
         nodes.acyclic <- nodes.acyclic[-which(colSums(L[nodes.acyclic,
                                                         nodes.acyclic,
-                                                        drop=FALSE]) == 0)]
+                                                        drop = FALSE]) == 0)]
         if (length(nodes.acyclic) == 0) {
           Decomp <- TRUE
         }
@@ -313,16 +313,16 @@ graphID.decompose <- function(L, O, decomp.if.acyclic = TRUE,
 
   if (Decomp) {
     Bidir.comp <- diag(m) + O
-    for (i in 1:(m-1)) {
-      Bidir.comp <- (Bidir.comp %*% (diag(m) + O)>0) + 0
+    for (i in 1:(m - 1)) {
+      Bidir.comp <- (Bidir.comp %*% (diag(m) + O) > 0) + 0
     }
     Components <- list()
     V <- 1:m
-    num.comp=0
+    num.comp = 0
     while (length(V) > 0) {
       num.comp <- num.comp + 1
       i <- min(V)
-      Components[[num.comp]] <- which(Bidir.comp[i,]==1)
+      Components[[num.comp]] <- which(Bidir.comp[i,] == 1)
       V <- setdiff(V,Components[[num.comp]])
     }
   } else {
@@ -334,7 +334,7 @@ graphID.decompose <- function(L, O, decomp.if.acyclic = TRUE,
   for (comp in 1:num.comp) {
     Component <- Components[[comp]]
     Component.parents <-
-      sort(setdiff(which(rowSums(L[,Component,drop=FALSE])>0),Component))
+      sort(setdiff(which(rowSums(L[,Component,drop = FALSE])>0),Component))
     if (length(Components[[comp]]) == 1) {
       Components[[comp]] <- list()
       Components[[comp]]$Nodes <- Component
@@ -355,7 +355,7 @@ graphID.decompose <- function(L, O, decomp.if.acyclic = TRUE,
                             matrix(0, m1 + m2, m2) )
       O.Component <- cbind( rbind( O[Component,Component], matrix(0, m2, m1) ),
                             matrix(0, m1 + m2, m2) )
-      Components[[comp]] <- c(list(Nodes=Component),
+      Components[[comp]] <- c(list(Nodes = Component),
                               graphID.main(L.Component, O.Component,
                                            test.globalID, test.genericID,
                                            test.nonID))
@@ -364,7 +364,7 @@ graphID.decompose <- function(L, O, decomp.if.acyclic = TRUE,
                             1:length(Component))]
     }
   }
-  Graph.output=list()
+  Graph.output = list()
   Graph.output$Components <- Components
   Graph.output$Decomp <- Decomp
   return(Graph.output)
@@ -389,7 +389,7 @@ graphID.main <- function(L, O, test.globalID = TRUE, test.genericID = TRUE,
 
   ILinv <- diag(m)
   for (i in 1:m) {
-    ILinv <- 0 + (diag(m) + ILinv %*% L>0)
+    ILinv <- 0 + (diag(m) + ILinv %*% L > 0)
   }
 
   Output <- list()
@@ -456,25 +456,26 @@ graphID.globalID <- function(L, O) {
   L <- (L != 0) ; diag(L) <- 0
   O <- O + t(O) ; O <- (O != 0) ; diag(O) <- 0
 
-  Global.ID=TRUE
+  Global.ID = TRUE
   i <- 0
   while (Global.ID == 1 && i < m) {
-    i <- i+1
+    i <- i + 1
     S <- 1:m
     change <- 1
     while (change == 1) {
       change <- 0
       S.old <- S
       for (s in setdiff(S.old, i)) {
-        if (graph.maxflow(graph.adjacency(L), source=s, target=i)$value == 0) {
+        if (graph.maxflow(graph.adjacency(L), source = s,
+                          target = i)$value == 0) {
           S <- setdiff(S, s)
           change <- 1
         }
       }
       S.old <- S
       for (s in setdiff(S.old, i)) {
-        if (graph.maxflow(graph.adjacency(O, mode='undirected'),
-                          source=s, target=i)$value == 0) {
+        if (graph.maxflow(graph.adjacency(O, mode = 'undirected'),
+                          source = s, target = i)$value == 0) {
           S <- setdiff(S, s)
           change <- 1
         }
@@ -520,8 +521,8 @@ graphID.nonID <- function(L, O) {
 
   nonsibs <- NULL
   N <- 0
-  for (i in 1:(m-1)) {
-    for (j in (i+1):m) {
+  for (i in 1:(m - 1)) {
+    for (j in (i + 1):m) {
       if (O[i,j] == 0) {
         N <- N + 1
         nonsibs <- rbind(nonsibs, c(i, j))
@@ -529,36 +530,38 @@ graphID.nonID <- function(L, O) {
     }
   }
 
-  Cap.matrix <- matrix(0, 2*m^2+N+2, 2*m^2+N+2)
+  Cap.matrix <- matrix(0, 2*m^2 + N + 2, 2*m^2 + N + 2)
   if (N != 0) {
     Cap.matrix[1, 2 + (1:N)] <- 1 # edges from source to L{i,j} for each
                                   # nonsibling pair
     for (n in 1:N) {  #{i,j} = nonsibs[n,1:2]
       # edge from L{i,j} to R_i(j), and to R_i(k)-in for all siblings k of
       # node j
-      Cap.matrix[2+n, 2+N +
+      Cap.matrix[2 + n, 2 + N +
                    (nonsibs[n,1] - 1)*m +
                    c(nonsibs[n,2], which(O[nonsibs[n,2], ] == 1))] <- 1
       # edge from L{i,j} to R_j(i), and to R_j(i)-in for all siblings k of
       # node i
-      Cap.matrix[2+n, 2+N +
+      Cap.matrix[2 + n, 2 + N +
                    (nonsibs[n,2] - 1)*m +
                    c(nonsibs[n,1], which(O[nonsibs[n,1], ] == 1))] <- 1
     }
   }
   for (i in 1:m) {
     # edge from R_i(j)-out to target when j is a parent of i
-    Cap.matrix[2+N+m^2 + (i-1)*m + which(L[, i] == 1), 2] <- 1
+    Cap.matrix[2 + N + m^2 + (i - 1)*m + which(L[, i] == 1), 2] <- 1
     for (j in 1:m) {
       # edge from R_i(j)-in to R_i(j)-out
-      Cap.matrix[2+N + (i-1)*m + j, 2+N+m^2 + (i-1)*m + j] <- 1
+      Cap.matrix[2 + N + (i - 1)*m + j,
+                 2 + N + m^2 + (i - 1)*m + j] <- 1
       # edge from R_i(j)-out to R_i(k)-in where j->k is a directed edge
-      Cap.matrix[2+N+m^2 + (i-1)*m + j, 2+N + (i-1)*m + which(L[j, ] == 1)] <- 1
+      Cap.matrix[2 + N + m^2 + (i - 1)*m + j,
+                 2 + N + (i - 1)*m + which(L[j, ] == 1)] <- 1
     }
   }
 
   HTC.nonID <-
-    graph.maxflow(graph.adjacency(Cap.matrix), source=1, target=2)$value
+    graph.maxflow(graph.adjacency(Cap.matrix), source = 1, target = 2)$value
   return(HTC.nonID < sum(L))
 }
 
@@ -585,7 +588,7 @@ graphID.nonID <- function(L, O) {
 #' {Drton}, M. and {Weihs}, L. (2015) Generic Identifiability of Linear
 #' Structural Equation Models by Ancestor Decomposition. arXiv 1504.02992
 graphID.genericID <- function(L, O) {
-  if (is.dag(graph.adjacency(L, mode="directed"))) {
+  if (is.dag(graph.adjacency(L, mode = "directed"))) {
     return(graphID.ancestral(L, O))
   } else {
     return(graphID.HTC(L, O))
@@ -620,14 +623,14 @@ graphID.HTC <- function(L, O) {
   # 2+m + {1,...,m} = R(i)-in for i=1,...,m
   # 2+2*m + {1,...,m} = R(i)-out for i=1,...,m
 
-  Cap.matrix.init <- matrix(0, 2+3*m, 2+3*m)
+  Cap.matrix.init <- matrix(0, 2 + 3*m, 2 + 3*m)
   for (i in 1:m) {
     # edge from L(i) to R(i)-in, and to R(j)-in for all siblings j of i
-    Cap.matrix.init[2+i, 2+m+c(i, which(O[i,] == 1))] <- 1
+    Cap.matrix.init[2 + i, 2 + m + c(i, which(O[i,] == 1))] <- 1
     # edge from R(i)-in to R(i)-out
-    Cap.matrix.init[2+m+i, 2+2*m+i] <- 1
+    Cap.matrix.init[2 + m + i, 2 + 2*m + i] <- 1
     # edge from R(i)-out to R(j)-in for all directed edges i->j
-    Cap.matrix.init[2+2*m+i, 2+m + which(L[i,] == 1)] <- 1
+    Cap.matrix.init[2 + 2*m + i, 2 + m + which(L[i,] == 1)] <- 1
   }
 
   # when testing if a set A satisfies the HTC with respect to a node i,
@@ -654,15 +657,15 @@ graphID.HTC <- function(L, O) {
 
       Cap.matrix <- Cap.matrix.init
 
-      Cap.matrix[1, 2+A] <- 1
-      Cap.matrix[2+2*m + which(L[,i] == 1), 2] <- 1
+      Cap.matrix[1, 2 + A] <- 1
+      Cap.matrix[2 + 2*m + which(L[,i] == 1), 2] <- 1
 
       flow <-
-        graph.maxflow(graph.adjacency(Cap.matrix), source=1, target=2)$value
+        graph.maxflow(graph.adjacency(Cap.matrix), source = 1, target = 2)$value
 
       if (flow == sum(L[,i])) {
         change <- 1
-        count <- count+1
+        count <- count + 1
         Solved.nodes[i] <- count
       }
     }
@@ -671,7 +674,7 @@ graphID.HTC <- function(L, O) {
   if (all(Solved.nodes == 0)) {
     Solved.nodes <- NULL
   } else {
-    Solved.nodes <- order(Solved.nodes)[(1+sum(Solved.nodes == 0)):m]
+    Solved.nodes <- order(Solved.nodes)[(1 + sum(Solved.nodes == 0)):m]
   }
   return(Solved.nodes)
 }
@@ -707,7 +710,7 @@ parents <- function(g, nodes) {
   if (vcount(g) == 0 || length(nodes) == 0) {
     return(numeric(0))
   }
-  sort(unique(unlist(neighborhood(g, 1, nodes=nodes, mode="in"))))
+  sort(unique(unlist(neighborhood(g, 1, nodes = nodes, mode = "in"))))
 }
 
 #' Get siblings of nodes in a graph.
@@ -723,7 +726,7 @@ siblings <- function(g, nodes) {
   if (vcount(g) == 0 || length(nodes) == 0) {
     return(numeric(0))
   }
-  sort(unique(unlist(neighborhood(g, 1, nodes=nodes, mode="all"))))
+  sort(unique(unlist(neighborhood(g, 1, nodes = nodes, mode = "all"))))
 }
 
 #' Getdescendants of nodes in a graph.
@@ -749,6 +752,9 @@ descendants <- function(g, nodes) {
 #'
 #' Gets all vertices in a graph that are half-trek reachable from a set of
 #' nodes.
+#' WARNING: Often the half-trek reachable nodes from a vertex v are defined to
+#' not include the vertex v or its siblings. We DO NOT follow this convention,
+#' the returned set will include input nodes and their siblings.
 #'
 #' @inheritParams getMixedCompForNode
 #' @param nodes the nodes in the graph of which to get the HTR nodes.
@@ -795,11 +801,11 @@ getMixedCompForNode <- function(dG, bG, subNodes, node) {
 
   bidirectedComp =
     as.numeric(sort(graph.bfs(bG, root = node, restricted = subNodes - 1,
-                              neimode = "total", unreachable=F)$order))
+                              neimode = "total", unreachable = F)$order))
   incomingNodes =
     intersect(setdiff(parents(dG, bidirectedComp), bidirectedComp),
               subNodes)
-  return(list(biNodes=bidirectedComp, inNodes=incomingNodes))
+  return(list(biNodes = bidirectedComp, inNodes = incomingNodes))
 }
 
 
@@ -846,7 +852,7 @@ getMaxFlow <- function(L, O, allowedNodes, biNodes, inNodes, node) {
 
   oldNumToNewNum = numeric(m)
   oldNumToNewNum[biNodes] = 1:length(biNodes)
-  oldNumToNewNum[inNodes] = (length(biNodes)+1):m
+  oldNumToNewNum[inNodes] = (length(biNodes) + 1):m
 
   nodesToUse = c(biNodes, inNodes)
   allowedNodes = intersect(allowedNodes, nodesToUse)
@@ -876,7 +882,8 @@ getMaxFlow <- function(L, O, allowedNodes, biNodes, inNodes, node) {
   Cap.matrix[1, 2 + allowedNodes] = 1
   Cap.matrix[2 + 2*m + which(L[,node] == 1), 2] = 1
 
-  return(graph.maxflow(graph.adjacency(Cap.matrix), source=1, target=2)$value)
+  return(graph.maxflow(graph.adjacency(Cap.matrix),
+                       source = 1, target = 2)$value)
 }
 
 #' Determine generic identifiability of an acyclic mixed graph using ancestral
@@ -916,7 +923,7 @@ graphID.ancestral <- function(L, O) {
   # Generates a list where, for each node v, we have a vector
   # corresponding to all the nodes that could ever be in a
   # half-trek system for v
-  halfTrekSources = vector("list", length=m)
+  halfTrekSources = vector("list", length = m)
   for (i in 1:m) {
     halfTrekSources[[i]] = siblings(bG, ancestors(dG, i))
   }
@@ -968,7 +975,7 @@ graphID.ancestral <- function(L, O) {
   if (all(Solved.nodes == 0)) {
     Solved.nodes <- NULL
   } else {
-    Solved.nodes <- order(Solved.nodes)[(1+sum(Solved.nodes == 0)):m]
+    Solved.nodes <- order(Solved.nodes)[(1 + sum(Solved.nodes == 0)):m]
   }
 
   return(newOrder[Solved.nodes])
