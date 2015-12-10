@@ -102,7 +102,6 @@ graphID <- function(L, O, output.type = 'matrix', file.name = NULL,
                                      file.name, test.globalID, test.genericID,
                                      test.nonID)
         }
-
       }
     }
   }
@@ -271,18 +270,28 @@ graphID.output.notalltests <- function(Graph.components, Decomp, output.type,
 
 #' Determine generic identifiability by Tian Decomposition and HTC
 #'
-#' Split a graph into bidirected connected components and solve each separately
+#' Split a graph into mixed Tiancomponents and solve each separately
 #' using the HTC.
 #'
-#' @export
-#'
 #' @inheritParams graphID
+#'
+#' @return A list with two named components:
+#'
+#'   1. Components - a list of lists. Each list represents one mixed Tian component
+#'       of the graph. Each list contains named components corresponding to which
+#'       nodes are in the component and results of various tests of
+#'       identifiability on the component (see the parameter descriptions).
+#'
+#'  2. Decomp - true if a decomposition occured, false if not.
 graphID.decompose <- function(L, O, decomp.if.acyclic = TRUE,
                               test.globalID = TRUE, test.genericID = TRUE,
                               test.nonID = TRUE) {
-  m <- dim(L)[1]
-  L <- (L != 0) ; diag(L) <- 0
-  O <- O + t(O) ; O <- (O != 0) ; diag(O) <- 0
+  m <- nrow(L)
+  L <- (L != 0)
+  diag(L) <- 0
+  O <- O + t(O)
+  O <- (O != 0)
+  diag(O) <- 0
 
   Decomp <- FALSE
   if (decomp.if.acyclic) {
@@ -366,11 +375,17 @@ graphID.decompose <- function(L, O, decomp.if.acyclic = TRUE,
 #' Calls the other functions that determine identifiability status.
 #'
 #' @inheritParams graphID
+#'
+#' @return A list containing named components of the results of various tests
+#' desired based on the input parameters.
 graphID.main <- function(L, O, test.globalID = TRUE, test.genericID = TRUE,
                          test.nonID = TRUE) {
-  m <- dim(L)[1]
-  L <- (L != 0) ; diag(L) <- 0
-  O <- O + t(O) ; O <- (O != 0) ; diag(O) <- 0
+  m <- nrow(L)
+  L <- (L != 0)
+  diag(L) <- 0
+  O <- O + t(O)
+  O <- (O != 0)
+  diag(O) <- 0
 
   ILinv <- diag(m)
   for (i in 1:m) {
@@ -381,9 +396,7 @@ graphID.main <- function(L, O, test.globalID = TRUE, test.genericID = TRUE,
 
   Output$acyclic <- (max(ILinv + t(ILinv) - diag(m)) == 1)
 
-
   if (test.genericID) {
-
     Output$HTC.ID.nodes <- graphID.HTC(L,O)
 
     if (length(Output$HTC.ID.nodes) < m) {
@@ -428,6 +441,8 @@ graphID.main <- function(L, O, test.globalID = TRUE, test.genericID = TRUE,
 #' @export
 #'
 #' @inheritParams graphID
+#'
+#' @return TRUE if the graph was globally identifiable, FALSE otherwise.
 #'
 #' @references
 #' Drton, Mathias; Foygel, Rina; Sullivant, Seth. Global identifiability of
@@ -478,9 +493,12 @@ graphID.globalID <- function(L, O) {
 #' Checks if a mixed graph is infinite-to-one using the half-trek criterion
 #' presented by Foygel, Draisma, and Drton (2012).
 #'
+#' @export
+#'
 #' @inheritParams graphID
 #'
-#' @export
+#' @return TRUE if the graph could be determined to be generically
+#' non-identifiable, FALSE if this test was inconclusive.
 #'
 #' @references
 #' Foygel, R., Draisma, J., and Drton, M.  (2012) Half-trek criterion for
@@ -544,9 +562,6 @@ graphID.nonID <- function(L, O) {
   return(HTC.nonID < sum(L))
 }
 
-
-
-
 #' Determine generic identifiability of a mixed graph.
 #'
 #' If directed part of input graph is cyclic then will check for generic
@@ -558,6 +573,9 @@ graphID.nonID <- function(L, O) {
 #'
 #' @inheritParams graphID
 #'
+#' @return The vector of nodes that could be determined to be generically
+#' identifiable.
+#'
 #' @references
 #' Foygel, R., Draisma, J., and Drton, M.  (2012) Half-trek criterion for
 #' generic identifiability of linear structural equation models.
@@ -566,11 +584,11 @@ graphID.nonID <- function(L, O) {
 #' @references
 #' {Drton}, M. and {Weihs}, L. (2015) Generic Identifiability of Linear
 #' Structural Equation Models by Ancestor Decomposition. arXiv 1504.02992
-graphID.genericID <- function(L, O, ILinv=0) {
+graphID.genericID <- function(L, O) {
   if (is.dag(graph.adjacency(L, mode="directed"))) {
     return(graphID.ancestral(L, O))
   } else {
-    return(graphID.HTC(L, O, ILinv))
+    return(graphID.HTC(L, O))
   }
 }
 
@@ -583,11 +601,13 @@ graphID.genericID <- function(L, O, ILinv=0) {
 #'
 #' @inheritParams graphID
 #'
+#' @return The vector of HTC-identifiable nodes.
+#'
 #' @references
 #' Foygel, R., Draisma, J., and Drton, M.  (2012) Half-trek criterion for
 #' generic identifiability of linear structural equation models.
 #' \emph{Ann. Statist.} 40(3): 1682-1713.
-graphID.HTC <- function(L, O, ILinv = 0) {
+graphID.HTC <- function(L, O) {
   m <- nrow(L)
   L <- (L != 0)
   diag(L) <- 0
@@ -615,12 +635,8 @@ graphID.HTC <- function(L, O, ILinv = 0) {
   #            and (2) edge from R(j)-out to target for all parents j of i
 
   Dependence.matrix <- O + diag(m)
-  if (is.matrix(ILinv)) {
-    Dependence.matrix <- Dependence.matrix %*% ILinv
-  } else {
-    for (i in 1:m) {
-      Dependence.matrix <- (Dependence.matrix + Dependence.matrix %*% L > 0)
-    }
+  for (i in 1:m) {
+    Dependence.matrix <- (Dependence.matrix + Dependence.matrix %*% L > 0)
   }
 
   Solved.nodes <- rep(0,m)
@@ -684,7 +700,7 @@ ancestors <- function(g, nodes) {
 #' the input nodes themselves.
 #'
 #' @param nodes the nodes in the graph of which to get the parents.
-#' @inheritParams parents
+#' @inheritParams ancestors
 #'
 #' @return a sorted vector of all parent nodes.
 parents <- function(g, nodes) {
@@ -703,7 +719,7 @@ parents <- function(g, nodes) {
 #' @inheritParams ancestors
 #'
 #' @return a sorted vector of all siblings of nodes.
-siblings = function(g, nodes) {
+siblings <- function(g, nodes) {
   if (vcount(g) == 0 || length(nodes) == 0) {
     return(numeric(0))
   }
@@ -720,7 +736,7 @@ siblings = function(g, nodes) {
 #' @inheritParams ancestors
 #'
 #' @return a sorted vector of all descendants of nodes.
-descendants = function(g, nodes) {
+descendants <- function(g, nodes) {
   if (vcount(g) == 0 || length(nodes) == 0) {
     return(numeric(0))
   }
@@ -738,11 +754,11 @@ descendants = function(g, nodes) {
 #' @param nodes the nodes in the graph of which to get the HTR nodes.
 #'
 #' @return a sorted list of all half-trek reachable nodes.
-htr = function(dG, bG, nodes) {
-  if (!is.directed(dG) || is.directed(bG)) {
+htr <- function(dG, bG, nodes) {
+  if (!is.directed(dG) || is.directed(bG) || vcount(dG) != vcount(bG)) {
     stop("dG is undirected or bG is directed.")
   }
-  if (vcount(g) == 0 || length(nodes) == 0) {
+  if (vcount(dG) == 0 || length(nodes) == 0) {
     return(numeric(0))
   }
   return(descendants(dG, siblings(bG, nodes)))
@@ -787,7 +803,8 @@ getMixedCompForNode <- function(dG, bG, subNodes, node) {
 }
 
 
-#' Find largest HT system with no sided intersection to a node.
+#' Size of largest HT system Y satisfying the HTC for a node v except perhaps
+#' having |parents(v)| < |Y|.
 #'
 #' For an input mixed graph H, constructs the Gflow graph as described in Foygel
 #' et al. (2012) for a subgraph G of H. A max flow algorithm is then run on
@@ -806,11 +823,13 @@ getMixedCompForNode <- function(dG, bG, subNodes, node) {
 #' trek system
 #' @inheritParams graphID
 #'
+#' @return See title.
+#'
 #' @references
 #' Foygel, R., Draisma, J., and Drton, M.  (2012) Half-trek criterion for
 #' generic identifiability of linear structural equation models.
 #' \emph{Ann. Statist.} 40(3): 1682-1713.
-getMaxFlow = function(L, O, allowedNodes, biNodes, inNodes, node) {
+getMaxFlow <- function(L, O, allowedNodes, biNodes, inNodes, node) {
   if (!(node %in% biNodes) || any(O[biNodes, inNodes] != 0)) {
     stop(paste("When getting max flow either some in-nodes were connected to",
                "some bi-nodes or node was not in biNodes."))
@@ -860,7 +879,6 @@ getMaxFlow = function(L, O, allowedNodes, biNodes, inNodes, node) {
   return(graph.maxflow(graph.adjacency(Cap.matrix), source=1, target=2)$value)
 }
 
-
 #' Determine generic identifiability of an acyclic mixed graph using ancestral
 #' decomposition.
 #'
@@ -871,6 +889,9 @@ getMaxFlow = function(L, O, allowedNodes, biNodes, inNodes, node) {
 #' @export
 #'
 #' @inheritParams graphID
+#'
+#' @return The vector of nodes that could be determined to be generically
+#' identifiable using the above algorithm.
 #'
 #' @references
 #' {Drton}, M. and {Weihs}, L. (2015) Generic Identifiability of Linear

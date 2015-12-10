@@ -4,7 +4,7 @@
 \alias{graphID.HTC}
 \title{Determines if a mixed graph is HTC-identifiable.}
 \usage{
-graphID.HTC(L, O, ILinv = 0)
+graphID.HTC(L, O)
 }
 \arguments{
 \item{L}{Adjacency matrix for the directed part of the path
@@ -12,6 +12,9 @@ diagram/mixed graph; an edge pointing from i to j is encoded as L[i,j]=1.}
 
 \item{O}{Adjacency matrix for the bidirected part of the path
 diagram/mixed graph.}
+}
+\value{
+The vector of HTC-identifiable nodes.
 }
 \description{
 Uses the half-trek criterion of Foygel, Draisma, and Drton (2015) to check

@@ -13,6 +13,10 @@ diagram/mixed graph; an edge pointing from i to j is encoded as L[i,j]=1.}
 \item{O}{Adjacency matrix for the bidirected part of the path
 diagram/mixed graph.}
 }
+\value{
+TRUE if the graph could be determined to be generically
+non-identifiable, FALSE if this test was inconclusive.
+}
 \description{
 Checks if a mixed graph is infinite-to-one using the half-trek criterion
 presented by Foygel, Draisma, and Drton (2012).

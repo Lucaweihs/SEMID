@@ -23,6 +23,10 @@ condition for generic identifiability is checked.}
 \item{test.nonID}{A logical value indicating whether or not a condition
 implying generic non-identifiability is checked.}
 }
+\value{
+A list containing named components of the results of various tests
+desired based on the input parameters.
+}
 \description{
 Calls the other functions that determine identifiability status.
 }

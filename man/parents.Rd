@@ -7,6 +7,8 @@
 parents(g, nodes)
 }
 \arguments{
+\item{g}{the graph (as an igraph).}
+
 \item{nodes}{the nodes in the graph of which to get the parents.}
 }
 \value{

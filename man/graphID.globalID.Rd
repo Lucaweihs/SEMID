@@ -13,6 +13,9 @@ diagram/mixed graph; an edge pointing from i to j is encoded as L[i,j]=1.}
 \item{O}{Adjacency matrix for the bidirected part of the path
 diagram/mixed graph.}
 }
+\value{
+TRUE if the graph was globally identifiable, FALSE otherwise.
+}
 \description{
 Checks for the global identifiability of a mixed graph using techniques
 presented in Drton, Foygel, Sullivant (2011).

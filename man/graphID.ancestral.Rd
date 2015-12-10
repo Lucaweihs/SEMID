@@ -14,6 +14,10 @@ diagram/mixed graph; an edge pointing from i to j is encoded as L[i,j]=1.}
 \item{O}{Adjacency matrix for the bidirected part of the path
 diagram/mixed graph.}
 }
+\value{
+The vector of nodes that could be determined to be generically
+identifiable using the above algorithm.
+}
 \description{
 For an input, acyclic, mixed graph attempts to determine if the graph is
 generically identifiable using decomposition by ancestral subsets. See

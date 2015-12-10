@@ -26,8 +26,18 @@ condition for generic identifiability is checked.}
 \item{test.nonID}{A logical value indicating whether or not a condition
 implying generic non-identifiability is checked.}
 }
+\value{
+A list with two named components:
+
+  1. Components - a list of lists. Each list represents one mixed Tian component
+      of the graph. Each list contains named components corresponding to which
+      nodes are in the component and results of various tests of
+      identifiability on the component (see the parameter descriptions).
+
+ 2. Decomp - true if a decomposition occured, false if not.
+}
 \description{
-Split a graph into bidirected connected components and solve each separately
+Split a graph into mixed Tiancomponents and solve each separately
 using the HTC.
 }
 

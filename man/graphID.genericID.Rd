@@ -4,7 +4,7 @@
 \alias{graphID.genericID}
 \title{Determine generic identifiability of a mixed graph.}
 \usage{
-graphID.genericID(L, O, ILinv = 0)
+graphID.genericID(L, O)
 }
 \arguments{
 \item{L}{Adjacency matrix for the directed part of the path
@@ -12,6 +12,10 @@ diagram/mixed graph; an edge pointing from i to j is encoded as L[i,j]=1.}
 
 \item{O}{Adjacency matrix for the bidirected part of the path
 diagram/mixed graph.}
+}
+\value{
+The vector of nodes that could be determined to be generically
+identifiable.
 }
 \description{
 If directed part of input graph is cyclic then will check for generic

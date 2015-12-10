@@ -2,7 +2,8 @@
 % Please edit documentation in R/graphID.R
 \name{getMaxFlow}
 \alias{getMaxFlow}
-\title{Find largest HT system with no sided intersection to a node.}
+\title{Size of largest HT system Y satisfying the HTC for a node v except perhaps
+having |parents(v)| < |Y|.}
 \usage{
 getMaxFlow(L, O, allowedNodes, biNodes, inNodes, node)
 }
@@ -23,6 +24,9 @@ part but are a parent of some node in the bidirected component.}
 
 \item{node}{the node (as an integer) for which the maxflow the largest half
 trek system}
+}
+\value{
+See title.
 }
 \description{
 For an input mixed graph H, constructs the Gflow graph as described in Foygel

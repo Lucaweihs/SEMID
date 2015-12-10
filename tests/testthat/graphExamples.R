@@ -1,3 +1,4 @@
+source("helperFunctions.R")
 graphExamples = list()
 
 ## Empty graph
@@ -318,3 +319,53 @@ O = t(matrix(
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 1, htcId = 1)))
+
+## Several examples where ancestor decomposition was seen to be helpful
+n = 6
+p = .1
+p1 = .2
+set.seed(176796)
+O = rConnectedAdjMatrix(n, p)
+L = rDirectedAdjMatrix(n, p1)
+graphExamples = c(graphExamples,
+                  list(list(L = L, O = O,
+                            globalId = 0, genId = 1, htcId = -1, ancId = 1)))
+set.seed(335911)
+O = rConnectedAdjMatrix(n, p)
+L = rDirectedAdjMatrix(n, p1)
+graphExamples = c(graphExamples,
+                  list(list(L = L, O = O,
+                            globalId = 0, genId = 1, htcId = -1, ancId = 1)))
+
+set.seed(762097)
+O = rConnectedAdjMatrix(n, p)
+L = rDirectedAdjMatrix(n, p1)
+graphExamples = c(graphExamples,
+                  list(list(L = L, O = O,
+                            globalId = 0, genId = 1, htcId = -1, ancId = 1)))
+
+n = 8
+p = .3
+p1 = .4
+set.seed(501)
+O = rConnectedAdjMatrix(n, p)
+L = rDirectedAdjMatrix(n, p1)
+graphExamples = c(graphExamples,
+                  list(list(L = L, O = O,
+                            globalId = 0, genId = 1, htcId = -1, ancId = 1)))
+
+n = 10
+p = .2
+p1 = .5
+set.seed(3178)
+O = rConnectedAdjMatrix(n, p)
+L = rDirectedAdjMatrix(n, p1)
+graphExamples = c(graphExamples,
+                  list(list(L = L, O = O,
+                            globalId = 0, genId = 1, htcId = -1, ancId = 1)))
+
+set.seed(5536)
+O = rConnectedAdjMatrix(n, p)
+L = rDirectedAdjMatrix(n, p1)
+sort(graphID(L, O, output.type="list")[[1]]$HTC.ID.nodes)
+sort(graphID.ancestral(L, O))
