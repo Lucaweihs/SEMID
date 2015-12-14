@@ -2,9 +2,9 @@
 
 export(getMixedCompForNode)
 export(graphID)
-export(graphID.HTC)
-export(graphID.ancestral)
+export(graphID.ancestralID)
 export(graphID.genericID)
 export(graphID.globalID)
-export(graphID.nonID)
+export(graphID.htcID)
+export(graphID.nonHtcID)
 import(igraph)

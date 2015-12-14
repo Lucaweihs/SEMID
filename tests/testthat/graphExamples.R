@@ -367,5 +367,6 @@ graphExamples = c(graphExamples,
 set.seed(5536)
 O = rConnectedAdjMatrix(n, p)
 L = rDirectedAdjMatrix(n, p1)
-sort(graphID(L, O, output.type="list")[[1]]$HTC.ID.nodes)
-sort(graphID.ancestral(L, O))
+graphExamples = c(graphExamples,
+                  list(list(L = L, O = O,
+                            globalId = 0, genId = -1, htcId = -1, ancId = -1)))

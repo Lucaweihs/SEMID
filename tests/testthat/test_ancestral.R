@@ -205,7 +205,7 @@ test_that("getMaxFlow function works as expected.", {
   expect_equal(getMaxFlow(L1, O1, allowedNodes=c(2,6), biNodes=1:6, inNodes=c(), node=5), 1)
 })
 
-test_that("graphID.ancestral function works as expected.", {
+test_that("graphID.ancestralID function works as expected.", {
   # Random test
   set.seed(23231)
   ps = c(.2, .4, .6, .8)
@@ -216,9 +216,9 @@ test_that("graphID.ancestral function works as expected.", {
       for(i in 1:sims) {
         L = rDirectedAdjMatrix(n, p)
         O = rConnectedAdjMatrix(n, p)
-        gia = graphID.ancestral(L, O)
-        gig = graphID.HTC(L, O)
-        gin = graphID.nonID(L, O)
+        gia = graphID.ancestralID(L, O)
+        gig = graphID.htcID(L, O)
+        gin = graphID.nonHtcID(L, O)
         expect_true(length(gia) >= length(gig))
         expect_true(all(gig %in% gia))
         expect_true((length(gia) != n) || !gin)
@@ -230,5 +230,5 @@ test_that("graphID.ancestral function works as expected.", {
                              ncol=2, byrow=T))
   bG = graph.edgelist(matrix(c(1,6, 1,4, 2,3, 2,5, 2,6),
                              ncol=2, byrow=T), directed=F)
-  expect_equal(as.numeric(sort(graphID.ancestral(getAdjMat(dG), getAdjMat(bG)))), 1:6)
+  expect_equal(as.numeric(sort(graphID.ancestralID(getAdjMat(dG), getAdjMat(bG)))), 1:6)
 })

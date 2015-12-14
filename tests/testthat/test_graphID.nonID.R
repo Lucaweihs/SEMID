@@ -3,7 +3,7 @@ context("Testing that half-trek criterion function for generic non-identifiabili
 
 source("graphExamples.R")
 
-test_that("graphID.nonID returns correct value for known examples.", {
+test_that("graphID.nonHtcID returns correct value for known examples.", {
   for (i in 1:length(graphExamples)) {
     graphExample = graphExamples[[i]]
     L = graphExample$L
@@ -11,7 +11,7 @@ test_that("graphID.nonID returns correct value for known examples.", {
     htcId = graphExample$htcId
     m = nrow(L)
 
-    result = graphID.nonID(L, O)
+    result = graphID.nonHtcID(L, O)
     if (htcId == 0) {
       expect_true(result)
     } else {

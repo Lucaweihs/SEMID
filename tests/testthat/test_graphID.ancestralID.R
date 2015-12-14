@@ -1,9 +1,9 @@
 library(SEMID)
-context("Testing known examples on graphID.ancestral.")
+context("Testing known examples on graphID.ancestralID.")
 
 source("graphExamples.R")
 
-test_that("graphID.ancestral returns correct value for known examples.", {
+test_that("graphID.ancestralID returns correct value for known examples.", {
   for (i in 1:length(graphExamples)) {
     graphExample = graphExamples[[i]]
     L = graphExample$L
@@ -15,7 +15,7 @@ test_that("graphID.ancestral returns correct value for known examples.", {
       next
     }
 
-    result = graphID.ancestral(L, O)
+    result = graphID.ancestralID(L, O)
 
     if (!is.null(ancId)) {
       if (ancId == 1) {
@@ -30,7 +30,7 @@ test_that("graphID.ancestral returns correct value for known examples.", {
     } else if (htcId == 1) {
       expect_equal(sort(result), 1:m)
     } else {
-      expect_true(all(graphID.HTC(L, O) %in% result))
+      expect_true(all(graphID.htcID(L, O) %in% result))
     }
   }
 })

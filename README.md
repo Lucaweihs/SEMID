@@ -9,7 +9,7 @@ which allows one to perform multiple tests simultaneously and formats the output
 nicely. The different tests of identifiability can, however, also be accessed
 directly. In particular we have the following functions:
 
-* `graphID.HTC` and `graphID.nonID` which implement the two algorithms from
+* `graphID.htcID` and `graphID.nonHtcID` which implement the two algorithms from
 
  Drton, M., Foygel, R., and Sullivant, S.  (2011) Global
 identifiability of linear structural equation models. _Ann. Statist._
@@ -21,7 +21,7 @@ identifiability of linear structural equation models. _Ann. Statist._
 linear structural equation models. _Ann. Statist._  39 (2011), no. 2,
 865--886.
 
-* `graphID.ancestral` implementing the algorithm from
+* `graphID.ancestralID` implementing the algorithm from
 
  Drton, M. and Weihs, L. (2015) Generic Identifiability of Linear
 Structural Equation Models by Ancestor Decomposition. arXiv 1504.02992

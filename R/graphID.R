@@ -397,7 +397,7 @@ graphID.main <- function(L, O, test.globalID = TRUE, test.genericID = TRUE,
   Output$acyclic <- (max(ILinv + t(ILinv) - diag(m)) == 1)
 
   if (test.genericID) {
-    Output$HTC.ID.nodes <- graphID.HTC(L,O)
+    Output$HTC.ID.nodes <- graphID.htcID(L,O)
 
     if (length(Output$HTC.ID.nodes) < m) {
       Output$GenericID <- FALSE
@@ -405,7 +405,7 @@ graphID.main <- function(L, O, test.globalID = TRUE, test.genericID = TRUE,
         Output$GlobalID <- FALSE
       }
       if (test.nonID) {
-        Output$NonID <- graphID.nonID(L,O)
+        Output$NonID <- graphID.nonHtcID(L,O)
       }
     } else {
       Output$GenericID <- TRUE
@@ -418,7 +418,7 @@ graphID.main <- function(L, O, test.globalID = TRUE, test.genericID = TRUE,
     }
   } else {
     if (test.nonID) {
-      Output$NonID <- graphID.nonID(L,O)
+      Output$NonID <- graphID.nonHtcID(L,O)
       if (!Output$NonID) {
         if (Output$acyclic && test.globalID) {
           Output$GlobalID <- graphID.globalID(L,O)
@@ -505,7 +505,7 @@ graphID.globalID <- function(L, O) {
 #' Foygel, R., Draisma, J., and Drton, M.  (2012) Half-trek criterion for
 #' generic identifiability of linear structural equation models.
 #' \emph{Ann. Statist.} 40(3): 1682-1713.
-graphID.nonID <- function(L, O) {
+graphID.nonHtcID <- function(L, O) {
   m <- nrow(L)
   L <- (L != 0)
   diag(L) <- 0
@@ -589,9 +589,9 @@ graphID.nonID <- function(L, O) {
 #' Structural Equation Models by Ancestor Decomposition. arXiv 1504.02992
 graphID.genericID <- function(L, O) {
   if (is.dag(graph.adjacency(L, mode = "directed"))) {
-    return(graphID.ancestral(L, O))
+    return(graphID.ancestralID(L, O))
   } else {
-    return(graphID.HTC(L, O))
+    return(graphID.htcID(L, O))
   }
 }
 
@@ -610,7 +610,7 @@ graphID.genericID <- function(L, O) {
 #' Foygel, R., Draisma, J., and Drton, M.  (2012) Half-trek criterion for
 #' generic identifiability of linear structural equation models.
 #' \emph{Ann. Statist.} 40(3): 1682-1713.
-graphID.HTC <- function(L, O) {
+graphID.htcID <- function(L, O) {
   m <- nrow(L)
   L <- (L != 0)
   diag(L) <- 0
@@ -903,7 +903,7 @@ getMaxFlow <- function(L, O, allowedNodes, biNodes, inNodes, node) {
 #' @references
 #' {Drton}, M. and {Weihs}, L. (2015) Generic Identifiability of Linear
 #' Structural Equation Models by Ancestor Decomposition. arXiv 1504.02992
-graphID.ancestral <- function(L, O) {
+graphID.ancestralID <- function(L, O) {
   m <- nrow(L)
   L <- (L != 0)
   diag(L) <- 0
