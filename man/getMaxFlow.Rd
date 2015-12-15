@@ -9,10 +9,15 @@ getMaxFlow(L, O, allowedNodes, biNodes, inNodes, node)
 }
 \arguments{
 \item{L}{Adjacency matrix for the directed part of the path
-diagram/mixed graph; an edge pointing from i to j is encoded as L[i,j]=1.}
+diagram/mixed graph; an edge pointing from i to j is encoded as L[i,j]=1 and
+the lack of an edge between i and j is encoded as L[i,j]=0. There should be
+no directed self loops, i.e. no i such that L[i,i]=1.}
 
-\item{O}{Adjacency matrix for the bidirected part of the path
-diagram/mixed graph.}
+\item{O}{Adjacency matrix for the bidirected part of the path diagram/mixed
+graph. Edges are encoded as for the L parameter. Again there should be no
+self loops. Also this matrix will be coerced to be symmetric so it is only
+necessary to specify an edge once, i.e. if O[i,j]=1 you may, but are not
+required to, also have O[j,i]=1.}
 
 \item{allowedNodes}{the set of allowed nodes.}
 

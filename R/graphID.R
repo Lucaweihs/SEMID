@@ -1,3 +1,29 @@
+#' A helper function to validate input matrices.
+#'
+#' This helper function validates that the two input matrices, L and O, are of
+#' the appropriate form to be interpreted by the other functions. In particular
+#' they should be square matrices of 1's and 0's with all 0's along their
+#' diagonals. We do not require O to be symmetric here.
+#'
+#' @param L See above description.
+#' @param O See above description.
+#'
+#' @return This function has no return value.
+validateMatrices = function(L, O) {
+  if (!is.matrix(L) || !is.matrix(O)) {
+    stop("L and O must be matrices.")
+  } else if (length(unique(c(dim(L), dim(O)))) != 1) {
+    stop("L and O must both be square matrices of the same dimensions.")
+  }
+  t1 = all(L %in% c(0, 1))
+  t2 = all(O %in% c(0, 1))
+  if (!t1 || !t2) {
+    stop("L and O must contain only 1's and 0's.")
+  } else if (any(diag(L) != 0) || any(diag(O) != 0)) {
+    stop("L and O must have 0's along their diagonals.")
+  }
+}
+
 #' Identifiability of linear structural equation models.
 #'
 #' This function checks global and generic identifiability of linear
@@ -8,9 +34,14 @@
 #' @export
 #'
 #' @param L Adjacency matrix for the directed part of the path
-#' diagram/mixed graph; an edge pointing from i to j is encoded as L[i,j]=1.
-#' @param O Adjacency matrix for the bidirected part of the path
-#' diagram/mixed graph.
+#' diagram/mixed graph; an edge pointing from i to j is encoded as L[i,j]=1 and
+#' the lack of an edge between i and j is encoded as L[i,j]=0. There should be
+#' no directed self loops, i.e. no i such that L[i,i]=1.
+#' @param O Adjacency matrix for the bidirected part of the path diagram/mixed
+#' graph. Edges are encoded as for the L parameter. Again there should be no
+#' self loops. Also this matrix will be coerced to be symmetric so it is only
+#' necessary to specify an edge once, i.e. if O[i,j]=1 you may, but are not
+#' required to, also have O[j,i]=1.
 #' @param output.type A character string indicating whether output is
 #' printed ('matrix'), saved to a file ('file'), or returned as a list
 #' ('list') for further processing in R.
@@ -449,12 +480,13 @@ graphID.main <- function(L, O, test.globalID = TRUE, test.genericID = TRUE,
 #' linear structural equation models. \emph{Ann. Statist.}  39 (2011), no. 2,
 #' 865--886.
 graphID.globalID <- function(L, O) {
+  m <- nrow(L)
+  validateMatrices(L, O)
+  O <- 1 * ((O + t(O)) != 0)
+
   if (!is.dag(graph.adjacency(L))) {
     return(F)
   }
-  m <- dim(L)[1]
-  L <- (L != 0) ; diag(L) <- 0
-  O <- O + t(O) ; O <- (O != 0) ; diag(O) <- 0
 
   Global.ID = TRUE
   i <- 0
@@ -507,11 +539,8 @@ graphID.globalID <- function(L, O) {
 #' \emph{Ann. Statist.} 40(3): 1682-1713.
 graphID.nonHtcID <- function(L, O) {
   m <- nrow(L)
-  L <- (L != 0)
-  diag(L) <- 0
-  O <- O + t(O)
-  O <- (O != 0)
-  diag(O) <- 0
+  validateMatrices(L, O)
+  O <- 1 * ((O + t(O)) != 0)
 
   # 1 & 2 = source & target
   # 2 + {1,...,N} = L{i_n,j_n} for the n-th nonsibling pair, n=1,...,N
@@ -612,11 +641,8 @@ graphID.genericID <- function(L, O) {
 #' \emph{Ann. Statist.} 40(3): 1682-1713.
 graphID.htcID <- function(L, O) {
   m <- nrow(L)
-  L <- (L != 0)
-  diag(L) <- 0
-  O <- O + t(O)
-  O <- (O != 0)
-  diag(O) <- 0
+  validateMatrices(L, O)
+  O <- 1 * ((O + t(O)) != 0)
 
   # 1 & 2 = source & target
   # 2 + {1,...,m} = L(i) for i=1,...,m
@@ -776,8 +802,6 @@ htr <- function(dG, bG, nodes) {
 #' H on the nodes A. This function returns the mixed component of GA containing
 #' a specified node.
 #'
-#' @export
-#'
 #' @param dG a directed graph representing the directed part of the mixed graph.
 #' @param bG an undirected graph representing the undirected part of the mixed
 #'        graph.
@@ -905,10 +929,8 @@ getMaxFlow <- function(L, O, allowedNodes, biNodes, inNodes, node) {
 #' Structural Equation Models by Ancestor Decomposition. arXiv 1504.02992
 graphID.ancestralID <- function(L, O) {
   m <- nrow(L)
-  L <- (L != 0)
-  diag(L) <- 0
-  O <- (O + t(O)) != 0
-  diag(O) <- 0
+  validateMatrices(L, O)
+  O <- 1 * ((O + t(O)) != 0)
 
   dG = graph.adjacency(L)
   newOrder = as.numeric(topological.sort(dG))
