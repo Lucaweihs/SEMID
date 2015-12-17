@@ -8,5 +8,6 @@
 #' documentation.
 #'
 #' @import igraph
+#' @import utils
 "_PACKAGE"
 #> [1] "_PACKAGE"
