@@ -1,5 +1,5 @@
 ## Test environments
-* local OS X install, R 3.2.2
+* local OS X install, R 3.2.3
 * Using devtools::build_win()
 
 ## R CMD check results
