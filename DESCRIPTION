@@ -4,7 +4,7 @@ Date: 2015-12-01
 Title: Identifiability of linear structural equation models
 Author: Rina Foygel Barber <rina@uchicago.edu>, Mathias Drton <md5@uw.edu>, Luca
     Weihs <lucaw@uw.edu>.
-Maintainer: Mathias Drton <md5@uw.edu>, Luca Weihs <lucaw@uw.edu>
+Maintainer: Mathias Drton <md5@uw.edu>
 Depends:
     R (>= 2.10.1),
     igraph
