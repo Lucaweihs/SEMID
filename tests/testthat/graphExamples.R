@@ -326,20 +326,20 @@ p = .1
 p1 = .2
 set.seed(176796)
 O = rConnectedAdjMatrix(n, p)
-L = rDirectedAdjMatrix(n, p1)
+L = rAcyclicDirectedAdjMatrix(n, p1)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 1, htcId = -1, ancId = 1)))
 set.seed(335911)
 O = rConnectedAdjMatrix(n, p)
-L = rDirectedAdjMatrix(n, p1)
+L = rAcyclicDirectedAdjMatrix(n, p1)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 1, htcId = -1, ancId = 1)))
 
 set.seed(762097)
 O = rConnectedAdjMatrix(n, p)
-L = rDirectedAdjMatrix(n, p1)
+L = rAcyclicDirectedAdjMatrix(n, p1)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 1, htcId = -1, ancId = 1)))
@@ -349,7 +349,7 @@ p = .3
 p1 = .4
 set.seed(501)
 O = rConnectedAdjMatrix(n, p)
-L = rDirectedAdjMatrix(n, p1)
+L = rAcyclicDirectedAdjMatrix(n, p1)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 1, htcId = -1, ancId = 1)))
@@ -359,14 +359,14 @@ p = .2
 p1 = .5
 set.seed(3178)
 O = rConnectedAdjMatrix(n, p)
-L = rDirectedAdjMatrix(n, p1)
+L = rAcyclicDirectedAdjMatrix(n, p1)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 1, htcId = -1, ancId = 1)))
 
 set.seed(5536)
 O = rConnectedAdjMatrix(n, p)
-L = rDirectedAdjMatrix(n, p1)
+L = rAcyclicDirectedAdjMatrix(n, p1)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = -1, htcId = -1, ancId = -1)))

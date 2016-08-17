@@ -540,6 +540,10 @@ graphID.globalID <- function(L, O) {
 graphID.nonHtcID <- function(L, O) {
   m <- nrow(L)
   validateMatrices(L, O)
+  if (m == 1) {
+    # Always identifiable in this case
+    return(F)
+  }
   O <- 1 * ((O + t(O)) != 0)
 
   # 1 & 2 = source & target

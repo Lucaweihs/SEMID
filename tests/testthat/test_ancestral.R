@@ -1,27 +1,6 @@
 library(SEMID)
 context("Components related to generic identifiability by ancestor decomposition.")
 
-rUndirectedAdjMat = function(n, p) {
-  mat = matrix(runif(n^2), ncol=n) < p
-  mat = mat * upper.tri(mat)
-  return(mat + t(mat))
-}
-rConnectedAdjMatrix = function(n, p) {
-  weights = runif(n*(n-1)/2)
-  g = minimum.spanning.tree(graph.full(n), weights=weights)
-  adjMatrix = as.matrix(get.adjacency(g))
-  adjMatrix = (upper.tri(matrix(0,n,n)) & matrix(sample(c(T, F), n^2, replace=T, prob=c(p, 1-p)), ncol=n)) | adjMatrix
-  adjMatrix = 1*(adjMatrix | t(adjMatrix))
-  return(adjMatrix)
-}
-rDirectedAdjMatrix = function(n,p) {
-  return(1*(upper.tri(matrix(0,n,n)) & matrix(sample(c(T, F), n^2, replace=T, prob=c(p, 1-p)), ncol=n)))
-}
-rDirectedAdjMatrix = function(n, p) {
-  return(1*(upper.tri(matrix(0,n,n)) & matrix(sample(c(T, F), n^2, replace=T, prob=c(p, 1-p)), ncol=n)))
-}
-getAdjMat = function(g) { as.matrix(get.adjacency(g)) }
-
 test_that("ancestors function works as expected.", {
   ## Output should be empty
   expect_equal(ancestors(graph.empty(), c()), numeric(0))
@@ -214,7 +193,7 @@ test_that("graphID.ancestralID function works as expected.", {
   for(p in ps) {
     for(n in ns) {
       for(i in 1:sims) {
-        L = rDirectedAdjMatrix(n, p)
+        L = rAcyclicDirectedAdjMatrix(n, p)
         O = rConnectedAdjMatrix(n, p)
         gia = graphID.ancestralID(L, O)
         gig = graphID.htcID(L, O)
