@@ -1,57 +1,3 @@
-createHtrGraph = function(L, O) {
-  m = nrow(L)
-  htrGraphAdjMatrix = matrix(0, 2 * m, 2 * m)
-  for (i in 1:m) {
-    # Left i points to right i
-    htrGraphAdjMatrix[i, i + m] = 1
-    for (j in 1:m) {
-      if (O[i,j] == 1) {
-        # If bidirected edge from i to j then
-        # left i should point to right j
-        htrGraphAdjMatrix[i, j + m] = 1
-      }
-
-      if (L[i,j] == 1) {
-        # If directed edge from i to j then
-        # right i should point to right j
-        htrGraphAdjMatrix[i + m, j + m] = 1
-      }
-    }
-  }
-  return(graph.adjacency(htrGraphAdjMatrix, mode = "directed"))
-}
-
-flowGraphWithVertexCaps = function(L, O, vertexCap = 1) {
-  m = nrow(L)
-  adjMat = matrix(0, 3 * m + 2, 3 * m + 2)
-  for (i in 1:m) {
-    # Left-i points to right-i-in, right-i-in points to right-i-out
-    adjMat[i, i + m] = 1 # Left-i -> right-i-in
-    adjMat[i + m, i + 2 * m] = 1 # Right-i-in -> right-i-out
-
-    for (j in 1:m) {
-      if (i != j) {
-        if (O[i,j] == 1) {
-          # If bidirected edge from i to j then
-          # left-i should point to right-j-in
-          adjMat[i, j + m] = 1
-        }
-
-        if (L[i,j] == 1) {
-          # If directed edge from i to j then
-          # right-i-out should point to right-j-in
-          adjMat[i + 2 * m, j + m] = 1
-        }
-      }
-    }
-  }
-  adjMat[3 * m + 1, 1:m] = 1 # Source points to all lefts
-  adjMat[(2 * m + 1):(3 * m), 3 * m + 2] = 1 # All right-outs point to target
-  g = graph.adjacency(adjMat, mode = "directed")
-  E(g)$capacity = vertexCap
-  return(list(g = g, source = 3 * m + 1, target = 3 * m + 2))
-}
-
 createIdentifierBaseCase <- function(L) {
   return(function(Sigma) {
     Lambda <- matrix(NA, nrow(L), nrow(L))
@@ -97,93 +43,142 @@ createLinearIdentifierFunc <- function(idFunc, sources, targets, node, sourceHtr
   )
 }
 
+
+#' A helper function for edgewiseID that does one step through all the nodes
+#' and tries to identify new edge coefficients.
+#'
+#' @return a list
+#' @export
+linearIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
+                              identifier) {
+  changeFlag = F
+  m = mixedGraph$numNodes()
+  for (i in 1:m) {
+    unsolved = unsolvedParents[[i]]
+    if (length(unsolved) != 0) {
+      allowedNodesTrueFalse = logical(m)
+      for (j in 1:m) {
+        if (i != j &&
+            !mixedGraph$isSibling(i,j) &&
+            length(intersect(mixedGraph$htrFrom(j), unsolved)) != 0 &&
+            length(intersect(mixedGraph$htrFrom(i), unsolvedParents[[j]])) == 0) {
+          allowedNodesTrueFalse[j] = TRUE
+        }
+      }
+      if (all(!allowedNodesTrueFalse)) {
+        next
+      }
+      allowedNodes = which(allowedNodesTrueFalse)
+
+      subsetFound = F
+      for (k in length(unsolved):1) {
+        if (length(unsolved) == 1) {
+          # Silly conditional required because the combn function
+          # interprets inputs of size 1 as a length rather than an as
+          # a vector from which to get subsets
+          subsets = list(unsolved)
+        } else {
+          subsets = combn(unsolved, k, simplify = F)
+        }
+        for (subset in subsets) {
+          allowedForSubsetTrueFalse = logical(length(allowedNodes))
+          for (l in 1:length(allowedNodes)) {
+            a = allowedNodes[l]
+            allowedForSubsetTrueFalse[l] = all(intersect(mixedGraph$htrFrom(a),
+                                                         unsolved) %in% subset)
+          }
+          allowedForSubset = allowedNodes[allowedForSubsetTrueFalse]
+          if (length(allowedForSubset) == 0) {
+            next
+          }
+          halfTrekSystemResult = mixedGraph$getHalfTrekSystem(allowedForSubset,
+                                                              subset)
+          if (halfTrekSystemResult$systemExists) {
+            changeFlag = T
+            subsetFound = T
+            activeFrom = halfTrekSystemResult$activeFrom
+            identifier = createLinearIdentifierFunc(identifier,
+                                                    activeFrom,
+                                                    subset,
+                                                    i,
+                                                    lapply(activeFrom, function(x) {
+                                                      intersect(mixedGraph$htrFrom(i),
+                                                                mixedGraph$allParents(x))
+                                                    }))
+            solvedParents[[i]] = sort(c(subset, solvedParents[[i]]))
+            unsolvedParents[[i]] = setdiff(unsolved, subset)
+            break
+          }
+        }
+        if (subsetFound) {
+          break
+        }
+      }
+    }
+  }
+  return(list(changeFlag = changeFlag, unsolvedParents = unsolvedParents,
+              solvedParents = solvedParents, identifier = identifier))
+}
+
+# trekSeparationIdentifyStep = function(env, maxSubsetSize) {
+#   changeFlag = F
+#   m = nrow(O)
+#   for (i in 1:m) {
+#     unsolved = env$unsolvedParents[[i]]
+#     if (length(unsolved) != 0) {
+#       for (j in unsolved) {
+#         edgeIdentified = F
+#         for (k in 1:min(length(unsolved), m - 1)) {
+#           if (m == 2) {
+#             subsets = list(3 - i)
+#           } else {
+#             subsets = combn(setdiff(1:m, i), k, simplify = F)
+#           }
+#
+#           for (subset in subsets) {
+#             if (T) {# TODO
+#               edgeIdentified = T
+#               env$identifier = createTrekSeparationIdentifier(
+#                 env$identifier,
+#                 # TODO)
+#                 env$solvedParents[[i]] = sort(c(subset, env$solvedParents[[i]]))
+#                 env$unsolvedParents[[i]] = setdiff(unsolved, subset)
+#                 break
+#             }
+#           }
+#         }
+#       }
+#     }
+#   }
+#   return(changeFlag)
+# }
+
+#' Edge-wise identification
+#'
+#' @inheritParams graphID
+#'
+#' @return a list
+#' @export
 edgewiseID = function(L, O) {
   validateMatrices(L, O)
   O = 1 * ((O + t(O)) != 0)
   diag(O) = 0
   m = nrow(L)
 
-  htrGraph = createHtrGraph(L, O)
-  dirGraph = graph.adjacency(L, mode = "directed")
+  mixedGraph = MixedGraph(L, O)
 
-  htr = neighborhood(htrGraph, order = 2 * m, nodes = 1:m, mode = "out", mindist = 1)
-  unsolvedParents = neighborhood(dirGraph, order = 1, nodes = 1:m, mode = "in", mindist = 1)
-  parents = unsolvedParents
-  for (i in 1:m) {
-    htr[[i]] = as.numeric(htr[[i]]) - m
-    unsolvedParents[[i]] = as.numeric(unsolvedParents[[i]])
-    parents[[i]] = unsolvedParents[[i]]
-  }
+  unsolvedParents = lapply(1:m, function(node) { mixedGraph$allParents(node) })
 
-  flowGraphList = flowGraphWithVertexCaps(L, O, 1)
-  flowGraph = flowGraphList$g
-  s = flowGraphList$source
-  t = flowGraphList$target
-  sOutEdgeIds = get.edge.ids(flowGraph, as.numeric(rbind(rep(s, m), 1:m)))
-  tInEdgeIds = get.edge.ids(flowGraph, as.numeric(rbind((2 * m + 1):(3 * m), rep(t, m))))
   identifier = createIdentifierBaseCase(L)
   changeFlag = T
   solvedParents = rep(list(numeric(0)), m)
   while (changeFlag) {
-    changeFlag = F
-    for (i in 1:m) {
-      unsolved = unsolvedParents[[i]]
-      if (length(unsolved) != 0) {
-        allowedNodes = logical(m)
-        for (j in 1:m) {
-          if (i != j &&
-              O[i,j] != 1 &&
-              length(intersect(htr[[j]], unsolved)) != 0 &&
-              length(intersect(htr[[i]], unsolvedParents[[j]])) == 0) {
-            allowedNodes[j] = TRUE
-          }
-        }
-        if (all(!allowedNodes)) {
-          next
-        }
-
-        subsetFound = F
-        for (k in length(unsolved):1) {
-          if (length(unsolved) == 1) {
-            # Silly conditional required because the combn function
-            # interprets inputs of size 1 as a length rather than an as
-            # a vector from which to get subsets
-            subsets = list(unsolved)
-          } else {
-            subsets = combn(unsolved, k, simplify = F)
-          }
-          for (subset in subsets) {
-            E(flowGraph)$capacity[sOutEdgeIds] = 0
-            for (a in which(allowedNodes)) {
-              if (all(intersect(htr[[a]], unsolved) %in% subset)) {
-                E(flowGraph)$capacity[sOutEdgeIds[a]] = 1
-              }
-            }
-            E(flowGraph)$capacity[tInEdgeIds] = 0
-            E(flowGraph)$capacity[tInEdgeIds[subset]] = 1
-            flowResult = graph.maxflow(flowGraph, s, t)
-            if (flowResult$value == k) {
-              changeFlag = T
-              subsetFound = T
-              sources = which(flowResult$flow[sOutEdgeIds] == 1)
-              identifier = createLinearIdentifierFunc(identifier,
-                                                      sources,
-                                                      subset,
-                                                      i,
-                                                      lapply(sources, function(x) {
-                                                        intersect(htr[[i]], parents[[x]])
-                                                      }))
-              solvedParents[[i]] = sort(c(subset, solvedParents[[i]]))
-              unsolvedParents[[i]] = setdiff(unsolved, subset)
-              break
-            }
-          }
-          if (subsetFound) {
-            break
-          }
-        }
-      }
-    }
+    idResult = linearIdentifyStep(mixedGraph, unsolvedParents,
+                                  solvedParents, identifier)
+    changeFlag = idResult$changeFlag
+    unsolvedParents = idResult$unsolvedParents
+    solvedParents = idResult$solvedParents
+    identifier = idResult$identifier
   }
 
   return(list(solvedParents = solvedParents,

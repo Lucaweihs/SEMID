@@ -484,7 +484,7 @@ graphID.globalID <- function(L, O) {
   validateMatrices(L, O)
   O <- 1 * ((O + t(O)) != 0)
 
-  if (!is.dag(graph.adjacency(L))) {
+  if (!is.dag(igraph::graph.adjacency(L))) {
     return(F)
   }
 
@@ -498,7 +498,7 @@ graphID.globalID <- function(L, O) {
       change <- 0
       S.old <- S
       for (s in setdiff(S.old, i)) {
-        if (graph.maxflow(graph.adjacency(L), source = s,
+        if (graph.maxflow(igraph::graph.adjacency(L), source = s,
                           target = i)$value == 0) {
           S <- setdiff(S, s)
           change <- 1
@@ -506,7 +506,7 @@ graphID.globalID <- function(L, O) {
       }
       S.old <- S
       for (s in setdiff(S.old, i)) {
-        if (graph.maxflow(graph.adjacency(O, mode = 'undirected'),
+        if (graph.maxflow(igraph::graph.adjacency(O, mode = 'undirected'),
                           source = s, target = i)$value == 0) {
           S <- setdiff(S, s)
           change <- 1
@@ -594,7 +594,7 @@ graphID.nonHtcID <- function(L, O) {
   }
 
   HTC.nonID <-
-    graph.maxflow(graph.adjacency(Cap.matrix), source = 1, target = 2)$value
+    graph.maxflow(igraph::graph.adjacency(Cap.matrix), source = 1, target = 2)$value
   return(HTC.nonID < sum(L))
 }
 
@@ -621,7 +621,7 @@ graphID.nonHtcID <- function(L, O) {
 #' {Drton}, M. and {Weihs}, L. (2015) Generic Identifiability of Linear
 #' Structural Equation Models by Ancestor Decomposition. arXiv 1504.02992
 graphID.genericID <- function(L, O) {
-  if (is.dag(graph.adjacency(L, mode = "directed"))) {
+  if (is.dag(igraph::graph.adjacency(L, mode = "directed"))) {
     return(graphID.ancestralID(L, O))
   } else {
     return(graphID.htcID(L, O))
@@ -691,7 +691,7 @@ graphID.htcID <- function(L, O) {
       Cap.matrix[2 + 2*m + which(L[,i] == 1), 2] <- 1
 
       flow <-
-        graph.maxflow(graph.adjacency(Cap.matrix), source = 1, target = 2)$value
+        graph.maxflow(igraph::graph.adjacency(Cap.matrix), source = 1, target = 2)$value
 
       if (flow == sum(L[,i])) {
         change <- 1
@@ -910,8 +910,8 @@ getMaxFlow <- function(L, O, allowedNodes, biNodes, inNodes, node) {
   Cap.matrix[1, 2 + allowedNodes] = 1
   Cap.matrix[2 + 2*m + which(L[,node] == 1), 2] = 1
 
-  return(graph.maxflow(graph.adjacency(Cap.matrix),
-                       source = 1, target = 2)$value)
+  return(igraph::graph.maxflow(igraph::graph.adjacency(Cap.matrix),
+                               source = 1, target = 2)$value)
 }
 
 #' Determine generic identifiability of an acyclic mixed graph using ancestral
@@ -936,13 +936,13 @@ graphID.ancestralID <- function(L, O) {
   validateMatrices(L, O)
   O <- 1 * ((O + t(O)) != 0)
 
-  dG = graph.adjacency(L)
+  dG = igraph::graph.adjacency(L)
   newOrder = as.numeric(topological.sort(dG))
   L = L[newOrder, newOrder]
   O = O[newOrder, newOrder]
 
-  dG = graph.adjacency(L)
-  bG = graph.adjacency(O)
+  dG = igraph::graph.adjacency(L)
+  bG = igraph::graph.adjacency(O)
   V(dG)$names = 1:m
   V(bG)$names = 1:m
 

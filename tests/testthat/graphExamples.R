@@ -285,12 +285,12 @@ graphExamples = c(graphExamples,
                             tianId = 1)))
 
 ## Sink node marginalization example from ancestral decomposition paper
-dG = graph.edgelist(matrix(c(1,2, 1,3, 1,6, 2,3, 2,4, 2,5, 2,6, 3,4, 4,5),
+dG = igraph::graph.edgelist(matrix(c(1,2, 1,3, 1,6, 2,3, 2,4, 2,5, 2,6, 3,4, 4,5),
                            ncol=2, byrow=T))
-bG = graph.edgelist(matrix(c(1,6, 1,4, 2,3, 2,5, 2,6),
+bG = igraph::graph.edgelist(matrix(c(1,6, 1,4, 2,3, 2,5, 2,6),
                            ncol=2, byrow=T), directed=F)
-L = as.matrix(get.adjacency(dG))
-O = as.matrix(get.adjacency(bG))
+L = as.matrix(igraph::get.adjacency(dG))
+O = as.matrix(igraph::get.adjacency(bG))
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 1, htcId = -1,

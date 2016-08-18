@@ -6,8 +6,9 @@ Author: Rina Foygel Barber <rina@uchicago.edu>, Mathias Drton <md5@uw.edu>, Luca
     Weihs <lucaw@uw.edu>.
 Maintainer: Mathias Drton <md5@uw.edu>
 Depends:
-    R (>= 2.10.1),
-    igraph
+    R.oo (>= 1.20.0),
+Imports:
+    igraph (>= 1.0.1)
 Description: Provides routines to check identifiability or non-identifiability
     of linear structural equation models as described in Drton, Foygel &
     Sullivant (Ann. Statist., 2011) and Foygel, Draisma & Drton (Ann. Statist.,
