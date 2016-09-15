@@ -11,16 +11,17 @@ solvedParentsToIndexMat = function(solvedParents) {
       next
     }
     mat[k:(k + length(solved) - 1),] = cbind(solved, rep(i, length(solved)))
+    k = k + 1
   }
   return(mat)
 }
 
 test_that("edgewiseID function works as expected.", {
   # Random test
-  set.seed(23231)
-  ps = c(.4, .6)
-  sims = 20
-  ns = c(2, 6, 10)
+  set.seed(2323)
+  ps = c(.3, .4)
+  sims = 10
+  ns = c(4, 6)
   for (p in ps) {
     for (n in ns) {
       for (i in 1:sims) {
@@ -30,6 +31,14 @@ test_that("edgewiseID function works as expected.", {
         gid = graphID.htcID(L, O)
         gin = graphID.nonHtcID(L, O)
         eid = edgewiseID(L, O)
+
+        extraSolved = 0
+        for (j in 1:nrow(L)) {
+          if (!(j %in% gid)) {
+            extraSolved = extraSolved + length(eid$solvedParents[[j]])
+          }
+        }
+        print(extraSolved)
 
         edgeSolvedNodes = which(sapply(eid$unsolvedParents,
                                 function(x) { length(x) == 0 }))
@@ -44,7 +53,7 @@ test_that("edgewiseID function works as expected.", {
         S1 = t(solve(diag(n) - L1)) %*% O1 %*% solve(diag(n) - L1)
 
         toCheck = solvedParentsToIndexMat(eid$solvedParents)
-        expect_equal(eid$identifier(S1)[toCheck], L1[toCheck])
+        expect_true(all(abs(eid$identifier(S1)[toCheck] - L1[toCheck]) < 10^-6))
       }
     }
   }

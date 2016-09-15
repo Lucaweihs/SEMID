@@ -8,7 +8,8 @@ Maintainer: Mathias Drton <md5@uw.edu>
 Depends:
     R.oo (>= 1.20.0),
 Imports:
-    igraph (>= 1.0.1)
+    igraph (>= 1.0.1),
+    R.utils (>= 2.3.0)
 Description: Provides routines to check identifiability or non-identifiability
     of linear structural equation models as described in Drton, Foygel &
     Sullivant (Ann. Statist., 2011) and Foygel, Draisma & Drton (Ann. Statist.,

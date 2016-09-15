@@ -73,28 +73,19 @@ setMethodS3("allParents", "MixedGraph", function(this, node) {
 #' @export   createHtrGraph.MixedGraph
 NULL
 setMethodS3("createHtrGraph", "MixedGraph", function(this) {
-  L = this$.L
-  O = this$.O
   m = this$numNodes()
-  htrGraphAdjMatrix = matrix(0, 2 * m, 2 * m)
-  for (i in 1:m) {
-    # Left i points to right i
-    htrGraphAdjMatrix[i, i + m] = 1
-    for (j in 1:m) {
-      if (O[i,j] == 1) {
-        # If bidirected edge from i to j then
-        # left i should point to right j
-        htrGraphAdjMatrix[i, j + m] = 1
-      }
+  adjMat = matrix(0, 2 * m, 2 * m)
 
-      if (L[i,j] == 1) {
-        # If directed edge from i to j then
-        # right i should point to right j
-        htrGraphAdjMatrix[i + m, j + m] = 1
-      }
-    }
-  }
-  return(igraph::graph.adjacency(htrGraphAdjMatrix, mode = "directed"))
+  # Left nodes point to right nodes
+  adjMat[cbind(1:m, m + 1:m)] = 1
+
+  # If i <-> j, then left i should point to right j and left j to right i
+  adjMat[1:m, m + 1:m] = this$.O + adjMat[1:m, m + 1:m]
+
+  # If i -> j then right i should point to right j
+  adjMat[m + 1:m, m + 1:m] = this$.L
+
+  return(igraph::graph.adjacency(adjMat, mode = "directed"))
 }, appendVarArgs = F)
 
 #' Half trek reachable nodes.
@@ -107,9 +98,11 @@ setMethodS3("htrFrom", "MixedGraph", function(this, node) {
   if (!is.null(this$.htrFrom)) {
     return(this$.htrFrom[[node]])
   }
+  if (is.null(this$.htrGraph)) {
+    this$.htrGraph = this$createHtrGraph()
+  }
   m = this$numNodes()
-  htrGraph = this$createHtrGraph()
-  htrFrom = igraph::neighborhood(htrGraph, order = 2 * m, nodes = 1:m, mode = "out", mindist = 1)
+  htrFrom = igraph::neighborhood(this$.htrGraph, order = 2 * m, nodes = 1:m, mode = "out", mindist = 1)
   for (i in 1:m) {
     htrFrom[[i]] = as.numeric(htrFrom[[i]]) - m
   }
@@ -124,40 +117,17 @@ setMethodS3("htrFrom", "MixedGraph", function(this, node) {
 #' @export   createHalfTrekFlowGraph.MixedGraph
 NULL
 setMethodS3("createHalfTrekFlowGraph", "MixedGraph", function(this) {
-  m = this$numNodes()
-  adjMat = matrix(0, 3 * m + 2, 3 * m + 2)
-  for (i in 1:m) {
-    # Left-i points to right-i-in, right-i-in points to right-i-out
-    adjMat[i, i + m] = 1 # Left-i -> right-i-in
-    adjMat[i + m, i + 2 * m] = 1 # Right-i-in -> right-i-out
-
-    for (j in 1:m) {
-      if (i != j) {
-        if (this$.O[i,j] == 1) {
-          # If bidirected edge from i to j then
-          # left-i should point to right-j-in
-          adjMat[i, j + m] = 1
-        }
-
-        if (this$.L[i,j] == 1) {
-          # If directed edge from i to j then
-          # right-i-out should point to right-j-in
-          adjMat[i + 2 * m, j + m] = 1
-        }
-      }
-    }
+  if (is.null(this$.htrGraph)) {
+    this$.htrGraph = this$createHtrGraph()
   }
-  adjMat[3 * m + 1, 1:m] = 1 # Source points to all lefts
-  adjMat[(2 * m + 1):(3 * m), 3 * m + 2] = 1 # All right-outs point to target
-  g = igraph::graph.adjacency(adjMat, mode = "directed")
-  igraph::E(g)$capacity = 1 # All edges (and thus vertices) have capacity 1
-  sOutEdgeIds = get.edge.ids(g, as.numeric(rbind(rep(3 * m + 1, m), 1:m)))
-  tInEdgeIds = get.edge.ids(g, as.numeric(rbind((2 * m + 1):(3 * m), rep(3 * m + 2, m))))
-  return(list(flowGraph = g, s = 3 * m + 1, t = 3 * m + 2,
-              sOutEdgeIds = sOutEdgeIds, tInEdgeIds = tInEdgeIds))
+  adjMat = as.matrix(igraph::get.adjacency(this$.htrGraph))
+  # Create the flow graph from adjMat with all vertices and edges having a
+  # capacity of 1
+  flowGraph = FlowGraph(adjMat, rep(1, 2 * this$numNodes()), adjMat)
+  return(flowGraph)
 }, appendVarArgs = F)
 
-#' Determines if a trek system exists in the mixed graph.
+#' Determines if a half trek system exists in the mixed graph.
 #'
 #' @name     getHalfTrekSystem
 #' @export   getHalfTrekSystem
@@ -166,20 +136,131 @@ NULL
 setMethodS3("getHalfTrekSystem", "MixedGraph", function(this, fromNodes,
                                                               toNodes) {
   if (is.null(this$.halfTrekFlowGraph)) {
-    flowGraphList = this$createHalfTrekFlowGraph()
-    this$.halfTrekFlowGraph = flowGraphList$flowGraph
-    this$.s = flowGraphList$s
-    this$.t = flowGraphList$t
-    this$.sOutEdgeIds = flowGraphList$sOutEdgeIds
-    this$.tInEdgeIds = flowGraphList$tInEdgeIds
+    this$.halfTrekFlowGraph = this$createHalfTrekFlowGraph()
+  }
+  flowResult = this$.halfTrekFlowGraph$flowBetween(fromNodes,
+                                                   this$numNodes() + toNodes)
+  return(list(systemExists = (flowResult$value == length(toNodes)),
+              activeFrom = flowResult$activeSources))
+}, appendVarArgs = F)
+
+
+#' Helper function to create a graph encoding trek reachable relationships.
+#'
+#' @name     createTrGraph
+#' @export   createTrGraph
+#' @export   createTrGraph.MixedGraph
+NULL
+setMethodS3("createTrGraph", "MixedGraph", function(this) {
+  m = this$numNodes()
+  adjMat = matrix(0, 2 * m, 2 * m)
+
+  # Left nodes point to each other in the opposite direction of L
+  adjMat[1:m, 1:m] = t(this$.L)
+
+  # Left nodes point to their corresponding right nodes
+  adjMat[cbind(1:m, m + 1:m)] = 1
+
+  # If i <-> j, then left i should point to right j and left j to right i
+  adjMat[1:m, m + 1:m] = 1 * ((this$.O + adjMat[1:m, m + 1:m]) != 0)
+
+  # If i -> j then right i point to right j
+  adjMat[m + 1:m, m + 1:m] = this$.L
+
+  return(igraph::graph.adjacency(adjMat, mode = "directed"))
+}, appendVarArgs = F)
+
+#' Trek reachable nodes.
+#'
+#' @name     trFrom
+#' @export   trFrom
+#' @export   trFrom.MixedGraph
+NULL
+setMethodS3("trFrom", "MixedGraph", function(this, node) {
+  if (is.null(this$.trGraph)) {
+    this$.trGraph = this$createTrGraph()
+  }
+  m = this$numNodes()
+  trFrom = as.numeric(
+    igraph::neighborhood(this$.trGraph, order = 2 * m, nodes = node,
+                          mode = "out")[[1]])
+  trFrom[trFrom > m] = trFrom[trFrom > m] - m
+  return(unique(trFrom))
+}, appendVarArgs = F)
+
+#' Helper function to create a flow graph.
+#'
+#' @name     createTrekFlowGraph
+#' @export   createTrekFlowGraph
+#' @export   createTrekFlowGraph.MixedGraph
+NULL
+setMethodS3("createTrekFlowGraph", "MixedGraph", function(this) {
+  if (is.null(this$.trGraph)) {
+    this$.trGraph = this$createTrGraph()
+  }
+  adjMat = as.matrix(igraph::get.adjacency(this$.trGraph))
+
+  # Create the flow graph from adjMat. All vertices and edges have capacity 1
+  flowGraph = FlowGraph(adjMat, rep(1, 2 * this$numNodes()), adjMat)
+
+  return(flowGraph)
+}, appendVarArgs = F)
+
+#' Determines if a trek system exists in the mixed graph.
+#'
+#' @name     getTrekSystem
+#' @export   getTrekSystem
+#' @export   getTrekSystem.MixedGraph
+NULL
+setMethodS3("getTrekSystem", "MixedGraph", function(this, fromNodes, toNodes,
+                                                    avoidEdgeOnRight = NULL) {
+  if (is.null(this$.trekFlowGraph)) {
+    this$.trekFlowGraph = this$createTrekFlowGraph()
   }
 
-  igraph::E(this$.halfTrekFlowGraph)$capacity[this$.sOutEdgeIds] = 0
-  igraph::E(this$.halfTrekFlowGraph)$capacity[this$.sOutEdgeIds[fromNodes]] = 1
-  igraph::E(this$.halfTrekFlowGraph)$capacity[this$.tInEdgeIds] = 0
-  igraph::E(this$.halfTrekFlowGraph)$capacity[this$.tInEdgeIds[toNodes]] = 1
-
-  flowResult = igraph::graph.maxflow(this$.halfTrekFlowGraph, this$.s, this$.t)
+  if (!is.null(avoidEdgeOnRight)) {
+    if (this$.L[avoidEdgeOnRight[1], avoidEdgeOnRight[2]]  == 0) {
+      stop("avoidEdgeOnRight is not an edge in the graph")
+    }
+    this$.trekFlowGraph$updateEdgeCapacities(avoidEdgeOnRight + this$numNodes(),
+                                             0)
+  }
+  flowResult = this$.trekFlowGraph$flowBetween(fromNodes,
+                                               this$numNodes() + toNodes)
+  if (!is.null(avoidEdgeOnRight)) {
+    this$.trekFlowGraph$updateEdgeCapacities(avoidEdgeOnRight + this$numNodes(),
+                                             1)
+  }
   return(list(systemExists = (flowResult$value == length(toNodes)),
-              activeFrom = which(flowResult$flow[this$.sOutEdgeIds] == 1)))
+              activeFrom = flowResult$activeSources))
+}, appendVarArgs = F)
+
+
+#' Strongly connected component
+#'
+#' Get the strongly connected component for a node i in the directed part of
+#' the graph.
+#'
+#' @name     stronglyConnectedComponent
+#' @export   stronglyConnectedComponent
+#' @export   stronglyConnectedComponent.MixedGraph
+NULL
+setMethodS3("stronglyConnectedComponent", "MixedGraph", function(this, node) {
+  if (is.null(this$.stronglyConnectedComponents)) {
+    this$.stronglyConnectedComponents = igraph::components(this$.dirGraph,
+                                                           "strong")$membership
+  }
+  return(which(this$.stronglyConnectedComponents[node] == this$.stronglyConnectedComponents))
+}, appendVarArgs = F)
+
+#' Get descendents of a node
+#'
+#' @name     allDescendants
+#' @export   allDescendants
+#' @export   allDescendants.MixedGraph
+NULL
+setMethodS3("allDescendants", "MixedGraph", function(this, node) {
+  return(as.numeric(
+    igraph::neighborhood(this$.dirGraph, order = this$numNodes(),
+                         nodes = node, mode = "out", mindist = 1)[[1]]))
 }, appendVarArgs = F)
