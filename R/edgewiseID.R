@@ -98,18 +98,14 @@ linearIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
   for (i in 1:m) {
     unsolved = unsolvedParents[[i]]
     solved = solvedParents[[i]]
-    htrFromNodeOrTrFromSolved = mixedGraph$htrFrom(i)
-    for (j in solved) {
-      htrFromNodeOrTrFromSolved = c(htrFromNodeOrTrFromSolved, mixedGraph$trFrom(j))
-    }
-    htrFromNodeOrTrFromSolved = unique(htrFromNodeOrTrFromSolved)
+    htrFromNode = mixedGraph$htrFrom(i)
     if (length(unsolved) != 0) {
       allowedNodesTrueFalse = logical(m)
       for (j in 1:m) {
         if (i != j &&
             !mixedGraph$isSibling(i,j) &&
             length(intersect(mixedGraph$htrFrom(j), unsolved)) != 0 &&
-            length(intersect(htrFromNodeOrTrFromSolved, unsolvedParents[[j]])) == 0) {
+            length(intersect(htrFromNode, unsolvedParents[[j]])) == 0) {
           allowedNodesTrueFalse[j] = TRUE
         }
       }
