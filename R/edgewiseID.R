@@ -1,26 +1,10 @@
-subsetsOfSize <- function(x, k) {
-  if (k > length(x)) {
-    return(list())
-  }
-  if (k == 0) {
-    return(list(numeric(0)))
-  }
-  if (length(x) == k) {
-    return(list(x))
-  }
-  return(combn(x, k, simplify = F))
-}
-
-createIdentifierBaseCase <- function(L) {
-  return(function(Sigma) {
-    Lambda <- matrix(NA, nrow(L), nrow(L))
-    Lambda[L == 0] = 0
-    return(Lambda)
-  })
-}
-
-createLinearIdentifier <- function(idFunc, sources, targets, node, solvedNodeParents,
-                                   sourceParentsToRemove) {
+#' Create an edgewise identification function
+#'
+#' TODO: Add details
+#'
+#' @return an identification function
+createEdgewiseIdentifier <- function(idFunc, sources, targets, node,
+                                     solvedNodeParents, sourceParentsToRemove) {
   # These assignments may seem redundent but they are necessary as they
   # assign these variables to the local environment of the function call.
   # This allows them to persist and still be usable by the returned function.
@@ -33,7 +17,8 @@ createLinearIdentifier <- function(idFunc, sources, targets, node, solvedNodePar
   return(
     function(Sigma) {
       m <- nrow(Sigma)
-      Lambda <- idFunc(Sigma)
+      identifiedParams <- idFunc(Sigma)
+      Lambda <- identifiedParams$Lambda
 
       SigmaMinus = Sigma
       for (sourceInd in 1:length(sources)) {
@@ -58,46 +43,28 @@ createLinearIdentifier <- function(idFunc, sources, targets, node, solvedNodePar
         solve(SigmaMinus[sources, targets, drop = F],
               SigmaMinus[sources, node, drop = F])
 
-      return(Lambda)
+      if (!any(is.na(Lambda))) {
+        Omega = t(diag(m) - Lambda) %*% Sigma %*% (diag(m) - Lambda)
+        return(list(Lambda = Lambda, Omega = Omega))
+      }
+      return(list(Lambda = Lambda, Omega = identifiedParams$Omega))
     }
   )
 }
 
-createTrekSeparationIdentifier <- function(idFunc, sources, sinks, node, parent) {
-  # These assignments may seem redundent but they are necessary as they
-  # assign these variables to the local environment of the function call.
-  # This allows them to persist and still be usable by the returned function.
-  idFunc <- idFunc
-  sources <- sources
-  sinks <- sinks
-  node <- node
-  parent <- parent
-  return(
-    function(Sigma) {
-      m <- nrow(Sigma)
-      Lambda <- idFunc(Sigma)
-
-      subSigmaNode = Sigma[sources, c(sinks, node), drop = F]
-      subSigmaParent = Sigma[sources, c(sinks, parent), drop = F]
-
-      Lambda[parent, node] = det(subSigmaNode) / det(subSigmaParent)
-      return(Lambda)
-    }
-  )
-}
-
-#' A helper function for edgewiseID that does one step through all the nodes
-#' and tries to identify new edge coefficients using half-treks.
+#' Perform one iteration of edgewise identification.
+#'
+#' A function that does one step through all the nodes in a mixed graph
+#' and tries to identify new edge coefficients using edgewise
 #'
 #' @return a list
 #' @export
-linearIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
+edgewiseIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
                               identifier) {
-  changeFlag = F
+  identifiedEdges = c()
   m = mixedGraph$numNodes()
   for (i in 1:m) {
     unsolved = unsolvedParents[[i]]
-    solved = solvedParents[[i]]
     htrFromNode = mixedGraph$htrFrom(i)
     if (length(unsolved) != 0) {
       allowedNodesTrueFalse = logical(m)
@@ -143,10 +110,10 @@ linearIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
                                                               subset)
 
           if (halfTrekSystemResult$systemExists) {
-            changeFlag = T
+            identifiedEdges = c(identifiedEdges, as.numeric(rbind(subset, i)))
             subsetFound = T
             activeFrom = halfTrekSystemResult$activeFrom
-            identifier = createLinearIdentifier(identifier,
+            identifier = createEdgewiseIdentifier(identifier,
                                                 activeFrom,
                                                 subset,
                                                 i,
@@ -165,107 +132,7 @@ linearIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
       }
     }
   }
-  return(list(changeFlag = changeFlag, unsolvedParents = unsolvedParents,
+  return(list(identifiedEdges = identifiedEdges, unsolvedParents = unsolvedParents,
               solvedParents = solvedParents, identifier = identifier))
 }
-
-
-#' A helper function for edgewiseID that does one step through all the nodes
-#' and tries to identify new edge coefficients using trek separation.
-#'
-#' @return a list
-#' @export
-trekSeparationIdentifyStep = function(mixedGraph, unsolvedParents,
-                                      solvedParents, identifier,
-                                      maxSubsetSize = 3) {
-  if (maxSubsetSize <= 0) {
-    stop("Max subset size must be >= 1")
-  }
-  changeFlag = F
-  m = mixedGraph$numNodes()
-  for (i in 1:m) {
-    unsolvedBefore = unsolvedParents[[i]]
-    component = mixedGraph$stronglyConnectedComponent(i)
-    if (length(unsolvedBefore) != 0 && length(component) == 1) {
-      nonIDescendants = setdiff(1:m, c(mixedGraph$allDescendants(i), i))
-      for (j in unsolvedBefore) {
-        edgeIdentified = F
-        for (k in 1:min(maxSubsetSize, m - 1)) {
-          subsetsBig = subsetsOfSize(nonIDescendants, k)
-          subsetsSmall = subsetsOfSize(setdiff(nonIDescendants, j), k - 1)
-
-          for (subsetBig in subsetsBig) {
-            for (subsetSmall in subsetsSmall) {
-              systemWithJ = mixedGraph$getTrekSystem(subsetBig, c(subsetSmall, j))
-              if (systemWithJ$systemExists) {
-                systemWithoutJIEdge = mixedGraph$getTrekSystem(subsetBig,
-                                                               c(subsetSmall, i),
-                                                               c(j,i))
-                if (!systemWithoutJIEdge$systemExists) {
-                  print("HAPPENS")
-                  changeFlag = T
-                  edgeIdentified = T
-                  identifier =
-                    createTrekSeparationIdentifier(identifier, subsetBig,
-                                                   subsetSmall, i, j)
-                  solvedParents[[i]] = sort(c(j, solvedParents[[i]]))
-                  unsolvedParents[[i]] = setdiff(unsolvedParents[[i]], j)
-                  break
-                }
-              }
-            }
-            if (edgeIdentified) { break }
-          }
-          if (edgeIdentified) { break }
-        }
-      }
-    }
-  }
-  return(list(changeFlag = changeFlag, unsolvedParents = unsolvedParents,
-              solvedParents = solvedParents, identifier = identifier))
-}
-
-#' Edge-wise identification
-#'
-#' @inheritParams graphID
-#'
-#' @return a list
-#' @export
-edgewiseID = function(L, O, maxTrekSepSubsetSize = 3) {
-  validateMatrices(L, O)
-  O = 1 * ((O + t(O)) != 0)
-  diag(O) = 0
-  m = nrow(L)
-  mixedGraph = MixedGraph(L, O)
-
-  unsolvedParents = lapply(1:m, function(node) { mixedGraph$allParents(node) })
-
-  identifier = createIdentifierBaseCase(L)
-  changeFlag = T
-  solvedParents = rep(list(numeric(0)), m)
-  while (changeFlag) {
-    idResult = linearIdentifyStep(mixedGraph, unsolvedParents,
-                                  solvedParents, identifier)
-    changeFlag = idResult$changeFlag
-    unsolvedParents = idResult$unsolvedParents
-    solvedParents = idResult$solvedParents
-    identifier = idResult$identifier
-
-    if (!changeFlag && maxTrekSepSubsetSize != 0) {
-      idResult = trekSeparationIdentifyStep(mixedGraph, unsolvedParents,
-                                            solvedParents, identifier,
-                                            maxTrekSepSubsetSize)
-      changeFlag = idResult$changeFlag
-      unsolvedParents = idResult$unsolvedParents
-      solvedParents = idResult$solvedParents
-      identifier = idResult$identifier
-    }
-  }
-
-  return(list(solvedParents = solvedParents,
-              unsolvedParents = unsolvedParents,
-              identifier = identifier))
-}
-
-
 

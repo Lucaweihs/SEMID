@@ -213,22 +213,25 @@ setMethodS3("createTrekFlowGraph", "MixedGraph", function(this) {
 #' @export   getTrekSystem.MixedGraph
 NULL
 setMethodS3("getTrekSystem", "MixedGraph", function(this, fromNodes, toNodes,
-                                                    avoidEdgeOnRight = NULL) {
+                                                    avoidEdgesOnRight = NULL) {
   if (is.null(this$.trekFlowGraph)) {
     this$.trekFlowGraph = this$createTrekFlowGraph()
   }
 
-  if (!is.null(avoidEdgeOnRight)) {
-    if (this$.L[avoidEdgeOnRight[1], avoidEdgeOnRight[2]]  == 0) {
-      stop("avoidEdgeOnRight is not an edge in the graph")
+  if (!is.null(avoidEdgesOnRight)) {
+    if (is.vector(avoidEdgesOnRight)) {
+      avoidEdgesOnRight = matrix(avoidEdgesOnRight, byrow = T, ncol = 2)
     }
-    this$.trekFlowGraph$updateEdgeCapacities(avoidEdgeOnRight + this$numNodes(),
+    if (any(this$.L[avoidEdgesOnRight]  == 0)) {
+      stop("Some edge in avoidEdgesOnRight is not an edge in the graph")
+    }
+    this$.trekFlowGraph$updateEdgeCapacities(t(avoidEdgesOnRight + this$numNodes()),
                                              0)
   }
   flowResult = this$.trekFlowGraph$flowBetween(fromNodes,
                                                this$numNodes() + toNodes)
-  if (!is.null(avoidEdgeOnRight)) {
-    this$.trekFlowGraph$updateEdgeCapacities(avoidEdgeOnRight + this$numNodes(),
+  if (!is.null(avoidEdgesOnRight)) {
+    this$.trekFlowGraph$updateEdgeCapacities(t(avoidEdgesOnRight + this$numNodes()),
                                              1)
   }
   return(list(systemExists = (flowResult$value == length(toNodes)),
