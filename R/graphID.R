@@ -458,41 +458,29 @@ graphID.globalID <- function(L, O) {
   validateMatrices(L, O)
   O <- 1 * ((O + t(O)) != 0)
 
-  if (!is.dag(igraph::graph.adjacency(L))) {
+  if (any(L + O == 2) || !igraph::is.dag(igraph::graph.adjacency(L))) {
     return(F)
   }
 
-  Global.ID = TRUE
-  i <- 0
-  while (Global.ID == 1 && i < m) {
-    i <- i + 1
-    S <- 1:m
-    change <- 1
-    while (change == 1) {
-      change <- 0
-      S.old <- S
-      for (s in setdiff(S.old, i)) {
-        if (graph.maxflow(igraph::graph.adjacency(L), source = s,
-                          target = i)$value == 0) {
-          S <- setdiff(S, s)
-          change <- 1
-        }
+  for (i in 1:m) {
+    dirGraph = igraph::graph.adjacency(L)
+    biGraph = igraph::graph.adjacency(O, mode = "undirected")
+    ancestors = as.numeric(igraph::neighborhood(dirGraph, m, nodes = i, mode = "in")[[1]])
+    biComponent = as.numeric(igraph::neighborhood(biGraph, m, nodes = i)[[1]])
+    validVertices = intersect(ancestors, biComponent)
+
+    newL = 0 * L
+    newL[validVertices,validVertices] = L[validVertices, validVertices]
+    newDirGraph = igraph::graph.adjacency(newL)
+
+    for (j in setdiff(validVertices, i)) {
+      if (igraph::graph.maxflow(newDirGraph, source = j, target = i)$value != 0) {
+        return(FALSE)
       }
-      S.old <- S
-      for (s in setdiff(S.old, i)) {
-        if (graph.maxflow(igraph::graph.adjacency(O, mode = 'undirected'),
-                          source = s, target = i)$value == 0) {
-          S <- setdiff(S, s)
-          change <- 1
-        }
-      }
-    }
-    if (length(S) > 1) {
-      Global.ID <- FALSE
     }
   }
 
-  return(Global.ID)
+  return(TRUE)
 }
 
 #' Determine generic identifiability of a mixed graph.
