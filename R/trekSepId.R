@@ -30,10 +30,6 @@ createTrekSeparationIdentifier <- function(idFunc, sources, targets, node, paren
 
       Lambda[parent, node] = det(subSigmaNode) / det(subSigmaParent)
 
-      if (!any(is.na(Lambda))) {
-        Omega = t(diag(m) - Lambda) %*% Sigma %*% (diag(m) - Lambda)
-        return(list(Lambda = Lambda, Omega = Omega))
-      }
       return(list(Lambda = Lambda, Omega = identifiedParams$Omega))
     }
   )
@@ -54,7 +50,7 @@ trekSeparationIdentifyStep = function(mixedGraph, unsolvedParents,
   }
   m = mixedGraph$numNodes()
   identifiedEdges = c()
-  for (i in 1:m) {
+ for (i in 1:m) {
     unsolvedBefore = unsolvedParents[[i]]
     component = mixedGraph$stronglyConnectedComponent(i)
     if (length(unsolvedBefore) != 0 && length(component) == 1) {
@@ -64,7 +60,7 @@ trekSeparationIdentifyStep = function(mixedGraph, unsolvedParents,
       for (j in unsolvedBefore) {
         edgeIdentified = F
         for (k in 1:min(maxSubsetSize, m - 1)) {
-          sourceSets = subsetsOfSize(allButI, k)
+          sourceSets = subsetsOfSize(1:m, k)
           targetSets = subsetsOfSize(setdiff(nonIDescendants, j), k - 1)
 
           for (sources in sourceSets) {
@@ -83,13 +79,13 @@ trekSeparationIdentifyStep = function(mixedGraph, unsolvedParents,
                                                    targets, i, j, solvedParents[[i]])
                   solvedParents[[i]] = sort(c(j, solvedParents[[i]]))
                   unsolvedParents[[i]] = setdiff(unsolvedParents[[i]], j)
-                  break
+                 break
                 }
               }
             }
-            if (edgeIdentified) { break }
+           if (edgeIdentified) { break }
           }
-          if (edgeIdentified) { break }
+         if (edgeIdentified) { break }
         }
       }
     }

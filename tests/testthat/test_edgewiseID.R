@@ -30,3 +30,4 @@ test_that("Edgewise identification does not identify edges erroneously.", {
     }
   }
 })
+

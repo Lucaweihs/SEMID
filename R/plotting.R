@@ -1,7 +1,7 @@
 #' Plot a mixed graph
 #'
 #' Given adjacency matrices representing the directed and bidirected portions
-#' of a mixed graph, plots a representation of the graph in a pretty way.
+#' of a mixed graph, plots a representation of the graph.
 #'
 #' @export
 #'

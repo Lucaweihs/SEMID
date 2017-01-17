@@ -24,6 +24,22 @@ validateMatrices <- function(L, O) {
   }
 }
 
+createSimpleBiDirIdentifier <- function(idFunc) {
+  idFunc <- idFunc
+  return(
+    function(Sigma) {
+      m <- nrow(Sigma)
+      identifiedParams <- idFunc(Sigma)
+      Lambda <- identifiedParams$Lambda
+      if (!any(is.na(Lambda))) {
+        Omega = t(diag(m) - Lambda) %*% Sigma %*% (diag(m) - Lambda)
+        return(list(Lambda = Lambda, Omega = Omega))
+      }
+      return(list(Lambda = Lambda, Omega = identifiedParams$Omega))
+    }
+  )
+}
+
 #' A general identification algorithm template
 #'
 #' A function that encapsulates the general structure of our algorithms for
@@ -61,8 +77,18 @@ generalGenericID <- function(L, O, idStepFunctions) {
       }
     }
   }
+  if (length(unlist(unsolvedParents)) == 0) {
+    identifier = createSimpleBiDirIdentifier(identifier)
+    solvedSiblings = lapply(1:m, FUN = function(x) { mixedGraph$allSiblings(x) })
+    unsolvedSiblings = rep(list(integer(0)), m)
+  } else {
+    solvedSiblings = rep(list(integer(0)), m)
+    unsolvedSiblings = lapply(1:m, FUN = function(x) { mixedGraph$allSiblings(x) })
+  }
   return(list(solvedParents = solvedParents,
               unsolvedParents = unsolvedParents,
+              solvedSiblings = solvedSiblings,
+              unsolvedSiblings = unsolvedSiblings,
               identifier = identifier))
 }
 

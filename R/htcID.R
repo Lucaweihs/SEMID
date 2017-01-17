@@ -108,7 +108,70 @@ htcID <- function(L, O) {
 #' generic identifiability of linear structural equation models.
 #' \emph{Ann. Statist.} 40(3): 1682-1713.
 graphID.htcID <- function(L, O) {
-  return(which(sapply(htcID(L, O)$unsolvedParents, FUN = function(x) { length(x) == 0 })))
+  #return(generalGenericID(L, O, list(htcIdentifyStep)))
+  m <- nrow(L)
+  validateMatrices(L, O)
+  O <- 1 * ((O + t(O)) != 0)
+
+  # 1 & 2 = source & target
+  # 2 + {1,...,m} = L(i) for i=1,...,m
+  # 2+m + {1,...,m} = R(i)-in for i=1,...,m
+  # 2+2*m + {1,...,m} = R(i)-out for i=1,...,m
+
+  Cap.matrix.init <- matrix(0, 2 + 3*m, 2 + 3*m)
+  for (i in 1:m) {
+    # edge from L(i) to R(i)-in, and to R(j)-in for all siblings j of i
+    Cap.matrix.init[2 + i, 2 + m + c(i, which(O[i,] == 1))] <- 1
+    # edge from R(i)-in to R(i)-out
+    Cap.matrix.init[2 + m + i, 2 + 2*m + i] <- 1
+    # edge from R(i)-out to R(j)-in for all directed edges i->j
+    Cap.matrix.init[2 + 2*m + i, 2 + m + which(L[i,] == 1)] <- 1
+  }
+
+  # when testing if a set A satisfies the HTC with respect to a node i,
+  #    need to add (1) edge from source to L(j) for all j in A
+  #            and (2) edge from R(j)-out to target for all parents j of i
+
+  Dependence.matrix <- O + diag(m)
+  for (i in 1:m) {
+    Dependence.matrix <- (Dependence.matrix + Dependence.matrix %*% L > 0)
+  }
+
+  Solved.nodes <- rep(0,m)
+  Solved.nodes[which(colSums(L) == 0)] <- 1 # nodes with no parents
+  change <- 1
+  count <- 1
+
+  while (change == 1) {
+    change <- 0
+
+    for (i in which(Solved.nodes == 0)) {
+      A <- setdiff(c(which(Solved.nodes > 0),
+                     which(Dependence.matrix[i, ] == 0)),
+                   c(i, which(O[i,] == 1)))
+
+      Cap.matrix <- Cap.matrix.init
+
+      Cap.matrix[1, 2 + A] <- 1
+      Cap.matrix[2 + 2*m + which(L[,i] == 1), 2] <- 1
+
+      flow <-
+        graph.maxflow(graph.adjacency(Cap.matrix), source = 1, target = 2)$value
+
+      if (flow == sum(L[,i])) {
+        change <- 1
+        count <- count + 1
+        Solved.nodes[i] <- count
+      }
+    }
+  }
+
+  if (all(Solved.nodes == 0)) {
+    Solved.nodes <- NULL
+  } else {
+    Solved.nodes <- order(Solved.nodes)[(1 + sum(Solved.nodes == 0)):m]
+  }
+  return(Solved.nodes)
 }
 
 

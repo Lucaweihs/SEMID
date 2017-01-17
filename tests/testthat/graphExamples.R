@@ -14,10 +14,26 @@ O = t(matrix(
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0), 5, 5))
-O=O+t(O)
+O = O + t(O)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                        globalId = 1, genId = 1, htcId = 1)))
+
+## Verma graph
+L = t(matrix(
+  c(0, 1, 1, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1,
+    0, 0, 0, 0), 4, 4))
+O = t(matrix(
+  c(0, 0, 0, 0,
+    0, 0, 0, 1,
+    0, 0, 0, 0,
+    0, 0, 0, 0), 4, 4))
+O = O + t(O)
+graphExamples = c(graphExamples,
+                  list(list(L = L, O = O,
+                            globalId = 1, genId = 1, htcId = 1)))
 
 
 ## Ex. 3a HTC id
@@ -33,7 +49,7 @@ O = t(matrix(
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0), 5, 5))
-O=O+t(O)
+O = O + t(O)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 1, htcId = 1)))
@@ -52,7 +68,7 @@ O = t(matrix(
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0), 5, 5))
-O=O+t(O)
+O = O + t(O)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 1, htcId = 1)))
@@ -71,7 +87,7 @@ O = t(matrix(
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0), 5, 5))
-O=O+t(O)
+O = O + t(O)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 1, htcId = -1)))
@@ -90,7 +106,7 @@ O = t(matrix(
     0, 0, 0, 1, 0,
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0), 5, 5))
-O=O+t(O)
+O = O + t(O)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 1, htcId = 1)))
@@ -108,7 +124,7 @@ O = t(matrix(
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 1,
     0, 0, 0, 0, 0), 5, 5))
-O=O+t(O)
+O = O + t(O)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 1, htcId = -1)))
@@ -126,7 +142,7 @@ O = t(matrix(
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0), 5, 5))
-O=O+t(O)
+O = O + t(O)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 0, htcId = 0)))
@@ -145,7 +161,7 @@ O = t(matrix(
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0), 5, 5))
-O=O+t(O)
+O = O + t(O)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 0, htcId = -1)))
@@ -164,7 +180,7 @@ O = t(matrix(
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0), 5, 5))
-O=O+t(O)
+O = O + t(O)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 0, htcId = 0)))
@@ -183,7 +199,7 @@ O = t(matrix(
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 1,
     0, 0, 0, 0, 0), 5, 5))
-O=O+t(O)
+O = O + t(O)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 0, htcId = -1)))
@@ -202,7 +218,7 @@ O = t(matrix(
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0), 5, 5))
-O=O+t(O)
+O = O + t(O)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 0, htcId = -1)))
@@ -221,7 +237,7 @@ O = t(matrix(
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0), 5, 5))
-O=O+t(O)
+O = O + t(O)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 0, htcId = -1)))
@@ -240,7 +256,7 @@ O = t(matrix(
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0), 5, 5))
-O=O+t(O)
+O = O + t(O)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 0, htcId = -1)))
@@ -259,7 +275,7 @@ O = t(matrix(
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0), 5, 5))
-O=O+t(O)
+O = O + t(O)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 0, htcId = -1)))
@@ -278,7 +294,7 @@ O = t(matrix(
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0), 5, 5))
-O=O+t(O)
+O = O + t(O)
 graphExamples = c(graphExamples,
                   list(list(L = L, O = O,
                             globalId = 0, genId = 1, htcId = -1,

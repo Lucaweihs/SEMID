@@ -78,9 +78,8 @@ setConstructorS3("FlowGraph",
 #'
 NULL
 setMethodS3("flowBetween", "FlowGraph", function(this, sources, sinks) {
-  totalCap = sum(igraph::E(this$.flowGraph)$capacity)
-  igraph::E(this$.flowGraph)$capacity[this$.sOutIndices[sources]] = totalCap
-  igraph::E(this$.flowGraph)$capacity[this$.tInIndices[sinks]] = totalCap
+  igraph::E(this$.flowGraph)$capacity[this$.sOutIndices[sources]] = 1
+  igraph::E(this$.flowGraph)$capacity[this$.tInIndices[sinks]] = 1
   flowResult = igraph::max_flow(this$.flowGraph, this$.s, this$.t)
   igraph::E(this$.flowGraph)$capacity[this$.sOutIndices[sources]] = 0
   igraph::E(this$.flowGraph)$capacity[this$.tInIndices[sinks]] = 0

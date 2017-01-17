@@ -43,10 +43,6 @@ createEdgewiseIdentifier <- function(idFunc, sources, targets, node,
         solve(SigmaMinus[sources, targets, drop = F],
               SigmaMinus[sources, node, drop = F])
 
-      if (!any(is.na(Lambda))) {
-        Omega = t(diag(m) - Lambda) %*% Sigma %*% (diag(m) - Lambda)
-        return(list(Lambda = Lambda, Omega = Omega))
-      }
       return(list(Lambda = Lambda, Omega = identifiedParams$Omega))
     }
   )
@@ -60,7 +56,10 @@ createEdgewiseIdentifier <- function(idFunc, sources, targets, node,
 #' @return a list
 #' @export
 edgewiseIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
-                              identifier) {
+                                identifier, subsetSizeControl = Inf) {
+  if (subsetSizeControl <= 0) {
+    stop("Invalid subset size control parameter.")
+  }
   identifiedEdges = c()
   m = mixedGraph$numNodes()
   for (i in 1:m) {
@@ -93,7 +92,11 @@ edgewiseIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
       }
 
       subsetFound = F
-      for (k in length(unsolved):1) {
+      subsetSizes = union(
+        length(unsolved):max((length(unsolved) - subsetSizeControl + 1), 1),
+        1:min(length(unsolved), subsetSizeControl))
+
+      for (k in subsetSizes) {
         subsets = subsetsOfSize(unsolved, k)
         for (subset in subsets) {
           allowedForSubsetTrueFalse = logical(length(allowedNodes))
@@ -114,13 +117,13 @@ edgewiseIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
             subsetFound = T
             activeFrom = halfTrekSystemResult$activeFrom
             identifier = createEdgewiseIdentifier(identifier,
-                                                activeFrom,
-                                                subset,
-                                                i,
-                                                solvedParents[[i]],
-                                                lapply(activeFrom, function(x) {
-                                                  solvedParents[[x]]
-                                                }))
+                                                  activeFrom,
+                                                  subset,
+                                                  i,
+                                                  solvedParents[[i]],
+                                                  lapply(activeFrom, function(x) {
+                                                    solvedParents[[x]]
+                                                  }))
             solvedParents[[i]] = sort(c(subset, solvedParents[[i]]))
             unsolvedParents[[i]] = setdiff(unsolved, subset)
             break
