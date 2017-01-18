@@ -6,11 +6,13 @@
 #' @export
 #'
 #' @inheritParams graphID
-plotMixedGraph <- function(L, O, main = "") {
+plotMixedGraph <- function(L, O, main = "", vertexLabels = 1:nrow(L)) {
   R.utils::withSeed({
   m = ncol(L)
   dirGraph = igraph::graph.adjacency(L)
+  igraph::V(dirGraph)$name = vertexLabels
   biGraph = igraph::graph.adjacency(O, mode = "undirected")
+  igraph::V(biGraph)$name = vertexLabels
 
   layout = igraph::layout_in_circle(dirGraph)
 

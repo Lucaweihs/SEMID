@@ -40,6 +40,85 @@ createSimpleBiDirIdentifier <- function(idFunc) {
   )
 }
 
+#' Globally identify the covariance matrix of a C-component
+#'
+#' The Tian decomposition of a mixed graph G allows one to globally identify
+#' the covariance matrices Sigma' of special subgraphs of G called C-components.
+#' This function takes the covariance matrix Sigma corresponding to G and
+#' a collection of node sets which specify the C-component, and returns the
+#' Sigma' corresponding to the C-component.
+#'
+#' @param Sigma the covariance matrix for the mixed graph G
+#' @param internal an integer vector corresponding to the vertices of the
+#'        C-component that are in the bidirected equivalence classes (if the
+#'        graph is not-acyclic then these equivalence classes must be enlarged
+#'        by combining two bidirected components if there are two vertices, one
+#'        in each component, that are simultaneously on the same directed cycle).
+#' @param incoming the parents of vertices in internal that are not in the set
+#'        internal themselves
+#' @param topOrder a topological ordering of c(internal, incoming) with respect
+#'        to the graph G. For vertices in a strongly connected component the
+#'        ordering is allowed to be arbitrary.
+#'
+#' @export
+#'
+#' @return This function has no return value.
+tianSigmaForComponent <- function(Sigma, internal, incoming, topOrder) {
+  if (length(incoming) == 0) {
+    return(Sigma[topOrder, topOrder, drop = F])
+  }
+  newSigmaInv = matrix(0, length(topOrder), length(topOrder))
+  for (j in 1:length(topOrder)) {
+    node = topOrder[j]
+    if (node %in% internal) {
+      if (j == 1) {
+        newSigmaInv[j, j] = newSigmaInv[j,j] + 1 / Sigma[node, node,drop = F]
+      } else {
+        inds = topOrder[1:(j - 1)]
+
+        SigmaIndsInv = solve(Sigma[inds, inds, drop = F])
+        schurInv = solve(Sigma[node,node,drop = F] -
+                           Sigma[node, inds, drop = F] %*% SigmaIndsInv %*%
+                           Sigma[inds, node, drop = F])
+        newSigmaInv[j, j] = newSigmaInv[j,j] + schurInv
+        meanMat = as.numeric(solve(Sigma[inds,inds]) %*% Sigma[inds, node] %*% schurInv)
+        newSigmaInv[j, 1:(j-1)] = newSigmaInv[j, 1:(j-1)] - meanMat
+        newSigmaInv[1:(j-1), j] = newSigmaInv[j, 1:(j-1)]
+        newSigmaInv[1:(j-1), 1:(j-1)] = newSigmaInv[1:(j-1), 1:(j-1)] + SigmaIndsInv %*% Sigma[inds, node] %*% meanMat
+      }
+    }
+  }
+  newSigmaInv[topOrder %in% incoming, topOrder %in% incoming] =
+    newSigmaInv[topOrder %in% incoming, topOrder %in% incoming] + diag(length(incoming))
+  newSigma = solve(newSigmaInv)
+  return(newSigma)
+}
+
+tianIdentifier <- function(idFuncs, cComponents) {
+  idFuncs <- idFuncs
+  cComponents <- cComponents
+  return(
+    function(Sigma) {
+      Lambda = matrix(NA, ncol(Sigma), ncol(Sigma))
+      Omega = matrix(NA, ncol(Sigma), ncol(Sigma))
+
+      for (i in 1:length(cComponents)) {
+        internal = cComponents[[i]]$internal
+        incoming = cComponents[[i]]$incoming
+        topOrder = cComponents[[i]]$topOrder
+
+        newSigma = tianSigmaForComponent(Sigma, internal, incoming, topOrder)
+
+        result = idFuncs[[i]](newSigma)
+        internalInds = which(topOrder %in% internal)
+        Lambda[topOrder, internal] = result$Lambda[,internalInds]
+        Omega[internal, internal] = result$Omega[internalInds, internalInds]
+      }
+      return(list(Lambda = Lambda, Omega = Omega))
+    }
+  )
+}
+
 #' A general identification algorithm template
 #'
 #' A function that encapsulates the general structure of our algorithms for
@@ -50,40 +129,65 @@ createSimpleBiDirIdentifier <- function(idFunc) {
 #'
 #' @inheritParams graphID
 #' @param idStepFunctions a list of identification step functions
+#' @param tianDecompose True if the mixed graph be decomposed into Tian's
+#'        C-components before running the identification algorithms.
 #'
 #' @return a list
-generalGenericID <- function(L, O, idStepFunctions) {
-  validateMatrices(L, O)
+generalGenericID <- function(L, O, idStepFunctions, tianDecompose = T) {
   O = 1 * ((O + t(O)) != 0)
-  diag(O) = 0
   m = nrow(L)
 
   mixedGraph = MixedGraph(L, O)
   unsolvedParents = lapply(1:m, function(node) { mixedGraph$allParents(node) })
   solvedParents = rep(list(numeric(0)), m)
-  identifier = createIdentifierBaseCase(L, O)
 
-  changeFlag = T
-  while (changeFlag) {
-    for (idStepFunction in idStepFunctions) {
-      idResult = idStepFunction(mixedGraph, unsolvedParents,
-                                solvedParents, identifier)
-      changeFlag = length(idResult$identifiedEdges) != 0
-      unsolvedParents = idResult$unsolvedParents
-      solvedParents = idResult$solvedParents
-      identifier = idResult$identifier
-      if (changeFlag) {
-        break
+  if (!tianDecompose) {
+    identifier = createIdentifierBaseCase(L, O)
+
+    changeFlag = T
+    while (changeFlag) {
+      for (idStepFunction in idStepFunctions) {
+        idResult = idStepFunction(mixedGraph, unsolvedParents,
+                                  solvedParents, identifier)
+        changeFlag = length(idResult$identifiedEdges) != 0
+        unsolvedParents = idResult$unsolvedParents
+        solvedParents = idResult$solvedParents
+        identifier = idResult$identifier
+        if (changeFlag) {
+          break
+        }
       }
     }
-  }
-  if (length(unlist(unsolvedParents)) == 0) {
-    identifier = createSimpleBiDirIdentifier(identifier)
-    solvedSiblings = lapply(1:m, FUN = function(x) { mixedGraph$allSiblings(x) })
-    unsolvedSiblings = rep(list(integer(0)), m)
+    if (length(unlist(unsolvedParents)) == 0) {
+      identifier = createSimpleBiDirIdentifier(identifier)
+      solvedSiblings = lapply(1:m, FUN = function(x) { mixedGraph$allSiblings(x) })
+      unsolvedSiblings = rep(list(integer(0)), m)
+    } else {
+      solvedSiblings = rep(list(integer(0)), m)
+      unsolvedSiblings = lapply(1:m, FUN = function(x) { mixedGraph$allSiblings(x) })
+    }
   } else {
     solvedSiblings = rep(list(integer(0)), m)
-    unsolvedSiblings = lapply(1:m, FUN = function(x) { mixedGraph$allSiblings(x) })
+    cComps = mixedGraph$tianDecompose()
+
+    compResults = vector("list", length(cComps))
+    identifiers = vector("list", length(cComps))
+
+    for (i in 1:length(cComps)) {
+      result = generalGenericID(cComps[[i]]$L, cComps[[i]]$O, idStepFunctions, tianDecompose = F)
+      internal = cComps[[i]]$internal
+      compResults[[i]] = result
+      for (j in 1:length(internal)) {
+        solvedParents[[internal[j]]] = c(solvedParents[[internal[j]]], result$solvedParents[[j]])
+        solvedSiblings[[internal[j]]] = c(solvedSiblings[[internal[j]]], result$solvedSiblings[[j]])
+      }
+
+      identifiers[[i]] = result$identifier
+    }
+
+    unsolvedParents = lapply(1:m, FUN = function(x) { setdiff(mixedGraph$allParents(x), solvedParents[[x]]) })
+    unsolvedSiblings = lapply(1:m, FUN = function(x) { setdiff(mixedGraph$allSiblings(x), solvedSiblings[[x]]) })
+    identifier = tianIdentifier(identifiers, cComps)
   }
   return(list(solvedParents = solvedParents,
               unsolvedParents = unsolvedParents,

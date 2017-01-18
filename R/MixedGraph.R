@@ -501,11 +501,13 @@ setMethodS3("tianDecompose", "MixedGraph", function(this) {
   numComponents = length(components)
 
   shrunkO = matrix(0, numComponents, numComponents)
+  shrunkL = matrix(0, numComponents, numComponents)
 
   if (numComponents > 1) {
     for (i in 1:(numComponents - 1)) {
       for (j in (i+1):numComponents) {
         shrunkO[i,j] = 1 * any(this$.internalGraph$.O[components[[i]], components[[j]]] != 0)
+        shrunkL[i,j] = 1 * any(this$.internalGraph$.L[components[[i]], components[[j]]] != 0)
       }
     }
     shrunkO = shrunkO + t(shrunkO)
@@ -513,15 +515,19 @@ setMethodS3("tianDecompose", "MixedGraph", function(this) {
 
   biGraph = igraph::graph.adjacency(shrunkO, mode = "undirected")
   biComponents = igraph::components(biGraph)$membership
+  shrunkTopOrder = as.numeric(igraph::topological.sort(igraph::graph.adjacency(shrunkL, mode = "directed"), mode = "out"))
+  topOrder = unlist(components[shrunkTopOrder])
 
   cComponents = rep(list(list()), max(biComponents))
 
   for (i in 1:max(biComponents)) {
     superNodes = which(biComponents == i)
-    internal = sort(unlist(components[superNodes]))
-    incoming = sort(setdiff(this$.internalGraph$allParents(internal), internal))
-    indsInt = 1:length(internal)
-    indsInc = if (length(incoming) != 0) { length(internal) + 1:length(incoming) } else { c() }
+    internal = topOrder[topOrder %in% unlist(components[superNodes])]
+    incoming = topOrder[topOrder %in% setdiff(this$.internalGraph$allParents(internal), internal)]
+    allOrdered = topOrder[topOrder %in% c(internal, incoming)]
+
+    indsInt = which(allOrdered %in% internal)
+    indsInc = if (length(incoming) != 0) { which(allOrdered %in% incoming) } else { c() }
     newL = matrix(0, length(internal) + length(incoming), length(internal) + length(incoming))
     newO = newL
     newL[c(indsInt, indsInc), indsInt] =
@@ -530,8 +536,7 @@ setMethodS3("tianDecompose", "MixedGraph", function(this) {
 
     cComponents[[i]]$internal = this$toEx(internal)
     cComponents[[i]]$incoming = this$toEx(incoming)
-    cComponents[[i]]$vertexOrder = c(cComponents[[i]]$internal,
-                                     cComponents[[i]]$incoming)
+    cComponents[[i]]$topOrder = allOrdered
     cComponents[[i]]$L = newL
     cComponents[[i]]$O = newO
   }
@@ -539,5 +544,12 @@ setMethodS3("tianDecompose", "MixedGraph", function(this) {
   return(cComponents)
 }, appendVarArgs = F)
 
-
+#' Plot the mixed graph
+#'
+#' @name     plot.MixedGraph
+#' @export   plot.MixedGraph
+NULL
+setMethodS3("plot", "MixedGraph", function(this) {
+  plotMixedGraph(this$.L, this$.O, vertexLabels = this$.vertexNums)
+}, appendVarArgs = F)
 
