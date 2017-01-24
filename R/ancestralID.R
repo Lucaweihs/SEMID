@@ -1,13 +1,192 @@
-#' Get ancestors of nodes in a graph.
+#' Create an ancestral identification function.
 #'
-#' Get the ancestors of a collection of nodes in a graph g, the ancestors DO
+#' A helper function for ancestralIdentifyStep, creates an identifier function
+#' based on its given parameters. This created identifier function will
+#' identify the directed edges from 'targets' to 'node.'
+#'
+#' @inheritParams createHtcIdentifier
+#' @param idFunc
+#'
+#' @param ancestralSubset an ancestral subset of the graph containing node.
+#' @param cComponent a list corresponding to the c-component containing node
+#'        in the subgraph induced by ancestralSubset. See
+#'        \code{\link{tianDecompose}} for how such c-component lists are formed.
+#'
+#' @return an identification function
+createAncestralIdentifier <- function(idFunc, sources, targets, node,
+                                      htrSources, ancestralSubset, cComponent) {
+  # Necessary 'redundant' assignments
+  idFunc <- idFunc
+  sources <- sources
+  targets <- targets
+  node <- node
+  htrSources <- htrSources
+  ancestralSubset <- sort(ancestralSubset)
+  cComponent <- cComponent
+  return(
+    function(Sigma) {
+      m <- nrow(Sigma)
+      identifiedParams <- idFunc(Sigma)
+      Lambda <- identifiedParams$Lambda
+
+      topOrder = cComponent$topOrder
+
+      afterAnc = function(x) { which(x == ancestralSubset) }
+      topOrderAfterAnc = sapply(topOrder, afterAnc)
+      sourcesAfterAnc = sapply(sources, afterAnc)
+      targetsAfterAnc = sapply(targets, afterAnc)
+      htrSourcesAfterAnc = sapply(htrSources, afterAnc)
+      internalAfterAnc = sapply(cComponent$internal, afterAnc)
+      incomingAfterAnc = sapply(cComponent$incoming, afterAnc)
+      nodeAfterAnc = afterAnc(node)
+
+      SigmaAnc = Sigma[ancestralSubset, ancestralSubset]
+      SigmaAncTian = tianSigmaForComponent(SigmaAnc, internalAfterAnc,
+                                           incomingAfterAnc,
+                                           topOrderAfterAnc)
+
+      afterAncTian = function(x) { which(x == topOrderAfterAnc) }
+      sourcesAfterAncTian = sapply(sourcesAfterAnc, afterAncTian)
+      targetsAfterAncTian = sapply(targetsAfterAnc, afterAncTian)
+      htrSourcesAfterAncTian = sapply(htrSourcesAfterAnc, afterAncTian)
+      nodeAfterAncTian = afterAncTian(nodeAfterAnc)
+
+      LambdaAfterAncTian = Lambda[ancestralSubset, ancestralSubset, drop = F]
+      LambdaAfterAncTian = LambdaAfterAncTian[topOrderAfterAnc, topOrderAfterAnc, drop = F]
+
+      SigmaMinus = SigmaAncTian
+      for (source in htrSourcesAfterAncTian) {
+        SigmaMinus[source,] = SigmaAncTian[source,] - t(LambdaAfterAncTian[,source,drop = F]) %*% SigmaAncTian
+      }
+
+      if (abs(det(SigmaMinus[sourcesAfterAncTian, targetsAfterAncTian, drop = F])) < 10^-10) {
+        stop("In identification, found near-singular system. Is the input matrix generic?")
+      }
+
+      sols <-
+        solve(SigmaMinus[sourcesAfterAncTian, targetsAfterAncTian, drop = F],
+              SigmaMinus[sourcesAfterAncTian, nodeAfterAncTian, drop = F])
+
+      undoAncTian = function(x) { ancestralSubset[topOrderAfterAnc[x]] }
+      Lambda[undoAncTian(targetsAfterAncTian), node] = sols
+
+      return(list(Lambda = Lambda, Omega = identifiedParams$Omega))
+    }
+  )
+}
+
+#' Perform one iteration of ancestral identification.
+#'
+#' A function that does one step through all the nodes in a mixed graph
+#' and tries to determine if directed edge coefficients are generically
+#' identifiable by leveraging decomposition by ancestral subsets. See
+#' algorithm 1 of Drton and Weihs (2015); this version of the algorithm
+#' is somewhat different from Drton and Weihs (2015) in that it also works
+#' on cyclic graphs.
+#'
+#' @inheritParams htcIdentifyStep
+#'
+#' @return a list
+#'
+#' @export
+#'
+#' @references
+#' {Drton}, M. and {Weihs}, L. (2015) Generic Identifiability of Linear
+#' Structural Equation Models by Ancestor Decomposition. arXiv 1504.02992
+ancestralIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
+                                identifier) {
+  identifiedEdges = c()
+  m = mixedGraph$numNodes()
+  ancestralComps = rep(list(list()), m)
+  solvedNodes = which(sapply(unsolvedParents,
+                             FUN = function(x) { length(x) == 0 }))
+  for (i in 1:m) {
+    unsolved = unsolvedParents[[i]]
+    if (length(unsolved) != 0) {
+
+      if (length(ancestralComps[[i]]) == 0) {
+        nodeAncestors = mixedGraph$ancestors(i)
+        ancGraph = mixedGraph$inducedSubgraph(nodeAncestors)
+        tianComp = ancGraph$tianComponent(i)
+        tianComp$mixedGraph = MixedGraph(tianComp$L, tianComp$O,
+                                         vertexNums = tianComp$topOrder)
+        ancestralComps[[i]] = tianComp
+        ancestralComps[[i]]$ancestors = nodeAncestors
+      }
+
+      nodeParents = ancGraph$allParents(i)
+
+      # Using the first ancestor graph
+      ancGraph = ancestralComps[[i]]$mixedGraph
+      htrFromNode = ancGraph$htrFrom(i)
+      allowedNodes = setdiff(solvedNodes, ancGraph$allSiblings(i))
+      allowedNodes = union(setdiff(ancGraph$nodes(), htrFromNode), allowedNodes)
+      allowedNodes = intersect(ancGraph$nodes(), allowedNodes)
+      if (length(allowedNodes) >= length(nodeParents)) {
+        halfTrekSystemResult = ancGraph$getHalfTrekSystem(allowedNodes,
+                                                          nodeParents)
+        if (halfTrekSystemResult$systemExists) {
+          identifiedEdges = c(identifiedEdges, as.numeric(rbind(nodeParents, i)))
+          activeFrom = halfTrekSystemResult$activeFrom
+          identifier = createAncestralIdentifier(
+            identifier, activeFrom, nodeParents, i,
+           intersect(activeFrom, htrFromNode), ancestralComps[[i]]$ancestors,
+           ancestralComps[[i]])
+          solvedParents[[i]] = nodeParents
+          unsolvedParents[[i]] = integer()
+          solvedNodes = c(i, solvedNodes)
+        }
+        next
+      }
+
+      # Using the second ancestor graph
+      nodeAncestors = mixedGraph$ancestors(i)
+      nodeAncSibs = union(nodeAncestors, mixedGraph$allSiblings(nodeAncestors))
+      allowedAncSibs = intersect(nodeAncSibs,
+                                 setdiff(union(solvedNodes,
+                                       setdiff(1:m, mixedGraph$htrFrom(i))),
+                                       c(i, mixedGraph$allSiblings(i))))
+      ancGraph = mixedGraph$inducedSubgraph(mixedGraph$ancestors(c(i,allowedAncSibs)))
+      tianComp = ancGraph$tianComponent(i)
+      allowedNodes = union(intersect(allowedAncSibs, tianComp$internal), tianComp$incoming)
+
+      htrFromNode = ancGraph$htrFrom(i)
+      allowedNodes = setdiff(solvedNodes, ancGraph$allSiblings(i))
+      allowedNodes = union(setdiff(ancGraph$nodes(), htrFromNode), allowedNodes)
+      allowedNodes = intersect(ancGraph$nodes(), allowedNodes)
+
+      tianAncGraph = MixedGraph(tianComp$L, tianComp$O, tianComp$topOrder)
+      if (length(allowedNodes) >= length(nodeParents)) {
+        halfTrekSystemResult = tianAncGraph$getHalfTrekSystem(allowedNodes,
+                                                              nodeParents)
+        if (halfTrekSystemResult$systemExists) {
+          identifiedEdges = c(identifiedEdges, as.numeric(rbind(nodeParents, i)))
+          activeFrom = halfTrekSystemResult$activeFrom
+          identifier = createAncestralIdentifier(
+            identifier, activeFrom, nodeParents, i,
+            intersect(activeFrom, htrFromNode), ancGraph$nodes(), tianComp)
+          solvedParents[[i]] = nodeParents
+          unsolvedParents[[i]] = integer()
+          solvedNodes = c(i, solvedNodes)
+        }
+      }
+    }
+  }
+  return(list(identifiedEdges = identifiedEdges, unsolvedParents = unsolvedParents,
+              solvedParents = solvedParents, identifier = identifier))
+}
+
+
+#' Get getAncestors of nodes in a graph.
+#'
+#' Get the getAncestors of a collection of nodes in a graph g, the getAncestors DO
 #' include the the nodes themselves.
 #'
 #' @param g the graph (as an igraph).
-#' @param nodes the nodes in the graph of which to get the ancestors.
+#' @param nodes the nodes in the graph of which to get the getAncestors.
 #'
 #' @return a sorted vector of all ancestor nodes.
-ancestors <- function(g, nodes) {
+getAncestors <- function(g, nodes) {
   if (vcount(g) == 0 || length(nodes) == 0) {
     return(numeric(0))
   }
@@ -16,32 +195,32 @@ ancestors <- function(g, nodes) {
   #sort(unique(unlist(neighborhood(g, vcount(g), nodes=nodes, mode="in"))))
 }
 
-#' Get parents of nodes in a graph.
+#' Get getParents of nodes in a graph.
 #'
-#' Get the parents of a collection of nodes in a graph g, the parents DO include
+#' Get the getParents of a collection of nodes in a graph g, the getParents DO include
 #' the input nodes themselves.
 #'
-#' @param nodes the nodes in the graph of which to get the parents.
-#' @inheritParams ancestors
+#' @param nodes the nodes in the graph of which to get the getParents.
+#' @inheritParams getAncestors
 #'
 #' @return a sorted vector of all parent nodes.
-parents <- function(g, nodes) {
+getParents <- function(g, nodes) {
   if (vcount(g) == 0 || length(nodes) == 0) {
     return(numeric(0))
   }
   sort(unique(unlist(neighborhood(g, 1, nodes = nodes, mode = "in"))))
 }
 
-#' Get siblings of nodes in a graph.
+#' Get getSiblings of nodes in a graph.
 #'
-#' Get the siblings of a collection of nodes in a graph g, the siblings DO
+#' Get the getSiblings of a collection of nodes in a graph g, the getSiblings DO
 #' include the input nodes themselves.
 #'
-#' @param nodes the nodes in the graph of which to get the siblings.
-#' @inheritParams ancestors
+#' @param nodes the nodes in the graph of which to get the getSiblings.
+#' @inheritParams getAncestors
 #'
-#' @return a sorted vector of all siblings of nodes.
-siblings <- function(g, nodes) {
+#' @return a sorted vector of all getSiblings of nodes.
+getSiblings <- function(g, nodes) {
   if (vcount(g) == 0 || length(nodes) == 0) {
     return(numeric(0))
   }
@@ -55,7 +234,7 @@ siblings <- function(g, nodes) {
 #' include the nodes themselves.
 #'
 #' @param nodes the nodes in the graph of which to get the descendants.
-#' @inheritParams ancestors
+#' @inheritParams getAncestors
 #'
 #' @return a sorted vector of all descendants of nodes.
 descendants <- function(g, nodes) {
@@ -72,8 +251,8 @@ descendants <- function(g, nodes) {
 #' Gets all vertices in a graph that are half-trek reachable from a set of
 #' nodes.
 #' WARNING: Often the half-trek reachable nodes from a vertex v are defined to
-#' not include the vertex v or its siblings. We DO NOT follow this convention,
-#' the returned set will include input nodes and their siblings.
+#' not include the vertex v or its getSiblings. We DO NOT follow this convention,
+#' the returned set will include input nodes and their getSiblings.
 #'
 #' @inheritParams getMixedCompForNode
 #' @param nodes the nodes in the graph of which to get the HTR nodes.
@@ -86,7 +265,7 @@ htr <- function(dG, bG, nodes) {
   if (vcount(dG) == 0 || length(nodes) == 0) {
     return(numeric(0))
   }
-  return(descendants(dG, siblings(bG, nodes)))
+  return(descendants(dG, getSiblings(bG, nodes)))
 }
 
 #' Get the mixed component of a node in a mixed subgraph.
@@ -120,19 +299,19 @@ getMixedCompForNode <- function(dG, bG, subNodes, node) {
     as.numeric(sort(graph.bfs(bG, root = node, restricted = subNodes - 1,
                               neimode = "total", unreachable = F)$order))
   incomingNodes =
-    intersect(setdiff(parents(dG, bidirectedComp), bidirectedComp),
+    intersect(setdiff(getParents(dG, bidirectedComp), bidirectedComp),
               subNodes)
   return(list(biNodes = bidirectedComp, inNodes = incomingNodes))
 }
 
 
 #' Size of largest HT system Y satisfying the HTC for a node v except perhaps
-#' having |parents(v)| < |Y|.
+#' having |getParents(v)| < |Y|.
 #'
 #' For an input mixed graph H, constructs the Gflow graph as described in Foygel
 #' et al. (2012) for a subgraph G of H. A max flow algorithm is then run on
 #' Gflow to determine the largest half-trek system in G to a particular node's
-#' parents given a set of allowed nodes. Here G should consist of a bidirected
+#' getParents given a set of allowed nodes. Here G should consist of a bidirected
 #' part and nodes which are not in the bidirected part but are a parent of some
 #' node in the bidirected part. G should contain the node for which to compute
 #' the max flow.
@@ -158,7 +337,7 @@ getMaxFlow <- function(L, O, allowedNodes, biNodes, inNodes, node) {
                "some bi-nodes or node was not in biNodes."))
   }
   if (length(intersect(allowedNodes, c(node, which(O[node,] == 1)))) != 0) {
-    stop("Allowed nodes contained siblings of input node or the node itself.")
+    stop("Allowed nodes contained getSiblings of input node or the node itself.")
   }
   allowedNodes = union(allowedNodes, inNodes)
   m = length(biNodes) + length(inNodes)
@@ -186,7 +365,7 @@ getMaxFlow <- function(L, O, allowedNodes, biNodes, inNodes, node) {
   Cap.matrix <- matrix(0, 2 + 3*m, 2 + 3*m)
 
   for (i in 1:m) {
-    # edge from L(i) to R(i)-in, and to R(j)-in for all siblings j of i
+    # edge from L(i) to R(i)-in, and to R(j)-in for all getSiblings j of i
     Cap.matrix[2 + i, 2 + m + c(i, which(O[i,] == 1))] <- 1
     # edge from R(i)-in to R(i)-out
     Cap.matrix[2 + m + i, 2 + 2*m + i] <- 1
@@ -240,7 +419,7 @@ graphID.ancestralID <- function(L, O) {
   # half-trek system for v
   halfTrekSources = vector("list", length = m)
   for (i in 1:m) {
-    halfTrekSources[[i]] = siblings(bG, ancestors(dG, i))
+    halfTrekSources[[i]] = getSiblings(bG, getAncestors(dG, i))
   }
 
   # A matrix determining which nodes are half-trek reachable from each node
@@ -250,7 +429,7 @@ graphID.ancestralID <- function(L, O) {
   }
 
   Solved.nodes <- rep(0, m)
-  Solved.nodes[which(colSums(L) == 0)] <- 1 # nodes with no parents
+  Solved.nodes[which(colSums(L) == 0)] <- 1 # nodes with no getParents
   change <- 1
   count <- 1
   while (change == 1) {
@@ -264,7 +443,7 @@ graphID.ancestralID <- function(L, O) {
       # A <- A intersect (nodes that can ever be in a HT system for i)
       A = intersect(A, halfTrekSources[[i]])
 
-      mixedCompList = getMixedCompForNode(dG, bG, ancestors(dG, c(i,A)), i)
+      mixedCompList = getMixedCompForNode(dG, bG, getAncestors(dG, c(i,A)), i)
       flow = getMaxFlow(L, O, A,
                         mixedCompList$biNodes, mixedCompList$inNodes, i)
       if (flow == sum(L[,i])) {
@@ -274,7 +453,7 @@ graphID.ancestralID <- function(L, O) {
         next
       }
 
-      mixedCompList = getMixedCompForNode(dG, bG, ancestors(dG, i), i)
+      mixedCompList = getMixedCompForNode(dG, bG, getAncestors(dG, i), i)
       A = intersect(A, unlist(mixedCompList))
       flow = getMaxFlow(L, O, A,
                         mixedCompList$biNodes, mixedCompList$inNodes, i)

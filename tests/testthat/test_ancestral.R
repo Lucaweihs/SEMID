@@ -1,79 +1,157 @@
 library(SEMID)
 context("Components related to generic identifiability by ancestor decomposition.")
 
-test_that("ancestors function works as expected.", {
+ancestralID = function(L, O) {
+  return(generalGenericID(L, O, list(ancestralIdentifyStep), tianDecompose = F))
+}
+
+test_that("Ancestral identification does not identify edges erroneously.", {
+  # Random test
+  set.seed(232)
+  ps = c(.3)
+  sims = 30
+  ns = c(5, 6)
+  for (p in ps) {
+    for (n in ns) {
+      for (i in 1:sims) {
+        L = rDirectedAdjMatrix(n, p)
+        O = rUndirectedAdjMat(n, p)
+        gid = htcID(L, O)
+        aid = ancestralID(L, O)
+
+        expect_true(all(sapply(1:n, FUN = function(x) {
+          all(gid$solvedParents[[x]] %in% aid$solvedParents[[x]])
+        })))
+
+        randomIdentificationTest(aid$identifier, L, O, aid$solvedParents)
+      }
+    }
+  }
+})
+
+test_that("Old and new ancestralID implementations agree.", {
+  # Random test
+  set.seed(123)
+  ps = c(.2, .4, .6, .8)
+  sims = 10
+  ns = c(2, 4, 6)
+  for (p in ps) {
+    for (n in ns) {
+      for (i in 1:sims) {
+        L = rAcyclicDirectedAdjMatrix(n, p)
+        O = rConnectedAdjMatrix(n, p)
+        gia = sort(graphID.ancestralID(L, O))
+        aid = ancestralID(L, O)
+        solvedAid = setdiff(1:n, which(sapply(aid$unsolvedParents,
+                                        FUN = function(x) { length(x) != 0 })))
+        randomIdentificationTest(aid$identifier, L, O, aid$solvedParents)
+        expect_true(all(gia == solvedAid))
+      }
+    }
+  }
+})
+
+test_that("graphID.ancestralID function works as expected.", {
+  # Random test
+  set.seed(23231)
+  ps = c(.2, .4, .6, .8)
+  sims = 10
+  ns = c(2, 4, 6)
+  for(p in ps) {
+    for(n in ns) {
+      for(i in 1:sims) {
+        L = rAcyclicDirectedAdjMatrix(n, p)
+        O = rConnectedAdjMatrix(n, p)
+        gia = graphID.ancestralID(L, O)
+        gig = graphID.htcID(L, O)
+        gin = graphID.nonHtcID(L, O)
+        expect_true(length(gia) >= length(gig))
+        expect_true(all(gig %in% gia))
+        expect_true((length(gia) != n) || !gin)
+      }
+    }
+  }
+
+  dG = igraph::graph.edgelist(matrix(c(1,2, 1,3, 1,6, 2,3, 2,4, 2,5, 2,6, 3,4, 4,5),
+                                     ncol=2, byrow=T))
+  bG = igraph::graph.edgelist(matrix(c(1,6, 1,4, 2,3, 2,5, 2,6),
+                                     ncol=2, byrow=T), directed=F)
+  expect_equal(as.numeric(sort(graphID.ancestralID(getAdjMat(dG), getAdjMat(bG)))), 1:6)
+})
+
+test_that("getAncestors function works as expected.", {
   ## Output should be empty
-  expect_equal(ancestors(igraph::graph.empty(), c()), numeric(0))
-  expect_equal(ancestors(igraph::graph.empty(), c(1,2,3)), numeric(0))
-  expect_equal(ancestors(igraph::graph.star(5, mode="in"), c()), numeric(0))
+  expect_equal(getAncestors(igraph::graph.empty(), c()), numeric(0))
+  expect_equal(getAncestors(igraph::graph.empty(), c(1,2,3)), numeric(0))
+  expect_equal(getAncestors(igraph::graph.star(5, mode="in"), c()), numeric(0))
 
   # Graph with no edges
-  expect_equal(ancestors(igraph::graph.empty(5), 1), 1)
-  expect_equal(ancestors(igraph::graph.empty(5), 2), 2)
-  expect_equal(ancestors(igraph::graph.empty(5), c(2,4,5)), c(2,4,5))
+  expect_equal(getAncestors(igraph::graph.empty(5), 1), 1)
+  expect_equal(getAncestors(igraph::graph.empty(5), 2), 2)
+  expect_equal(getAncestors(igraph::graph.empty(5), c(2,4,5)), c(2,4,5))
 
   # Graphs with edges
-  expect_equal(ancestors(igraph::graph.star(5, mode="in"), 1), 1:5)
-  expect_equal(ancestors(igraph::graph.star(5, mode="in"), 2), 2)
-  expect_equal(ancestors(igraph::graph.star(5, mode="out"), 1), 1)
-  expect_equal(ancestors(igraph::graph.full(5, directed=T), 1), 1:5)
+  expect_equal(getAncestors(igraph::graph.star(5, mode="in"), 1), 1:5)
+  expect_equal(getAncestors(igraph::graph.star(5, mode="in"), 2), 2)
+  expect_equal(getAncestors(igraph::graph.star(5, mode="out"), 1), 1)
+  expect_equal(getAncestors(igraph::graph.full(5, directed=T), 1), 1:5)
   g = igraph::graph.edgelist(matrix(c(1,2,2,3,3,5,5,7,2,4,4,6,6,7,4,5), ncol=2, byrow=T))
-  expect_equal(ancestors(g, 1), 1)
-  expect_equal(ancestors(g, 2), c(1,2))
-  expect_equal(ancestors(g, 4), c(1,2,4))
-  expect_equal(ancestors(g, 5), c(1,2,3,4,5))
-  expect_equal(ancestors(g, 6), c(1,2,4,6))
-  expect_equal(ancestors(g, c(6, 3)), c(1,2,3,4,6))
-  expect_equal(ancestors(g, 7), 1:7)
+  expect_equal(getAncestors(g, 1), 1)
+  expect_equal(getAncestors(g, 2), c(1,2))
+  expect_equal(getAncestors(g, 4), c(1,2,4))
+  expect_equal(getAncestors(g, 5), c(1,2,3,4,5))
+  expect_equal(getAncestors(g, 6), c(1,2,4,6))
+  expect_equal(getAncestors(g, c(6, 3)), c(1,2,3,4,6))
+  expect_equal(getAncestors(g, 7), 1:7)
 })
 
-test_that("parents function works as expected.", {
+test_that("getParents function works as expected.", {
   ## Output should be empty
-  expect_equal(parents(igraph::graph.empty(), c()), numeric(0))
-  expect_equal(parents(igraph::graph.empty(), c(1,2,3)), numeric(0))
-  expect_equal(parents(igraph::graph.star(5, mode="in"), c()), numeric(0))
+  expect_equal(getParents(igraph::graph.empty(), c()), numeric(0))
+  expect_equal(getParents(igraph::graph.empty(), c(1,2,3)), numeric(0))
+  expect_equal(getParents(igraph::graph.star(5, mode="in"), c()), numeric(0))
 
   # Graph with no edges
-  expect_equal(parents(igraph::graph.empty(5), 1), 1)
-  expect_equal(parents(igraph::graph.empty(5), 2), 2)
-  expect_equal(parents(igraph::graph.empty(5), c(2,4,5)), c(2,4,5))
+  expect_equal(getParents(igraph::graph.empty(5), 1), 1)
+  expect_equal(getParents(igraph::graph.empty(5), 2), 2)
+  expect_equal(getParents(igraph::graph.empty(5), c(2,4,5)), c(2,4,5))
 
   # Graphs with edges
-  expect_equal(parents(igraph::graph.star(5, mode="in"), 1), 1:5)
-  expect_equal(parents(igraph::graph.star(5, mode="in"), 2), 2)
-  expect_equal(parents(igraph::graph.star(5, mode="out"), 1), 1)
-  expect_equal(parents(igraph::graph.full(5, directed=T), 1), 1:5)
+  expect_equal(getParents(igraph::graph.star(5, mode="in"), 1), 1:5)
+  expect_equal(getParents(igraph::graph.star(5, mode="in"), 2), 2)
+  expect_equal(getParents(igraph::graph.star(5, mode="out"), 1), 1)
+  expect_equal(getParents(igraph::graph.full(5, directed=T), 1), 1:5)
   g = igraph::graph.edgelist(matrix(c(1,2,2,3,3,5,5,7,2,4,4,6,6,7,4,5,1,7), ncol=2, byrow=T))
-  expect_equal(parents(g, 1), 1)
-  expect_equal(parents(g, 2), c(1,2))
-  expect_equal(parents(g, 4), c(2,4))
-  expect_equal(parents(g, 5), c(3,4,5))
-  expect_equal(parents(g, 6), c(4,6))
-  expect_equal(parents(g, c(6, 3)), c(2,3,4,6))
-  expect_equal(parents(g, 7), c(1,5,6,7))
+  expect_equal(getParents(g, 1), 1)
+  expect_equal(getParents(g, 2), c(1,2))
+  expect_equal(getParents(g, 4), c(2,4))
+  expect_equal(getParents(g, 5), c(3,4,5))
+  expect_equal(getParents(g, 6), c(4,6))
+  expect_equal(getParents(g, c(6, 3)), c(2,3,4,6))
+  expect_equal(getParents(g, 7), c(1,5,6,7))
 })
 
-test_that("siblings function works as expected.", {
+test_that("getSiblings function works as expected.", {
   ## Output should be empty
-  expect_equal(siblings(igraph::graph.empty(), c()), numeric(0))
-  expect_equal(siblings(igraph::graph.empty(), c(1,2,3)), numeric(0))
-  expect_equal(siblings(igraph::graph.star(5, mode="in"), c()), numeric(0))
+  expect_equal(getSiblings(igraph::graph.empty(), c()), numeric(0))
+  expect_equal(getSiblings(igraph::graph.empty(), c(1,2,3)), numeric(0))
+  expect_equal(getSiblings(igraph::graph.star(5, mode="in"), c()), numeric(0))
 
   # Graph with no edges
-  expect_equal(siblings(igraph::graph.empty(5), 1), 1)
-  expect_equal(siblings(igraph::graph.empty(5), 2), 2)
-  expect_equal(siblings(igraph::graph.empty(5), c(2,4,5)), c(2,4,5))
+  expect_equal(getSiblings(igraph::graph.empty(5), 1), 1)
+  expect_equal(getSiblings(igraph::graph.empty(5), 2), 2)
+  expect_equal(getSiblings(igraph::graph.empty(5), c(2,4,5)), c(2,4,5))
 
   # Graphs with edges
-  expect_equal(siblings(igraph::graph.star(5, mode="in"), 1), 1:5)
-  expect_equal(siblings(igraph::graph.star(5, mode="in"), 2), c(1,2))
-  expect_equal(siblings(igraph::graph.star(5, mode="out"), 1), 1:5)
-  expect_equal(siblings(igraph::graph.star(5, mode = "undirected"), 1), 1:5)
-  expect_equal(siblings(igraph::graph.full(5, directed=F), 1), 1:5)
+  expect_equal(getSiblings(igraph::graph.star(5, mode="in"), 1), 1:5)
+  expect_equal(getSiblings(igraph::graph.star(5, mode="in"), 2), c(1,2))
+  expect_equal(getSiblings(igraph::graph.star(5, mode="out"), 1), 1:5)
+  expect_equal(getSiblings(igraph::graph.star(5, mode = "undirected"), 1), 1:5)
+  expect_equal(getSiblings(igraph::graph.full(5, directed=F), 1), 1:5)
   g = igraph::graph.edgelist(matrix(c(1,2,2,3,3,5,5,7,2,4,4,6,6,7,4,5,1,7), ncol=2, byrow=T), directed = F)
-  expect_equal(siblings(g, 1), c(1,2,7))
-  expect_equal(siblings(g, 2), c(1,2,3,4))
-  expect_equal(siblings(g, c(6, 3)), c(2,3,4,5,6,7))
+  expect_equal(getSiblings(g, 1), c(1,2,7))
+  expect_equal(getSiblings(g, 2), c(1,2,3,4))
+  expect_equal(getSiblings(g, c(6, 3)), c(2,3,4,5,6,7))
 })
 
 test_that("getMixedCompForNode function works as expected.", {
@@ -184,30 +262,3 @@ test_that("getMaxFlow function works as expected.", {
   expect_equal(getMaxFlow(L1, O1, allowedNodes=c(2,6), biNodes=1:6, inNodes=c(), node=5), 1)
 })
 
-test_that("graphID.ancestralID function works as expected.", {
-  # Random test
-  set.seed(23231)
-  ps = c(.2, .4, .6, .8)
-  sims = 10
-  ns = c(2, 4, 6)
-  for(p in ps) {
-    for(n in ns) {
-      for(i in 1:sims) {
-        L = rAcyclicDirectedAdjMatrix(n, p)
-        O = rConnectedAdjMatrix(n, p)
-        gia = graphID.ancestralID(L, O)
-        gig = graphID.htcID(L, O)
-        gin = graphID.nonHtcID(L, O)
-        expect_true(length(gia) >= length(gig))
-        expect_true(all(gig %in% gia))
-        expect_true((length(gia) != n) || !gin)
-      }
-    }
-  }
-
-  dG = igraph::graph.edgelist(matrix(c(1,2, 1,3, 1,6, 2,3, 2,4, 2,5, 2,6, 3,4, 4,5),
-                             ncol=2, byrow=T))
-  bG = igraph::graph.edgelist(matrix(c(1,6, 1,4, 2,3, 2,5, 2,6),
-                             ncol=2, byrow=T), directed=F)
-  expect_equal(as.numeric(sort(graphID.ancestralID(getAdjMat(dG), getAdjMat(bG)))), 1:6)
-})
