@@ -4,9 +4,15 @@
 #'
 #' @name FlowGraph
 #' @usage FlowGraph(L = matrix(0,1,1), vertexCaps = 1, edgeCaps = matrix(1,1,1))
-#' @export FlowGraph
 #'
-#' @inheritParams graphID
+#' @param L the adjacency matrix for the flow graph. The (i,j)th of L should be
+#'        a 1 if there is an edge from i to j and 0 otherwise.
+#' @param vertexCaps the capacity of the vertices in the flow graph, should
+#'        either be a single number or a vector whose ith entry is the capacity
+#'        of vertex i.
+#' @param edgeCaps the capacities of the edges in the the flow graph, should
+#'        be a matrix of the same dimensions as L with (i,j)th entry the
+#'        capacity of the i->j edge.
 #'
 #' @return An object representing the FlowGraph
 NULL
@@ -72,11 +78,18 @@ setConstructorS3("FlowGraph",
 
 #' Flow from one set of nodes to another.
 #'
-#' @name     flowBetween
-#' @export   flowBetween
-#' @export   flowBetween.FlowGraph
+#' @param sources the nodes from which flow should start.
+#' @param sinks the nodes at which the flow should end.
 #'
-NULL
+#' @return a list with two named components, \code{value} (the size of the
+#'         computed flow) and \code{activeSources} (a vector representing the
+#'         subset of sources which have non-zero flow out of them for the found
+#'         max-flow).
+#'
+#' @rdname   flowBetween
+#' @name     flowBetween.FlowGraph
+#' @usage    \method{flowBetween}{FlowGraph}(this, sources, sinks)
+#' @S3method flowBetween FlowGraph
 setMethodS3("flowBetween", "FlowGraph", function(this, sources, sinks) {
   igraph::E(this$.flowGraph)$capacity[this$.sOutIndices[sources]] = 1
   igraph::E(this$.flowGraph)$capacity[this$.tInIndices[sinks]] = 1
@@ -87,23 +100,29 @@ setMethodS3("flowBetween", "FlowGraph", function(this, sources, sinks) {
               activeSources = which(flowResult$flow[this$.sOutIndices] != 0)))
 }, appendVarArgs = F)
 
-#' Update vertex capacities
+#' Update vertex capacities.
 #'
-#' @name     updateVertexCapacities
-#' @export   updateVertexCapacities
-#' @export   updateVertexCapacities.FlowGraph
+#' @param vertices the vertices to update.
+#' @param newCaps the new capacities for the vertices.
 #'
-NULL
+#' @rdname   updateVertexCapacities
+#' @name     updateVertexCapacities.FlowGraph
+#' @usage    \method{updateVertexCapacities}{FlowGraph}(this, vertices, newCaps)
+#' @S3method updateVertexCapacities FlowGraph
 setMethodS3("updateVertexCapacities", "FlowGraph", function(this, vertices, newCaps) {
   igraph::E(this$.flowGraph)$capacity[this$.vertexCapEdges[vertices]] = newCaps
 }, appendVarArgs = F)
 
-#' Update edge capacities
+#' Update edge capacities.
 #'
-#' @name     updateEdgeCapacities
-#' @export   updateEdgeCapacities
-#' @export   updateEdgeCapacities.FlowGraph
-NULL
+#' @param edges the vertices to update (as a 2xr matrix with ith row
+#'        corresponding to the edge edges[i,1]->edges[i,2].
+#' @param newCaps the new capacities for the edges
+#'
+#' @rdname   updateEdgeCapacities
+#' @name     updateEdgeCapacities.FlowGraph
+#' @usage    \method{updateEdgeCapacities}{FlowGraph}(this, edges, newCaps)
+#' @S3method updateEdgeCapacities FlowGraph
 setMethodS3("updateEdgeCapacities", "FlowGraph", function(this, edges, newCaps) {
   if (is.vector(edges)) {
     edges = matrix(edges, nrow = 2)

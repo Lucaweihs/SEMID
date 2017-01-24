@@ -275,7 +275,7 @@ graphID.output.notalltests <- function(Graph.components, Decomp, output.type,
 
 #' Determine generic identifiability by Tian Decomposition and HTC
 #'
-#' Split a graph into mixed Tiancomponents and solve each separately
+#' Split a graph into mixed Tian components and solve each separately
 #' using the HTC.
 #'
 #' @inheritParams graphID

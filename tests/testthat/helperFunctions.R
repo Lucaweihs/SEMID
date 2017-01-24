@@ -56,7 +56,7 @@ randomIdentificationTest <- function(identifier, L, O, solvedParents) {
 
   identifiedParams = identifier(S1)
   toCheck = solvedParentsToIndexMat(solvedParents)
-  expect_true(all(!is.na(identifiedParams[toCheck])))
+  expect_true(all(!is.na(identifiedParams$Lambda[toCheck])))
   expect_true(all(abs(identifiedParams$Lambda - L1) < 10^-6, na.rm = T))
   expect_true(all(abs(identifiedParams$Omega - O1) < 10^-6, na.rm = T))
 }

@@ -1,8 +1,29 @@
-#' Create an htc identification function
+#' Create an htc identification function.
 #'
-#' TODO: Add details
+#' A helper function for htcIdentifyStep, creates an identifier function
+#' based on its given parameters. This created identifier function will
+#' identify the directed edges from 'targets' to 'node.'
+#'
+#' @param idFunc identification of edge coefficients often requires that other
+#'        edge coefficients already be identified. This argument should be a
+#'        function that produces all such identifications. The newly created
+#'        identifier function will return these identifications along with its
+#'        own.
+#' @param sources the sources of the half-trek system.
+#' @param targets the targets of the half-trek system (these should be the
+#'        parents of node).
+#' @param node the node for which all incoming edges are to be identified
+#'        (the tails of which are targets).
+#' @param htrSources the nodes in sources which are half-trek reachable from
+#'        node. All incoming edges to these sources should be identified by
+#'        idFunc for the newly created identification function to work.
 #'
 #' @return an identification function
+#'
+#' @references
+#' Foygel, R., Draisma, J., and Drton, M.  (2012) Half-trek criterion for
+#' generic identifiability of linear structural equation models.
+#' \emph{Ann. Statist.} 40(3): 1682-1713.
 createHtcIdentifier <- function(idFunc, sources, targets, node,
                                 htrSources) {
   # Necessary redundant assignments
@@ -39,24 +60,71 @@ createHtcIdentifier <- function(idFunc, sources, targets, node,
   )
 }
 
-#' Perform one iteration of htc identification.
+#' Perform one iteration of HTC identification.
 #'
 #' A function that does one step through all the nodes in a mixed graph
-#' and tries to identify new edge coefficients using half-treks.
+#' and tries to identify new edge coefficients using the existence of
+#' half-trek systems as described in Foygel, Draisma, Drton (2012).
+#'
+#' @param mixedGraph a \code{\link{MixedGraph}} object representing
+#'         the mixed graph.
+#' @param unsolvedParents a list whose ith index is a vector of all the parents
+#'        j of i in G which for which the edge j->i is not yet known to be
+#'        generically identifiable.
+#' @param solvedParents the complement of \code{unsolvedParents}, a list whose
+#'        ith index is a vector of all parents j of i for which the edge i->j
+#'        is known to be generically identifiable (perhaps by other algorithms).
+#' @param identifier an identification function that must produce the
+#'        identifications corresponding to those in solved parents. That is
+#'        \code{identifier} should be a function taking a single argument Sigma
+#'        (any generically generated covariance matrix corresponding
+#'        to the mixed graph) and returns a list with two named arguments
+#' \describe{
+#'   \item{Lambda}{denote the number of nodes in \code{mixedGraph} as n. Then
+#'                 Lambda is an nxn matrix whose i,jth entry
+#' \enumerate{
+#'   \item equals 0 if i is not a parent of j,
+#'   \item equals NA if i is a parent of j but \code{identifier} cannot
+#'         identify it generically,
+#'   \item equals the (generically) unique value corresponding to the weight
+#'         along the edge i->j that was used to produce Sigma.
+#' }}
+#'   \item{Omega}{just as Lambda but for the bidirected edges in the mixed
+#'                graph}
+#' }
+#'        such that if j is in \code{solvedParents[[i]]} we must have that
+#'        Lambda[j,i] is not NA.
+#'
+#' @return a list with four components:
+#' \describe{
+#'   \item{\code{identifiedEdges}}{a matrix rx2 matrix where r is the number
+#'   of edges that where identified by this function call and
+#'   \code{identifiedEdges[i,1] -> identifiedEdges[i,2]} was the ith edge
+#'   identified}
+#'   \item{\code{unsolvedParents}}{as the input argument but updated with
+#'   any newly identified edges}
+#'   \item{\code{solvedParents}}{as the input argument but updated with
+#'   any newly identified edges}
+#'   \item{\code{identifier}}{as the input argument but updated with
+#'   any newly identified edges}
+#' }
 #'
 #' @export
 #'
-#' @return a list
+#' @references
+#' Foygel, R., Draisma, J., and Drton, M.  (2012) Half-trek criterion for
+#' generic identifiability of linear structural equation models.
+#' \emph{Ann. Statist.} 40(3): 1682-1713
 htcIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
                            identifier) {
-  identifiedEdges = c()
-  m = mixedGraph$numNodes()
-  solvedNodes = which(sapply(unsolvedParents, FUN = function(x) { length(x) == 0 }))
-  for (i in setdiff(1:m, solvedNodes)) {
+  identifiedEdges = numeric(0)
+  allNodes = mixedGraph$nodes()
+  solvedNodes = which(sapply(unsolvedParents,
+                                      FUN = function(x) { length(x) == 0 }))
+  for (i in setdiff(allNodes, solvedNodes)) {
     htrFromNode = mixedGraph$htrFrom(i)
     allowedNodes = setdiff(solvedNodes, mixedGraph$allSiblings(i))
-    allowedNodes = union(setdiff(1:m, htrFromNode),
-                         intersect(allowedNodes, htrFromNode))
+    allowedNodes = union(setdiff(allNodes, htrFromNode), allowedNodes)
     nodeParents = mixedGraph$allParents(i)
     if (length(allowedNodes) < length(nodeParents)) {
       next
@@ -74,22 +142,56 @@ htcIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
       solvedNodes = c(i, solvedNodes)
     }
   }
-  return(list(identifiedEdges = identifiedEdges, unsolvedParents = unsolvedParents,
+  return(list(identifiedEdges = matrix(identifiedEdges, byrow = T, ncol = 2),
+              unsolvedParents = unsolvedParents,
               solvedParents = solvedParents, identifier = identifier))
 }
 
 #' Determines which edges in a mixed graph are HTC-identifiable.
 #'
 #' Uses the half-trek criterion of Foygel, Draisma, and Drton (2013) determine
-#' which edges in a mixed graph are generically identifiable.
+#' which edges in a mixed graph are generically identifiable. Depending on your
+#' application it faster to use the \code{\link{graphID.htcID}} function
+#' instead of this one, this function has the advantage of returning additional
+#' information.
 #'
 #' @export
 #'
 #' @inheritParams graphID
+#' @param tianDecompose TRUE or FALSE determining whether or not the Tian
+#'                      decomposition should be used before running the
+#'                      current generic identification algorithm. In general
+#'                      letting this be TRUE will make the algorithm faster and
+#'                      more powerful.
 #'
-#' @return a list
-htcID <- function(L, O) {
-  return(generalGenericID(L, O, list(htcIdentifyStep)))
+#' @return a list with 5 names arguments:
+#' \describe{
+#'   \item{\code{solvedParents}}{a list whose ith element contains a vector
+#'   containing the subsets of parents of node i for which the edge j->i could
+#'   be shown to be generically identifiable.}
+#'   \item{\code{unsolvedParents}}{as for \code{solvedParents} but for the
+#'   unsolved parents.}
+#'   \item{\code{solvedSiblings}}{as for \code{solvedParents} but for the
+#'   siblings of node i (i.e. the bidirected neighbors of i).}
+#'   \item{\code{unsolvedSiblings}}{as for \code{solvedSilbings} but for the
+#'   unsolved siblings of node i (i.e. the bidirected neighbors of i).}
+#'   \item{\code{identifier}}{a function that takes a (generic) covariance
+#'   matrix corresponding to the graph and identifies the edges parameters
+#'   from solvedParents and solvedSiblings. See \code{\link{htcIdentifyStep}}
+#'   for a more in-depth discussion of identifier functions.}
+#' }
+#'
+#' @references
+#' Foygel, R., Draisma, J., and Drton, M.  (2012) Half-trek criterion for
+#' generic identifiability of linear structural equation models.
+#' \emph{Ann. Statist.} 40(3): 1682-1713.
+#'
+#' Jin Tian. 2005. Identifying direct causal effects in linear models. In
+#' \emph{Proceedings of the 20th national conference on Artificial intelligence
+#' - Volume 1} (AAAI'05), Anthony Cohn (Ed.), Vol. 1. AAAI Press 346-352.
+htcID <- function(L, O, tianDecompose = T) {
+  return(generalGenericID(L, O, list(htcIdentifyStep),
+                          tianDecompose = tianDecompose))
 }
 
 #' Determines if a mixed graph is HTC-identifiable.
@@ -108,7 +210,6 @@ htcID <- function(L, O) {
 #' generic identifiability of linear structural equation models.
 #' \emph{Ann. Statist.} 40(3): 1682-1713.
 graphID.htcID <- function(L, O) {
-  #return(generalGenericID(L, O, list(htcIdentifyStep)))
   m <- nrow(L)
   validateMatrices(L, O)
   O <- 1 * ((O + t(O)) != 0)

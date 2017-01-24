@@ -93,7 +93,7 @@ edgewiseIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
 
       subsetFound = F
       subsetSizes = union(
-        length(unsolved):max((length(unsolved) - subsetSizeControl + 1), 1),
+        length(unsolved):min(max((length(unsolved) - subsetSizeControl + 1), 1), length(unsolved)),
         1:min(length(unsolved), subsetSizeControl))
 
       for (k in subsetSizes) {

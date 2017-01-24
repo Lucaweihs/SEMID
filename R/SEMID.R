@@ -9,5 +9,8 @@
 #'
 #' @import igraph
 #' @import utils
-"_PACKAGE"
-#> [1] "_PACKAGE"
+#' @importFrom R.oo Object setConstructorS3 extend
+#' @importFrom R.methodsS3 setMethodS3 throw
+#'
+#' @name SEMID-package
+NULL

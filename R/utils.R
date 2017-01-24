@@ -94,6 +94,10 @@ tianSigmaForComponent <- function(Sigma, internal, incoming, topOrder) {
   return(newSigma)
 }
 
+#' Identifies components in a tian decomposition
+#'
+#' @export
+#' @return This function has no return value.
 tianIdentifier <- function(idFuncs, cComponents) {
   idFuncs <- idFuncs
   cComponents <- cComponents
@@ -112,7 +116,10 @@ tianIdentifier <- function(idFuncs, cComponents) {
         result = idFuncs[[i]](newSigma)
         internalInds = which(topOrder %in% internal)
         Lambda[topOrder, internal] = result$Lambda[,internalInds]
+        Lambda[-topOrder, internal] = 0
         Omega[internal, internal] = result$Omega[internalInds, internalInds]
+        Omega[-internal, internal] = 0
+        Omega[internal, -internal] = 0
       }
       return(list(Lambda = Lambda, Omega = Omega))
     }
@@ -175,11 +182,11 @@ generalGenericID <- function(L, O, idStepFunctions, tianDecompose = T) {
 
     for (i in 1:length(cComps)) {
       result = generalGenericID(cComps[[i]]$L, cComps[[i]]$O, idStepFunctions, tianDecompose = F)
-      internal = cComps[[i]]$internal
+      topOrder = cComps[[i]]$topOrder
       compResults[[i]] = result
-      for (j in 1:length(internal)) {
-        solvedParents[[internal[j]]] = c(solvedParents[[internal[j]]], result$solvedParents[[j]])
-        solvedSiblings[[internal[j]]] = c(solvedSiblings[[internal[j]]], result$solvedSiblings[[j]])
+      for (j in 1:length(topOrder)) {
+        solvedParents[[topOrder[j]]] = c(solvedParents[[topOrder[j]]], topOrder[result$solvedParents[[j]]])
+        solvedSiblings[[topOrder[j]]] = c(solvedSiblings[[topOrder[j]]], topOrder[result$solvedSiblings[[j]]])
       }
 
       identifiers[[i]] = result$identifier

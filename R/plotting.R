@@ -21,10 +21,12 @@ plotMixedGraph <- function(L, O, main = "", vertexLabels = 1:nrow(L)) {
 
   biEdgeList = igraph::get.edgelist(biGraph)
   curvedOrNot = logical(nrow(biEdgeList))
-  for (i in 1:nrow(biEdgeList)) {
-    v1 = biEdgeList[i,1]
-    v2 = biEdgeList[i,2]
-    curvedOrNot[i] = (L[v1,v2] || L[v2,v1])
+  if (nrow(biEdgeList) != 0) {
+    for (i in 1:nrow(biEdgeList)) {
+      v1 = biEdgeList[i,1]
+      v2 = biEdgeList[i,2]
+      curvedOrNot[i] = (L[v1,v2] || L[v2,v1])
+    }
   }
   plot(biGraph, add = T, edge.color = "red", layout = layout,
        edge.curved = curvedOrNot, edge.arrow.mode = 3, vertex.size = 30,

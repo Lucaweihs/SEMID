@@ -1,25 +1,28 @@
 Package: SEMID
-Version: 0.2
-Date: 2015-12-17
+Type: Package
 Title: Identifiability of Linear Structural Equation Models
-Author: Rina Foygel Barber <rina@uchicago.edu>, Mathias Drton <md5@uw.edu>, Luca
-    Weihs <lucaw@uw.edu>.
-Maintainer: Mathias Drton <md5@uw.edu>
-Depends:
-    R.oo (>= 1.20.0),
-Imports:
-    igraph (>= 1.0.1),
-    R.utils (>= 2.3.0)
+Version: 0.2
+Author@R: c(person("Rina", "Foygel Barber", role=c("aut", "cre"), 
+                   email="rina@uchicago.edu"), 
+            person("Mathias", "Drton", role=c("aut", "cre"), 
+                   email="md5@uw.edu"), 
+            person("Luca", "Weihs", role=c("aut", "cre"), 
+                   email="lucaw@uw.edu"))
+Maintainer: Luca Weihs <lucaw@uw.edu>
 Description: Provides routines to check identifiability or non-identifiability
     of linear structural equation models as described in Drton, Foygel &
     Sullivant (Ann. Statist., 2011) and Foygel, Draisma & Drton (Ann. Statist.,
     2012). The routines are based on the graphical representation of
     structural equation models by a path diagram/mixed graph.
 License: GPL (>= 2)
-URL: http://www.r-project.org http://www.stat.washington.edu/~md5
-Packaged: 2013-08-16 17:09:31 UTC; root
-NeedsCompilation: no
-Repository: CRAN
+URL: https://github.com/Lucaweihs/SEMID
+BugReports: https://github.com/Lucaweihs/SEMID/issues
+Imports:
+    R.oo (>= 1.20.0),
+    igraph (>= 1.0.1),
+    R.utils (>= 2.3.0)
 Suggests:
     testthat
+NeedsCompilation: no
+Repository: CRAN
 RoxygenNote: 5.0.1
