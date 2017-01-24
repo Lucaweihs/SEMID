@@ -1,10 +1,12 @@
-#' Create an trek seperation identification function
+#' Create an trek separation identification function
 #'
-#' TODO: Add details
+#' A helper function for \link{\code{trekSeparationIdentifyStep}}, creates an
+#' identifier function based on its given parameters. This created identifier
+#' function will identify the directed edge from 'parent' to 'node.'
 #'
 #' @return an identification function
-createTrekSeparationIdentifier <- function(idFunc, sources, targets, node, parent,
-                                           solvedParents) {
+createTrekSeparationIdentifier <- function(idFunc, sources, targets, node,
+                                           parent, solvedParents) {
   # These assignments may seem redundent but they are necessary as they
   # assign these variables to the local environment of the function call.
   # This allows them to persist and still be usable by the returned function.
@@ -38,9 +40,17 @@ createTrekSeparationIdentifier <- function(idFunc, sources, targets, node, paren
 #' Perform one iteration of trek seperation identification.
 #'
 #' A function that does one step through all the nodes in a mixed graph
-#' and tries to identify new edge coefficients using trek-separation.
+#' and tries to identify new edge coefficients using trek-separation as
+#' described in Weihs, Robeva, Robinson, et al. (2017).
 #'
-#' @return a list
+#' @inheritParams htcIdentifyStep
+#' @param maxSubsetSize a positive integer which controls the maximum subset
+#'                      size considered in the trek-separation identification
+#'                      algorithm. Making this parameter smaller means the
+#'                      algorithm will be faster but less exhaustive (and hence
+#'                      less powerful).
+#'
+#' @return see the return of \code{\link{htcIdentifyStep}}.
 #' @export
 trekSeparationIdentifyStep = function(mixedGraph, unsolvedParents,
                                       solvedParents, identifier,
@@ -92,4 +102,35 @@ trekSeparationIdentifyStep = function(mixedGraph, unsolvedParents,
   }
   return(list(identifiedEdges = identifiedEdges, unsolvedParents = unsolvedParents,
               solvedParents = solvedParents, identifier = identifier))
+}
+
+#' Determines which edges in a mixed graph are edgewiseID+TS identifiable
+#'
+#' Uses the edgewise+TS identification criterion of Weihs, Robeva, Robinson, et
+#' al. (2017) to determine which edges in a mixed graph are generically
+#' identifiable. In particular this algorithm iterates between the half-trek,
+#' edgewise, and trek-separation identification algorithms in an attempt to
+#' identify as many edges as possible, this may be very slow.
+#'
+#' @export
+#'
+#' @inheritParams htcID
+#' @inheritParams edgewiseIdentifyStep
+#' @inheritParams trekSeparationIdentifyStep
+#'
+#' @return see the return of \code{\link{htcID}}.
+edgewiseTSID <- function(L, O, tianDecompose = T, subsetSizeControl = 3,
+                         maxSubsetSize = 3) {
+  eid <- function(mixedGraph, unsolvedParents, solvedParents, identifier) {
+    return(edgewiseIdentifyStep(mixedGraph, unsolvedParents, solvedParents,
+                                identifier,
+                                subsetSizeControl = subsetSizeControl))
+  }
+  tsid <- function(mixedGraph, unsolvedParents, solvedParents, identifier) {
+    return(trekSeparationIdentifyStep(mixedGraph, unsolvedParents,
+                                      solvedParents, identifier,
+                                      maxSubsetSize = maxSubsetSize))
+  }
+  return(generalGenericID(L, O, list(htcIdentifyStep, eid, tsid),
+                          tianDecompose = tianDecompose))
 }

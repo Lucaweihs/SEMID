@@ -24,6 +24,15 @@ validateMatrices <- function(L, O) {
   }
 }
 
+#' Identify bidirected edges if all directed edges are identified
+#'
+#' Creates an identifier function that assumes that all directed edges have
+#' already been identified and then is able to identify all bidirected edges
+#' simultaneously.
+#'
+#' @param idFunc an identifier function that identifies all directed edges
+#'
+#' @return a new identifier function that identifies everything.
 createSimpleBiDirIdentifier <- function(idFunc) {
   idFunc <- idFunc
   return(
@@ -43,10 +52,10 @@ createSimpleBiDirIdentifier <- function(idFunc) {
 #' Globally identify the covariance matrix of a C-component
 #'
 #' The Tian decomposition of a mixed graph G allows one to globally identify
-#' the covariance matrices Sigma' of special subgraphs of G called C-components.
+#' the covariance matrices Sigma' of special subgraphs of G called c-components.
 #' This function takes the covariance matrix Sigma corresponding to G and
-#' a collection of node sets which specify the C-component, and returns the
-#' Sigma' corresponding to the C-component.
+#' a collection of node sets which specify the c-component, and returns the
+#' Sigma' corresponding to the c-component.
 #'
 #' @param Sigma the covariance matrix for the mixed graph G
 #' @param internal an integer vector corresponding to the vertices of the
@@ -62,7 +71,7 @@ createSimpleBiDirIdentifier <- function(idFunc) {
 #'
 #' @export
 #'
-#' @return This function has no return value.
+#' @return the new Sigma corresponding to the c-component
 tianSigmaForComponent <- function(Sigma, internal, incoming, topOrder) {
   if (length(incoming) == 0) {
     return(Sigma[topOrder, topOrder, drop = F])
@@ -96,8 +105,15 @@ tianSigmaForComponent <- function(Sigma, internal, incoming, topOrder) {
 
 #' Identifies components in a tian decomposition
 #'
-#' @export
-#' @return This function has no return value.
+#' Creates an identification function which combines the identification
+#' functions created on a collection of c-components into a identification
+#' for the full mixed graph.
+#'
+#' @param idFuncs a list of identifier functions for the c-components
+#' @param cComponents the c-components of the mixed graph as returned by
+#'                    \code{\link{tianDecompose}}.
+#'
+#' @return a new identifier function
 tianIdentifier <- function(idFuncs, cComponents) {
   idFuncs <- idFuncs
   cComponents <- cComponents
@@ -126,20 +142,22 @@ tianIdentifier <- function(idFuncs, cComponents) {
   )
 }
 
-#' A general identification algorithm template
+#' A general generic identification algorithm template.
 #'
 #' A function that encapsulates the general structure of our algorithms for
 #' testing generic identifiability. Allows for various identification algorithms
-#' to be used in concert.
+#' to be used in concert, in particular it will use the identifier functions
+#' in the list \code{idStepFunctions} sequentially until it can find no more
+#' identifications.
 #'
 #' @export
 #'
-#' @inheritParams graphID
+#' @inheritParams htcID
 #' @param idStepFunctions a list of identification step functions
 #' @param tianDecompose True if the mixed graph be decomposed into Tian's
 #'        C-components before running the identification algorithms.
 #'
-#' @return a list
+#' @return see the return of \code{\link{htcID}}.
 generalGenericID <- function(L, O, idStepFunctions, tianDecompose = T) {
   O = 1 * ((O + t(O)) != 0)
   m = nrow(L)

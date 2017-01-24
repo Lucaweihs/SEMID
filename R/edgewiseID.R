@@ -1,6 +1,8 @@
 #' Create an edgewise identification function
 #'
-#' TODO: Add details
+#' A helper function for \link{\code{edgewiseIdentifyStep}}, creates an
+#' identifier function based on its given parameters. This created identifier
+#' function will identify the directed edges from 'targets' to 'node.'
 #'
 #' @return an identification function
 createEdgewiseIdentifier <- function(idFunc, sources, targets, node,
@@ -51,9 +53,20 @@ createEdgewiseIdentifier <- function(idFunc, sources, targets, node,
 #' Perform one iteration of edgewise identification.
 #'
 #' A function that does one step through all the nodes in a mixed graph
-#' and tries to identify new edge coefficients using edgewise
+#' and tries to identify new edge coefficients using the existence of
+#' half-trek systems as described in Weihs, Robeva, Robinson, et al. (2017).
 #'
-#' @return a list
+#' @inheritParams htcIdentifyStep
+#' @param subsetSizeControl a positive integer (Inf allowed) which controls
+#'                          the size of edgesets searched in the edgewiseID
+#'                          algorithm. Suppose, for example, this has value 3.
+#'                          Then if a node i has n parents, this will restrict
+#'                          the algorithm to only look at subsets of the parents
+#'                          of size 1,2,3 and n-2, n-1, n. Making this
+#'                          parameter smaller means the algorithm will be faster
+#'                          but less exhaustive (and hence less powerful).
+#'
+#' @return see the return of \code{\link{htcIdentifyStep}}.
 #' @export
 edgewiseIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
                                 identifier, subsetSizeControl = Inf) {
@@ -139,3 +152,24 @@ edgewiseIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
               solvedParents = solvedParents, identifier = identifier))
 }
 
+#' Determines which edges in a mixed graph are edgewiseID-identifiable
+#'
+#' Uses the edgewise identification criterion of Weihs, Robeva, Robinson, et al.
+#' (2017) to determine which edges in a mixed graph are generically
+#' identifiable.
+#'
+#' @export
+#'
+#' @inheritParams htcID
+#' @inheritParams edgewiseIdentifyStep
+#'
+#' @return see the return of \code{\link{htcID}}.
+edgewiseID <- function(L, O, tianDecompose = T, subsetSizeControl = 3) {
+  eid <- function(mixedGraph, unsolvedParents, solvedParents, identifier) {
+    return(edgewiseIdentifyStep(mixedGraph, unsolvedParents, solvedParents,
+                                identifier,
+                                subsetSizeControl = subsetSizeControl))
+  }
+  return(generalGenericID(L, O, list(eid),
+                          tianDecompose = tianDecompose))
+}

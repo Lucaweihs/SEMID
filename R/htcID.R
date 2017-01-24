@@ -1,7 +1,7 @@
 #' Create an htc identification function.
 #'
-#' A helper function for htcIdentifyStep, creates an identifier function
-#' based on its given parameters. This created identifier function will
+#' A helper function for \link{\code{htcIdentifyStep}}, creates an identifier
+#' function based on its given parameters. This created identifier function will
 #' identify the directed edges from 'targets' to 'node.'
 #'
 #' @param idFunc identification of edge coefficients often requires that other
@@ -274,7 +274,6 @@ graphID.htcID <- function(L, O) {
   }
   return(Solved.nodes)
 }
-
 
 #' Check for generic infinite-to-one via the half-trek criterion.
 #'

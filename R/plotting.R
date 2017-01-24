@@ -3,9 +3,10 @@
 #' Given adjacency matrices representing the directed and bidirected portions
 #' of a mixed graph, plots a representation of the graph.
 #'
-#' @export
-#'
 #' @inheritParams graphID
+#' @param vertexLabels labels to use for the vertices.
+#'
+#' @export
 plotMixedGraph <- function(L, O, main = "", vertexLabels = 1:nrow(L)) {
   R.utils::withSeed({
   m = ncol(L)
