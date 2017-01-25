@@ -148,7 +148,14 @@ tianIdentifier <- function(idFuncs, cComponents) {
 #' testing generic identifiability. Allows for various identification algorithms
 #' to be used in concert, in particular it will use the identifier functions
 #' in the list \code{idStepFunctions} sequentially until it can find no more
-#' identifications.
+#' identifications. The step functions that are currently available for use are
+#' in \code{idStepFunctions}
+#' \enumerate{
+#'   \item htcIdentifyStep
+#'   \item ancestralIdentifyStep
+#'   \item edgewiseIdentifyStep
+#'   \item trekSeparationIdentifyStep
+#' }
 #'
 #' @export
 #'

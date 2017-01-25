@@ -176,6 +176,23 @@ ancestralIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
               solvedParents = solvedParents, identifier = identifier))
 }
 
+#' Determines which edges in a mixed graph are ancestralID-identifiable
+#'
+#' Uses the an identification criterion of Drton and Weihs (2015); this version
+#' of the algorithm is somewhat different from Drton and Weihs (2015) in that it
+#' also works on cyclic graphs. The original version of the algorithm can be
+#' found in the function \code{\link{graphID.ancestralID}}.
+#'
+#' @export
+#'
+#' @inheritParams htcID
+#' @inheritParams ancestralIdentifyStep
+#'
+#' @return see the return of \code{\link{htcID}}.
+ancestralID <- function(L, O, tianDecompose = T) {
+  return(generalGenericID(L, O, list(ancestralIdentifyStep),
+                                     tianDecompose = tianDecompose))
+}
 
 #' Get getAncestors of nodes in a graph.
 #'

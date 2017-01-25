@@ -487,7 +487,28 @@ setMethodS3("descendants", "MixedGraphFixedOrder", function(this, node) {
 
 #' Construct MixedGraph object
 #'
-#' Creates an object representing a mixed graph.
+#' Creates an object representing a mixed graph. The methods that are currently
+#' available to be used on the mixed graph include
+#' \enumerate{
+#' \item ancestors
+#' \item descendants
+#' \item parents
+#' \item siblings
+#' \item isSibling
+#' \item htrFrom
+#' \item trFrom
+#' \item getHalfTrekSystem
+#' \item getTrekSystem
+#' \item inducedSubgraph
+#' \item L
+#' \item O
+#' \item nodes
+#' \item numNodes
+#' \item stronglyConnectedComponent
+#' \item tianComponent
+#' \item tianDecompose
+#' }
+#' see the individual function documentation for more information.
 #'
 #' @name MixedGraph
 #' @usage MixedGraph(L = matrix(0,1,1), O = matrix(0,1,1),

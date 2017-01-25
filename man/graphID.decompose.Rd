@@ -42,7 +42,7 @@ A list with two named components:
  2. Decomp - true if a decomposition occured, false if not.
 }
 \description{
-Split a graph into mixed Tiancomponents and solve each separately
+Split a graph into mixed Tian components and solve each separately
 using the HTC.
 }
 
