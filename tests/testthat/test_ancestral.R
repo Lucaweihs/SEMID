@@ -1,6 +1,8 @@
 library(SEMID)
 context("Components related to generic identifiability by ancestor decomposition.")
 
+source("helperFunctions.R")
+
 ancestralID = function(L, O) {
   return(generalGenericID(L, O, list(ancestralIdentifyStep), tianDecompose = F))
 }

@@ -4,6 +4,7 @@
 #'
 #' @name FlowGraph
 #' @usage FlowGraph(L = matrix(0,1,1), vertexCaps = 1, edgeCaps = matrix(1,1,1))
+#' @export
 #'
 #' @param L the adjacency matrix for the flow graph. The (i,j)th of L should be
 #'        a 1 if there is an edge from i to j and 0 otherwise.
@@ -78,6 +79,10 @@ setConstructorS3("FlowGraph",
 
 #' Flow from one set of nodes to another.
 #'
+#' @name flowBetween
+#' @export flowBetween
+#'
+#' @param this the flow graph object
 #' @param sources the nodes from which flow should start.
 #' @param sinks the nodes at which the flow should end.
 #'
@@ -85,7 +90,10 @@ setConstructorS3("FlowGraph",
 #'         computed flow) and \code{activeSources} (a vector representing the
 #'         subset of sources which have non-zero flow out of them for the found
 #'         max-flow).
-#'
+flowBetween <- function(this, sources, sinks) {
+  UseMethod("flowBetween")
+}
+
 #' @rdname   flowBetween
 #' @name     flowBetween.FlowGraph
 #' @usage    \method{flowBetween}{FlowGraph}(this, sources, sinks)
@@ -102,9 +110,16 @@ setMethodS3("flowBetween", "FlowGraph", function(this, sources, sinks) {
 
 #' Update vertex capacities.
 #'
+#' @name updateVertexCapacities
+#' @export updateVertexCapacities
+#'
+#' @param this the flow graph object
 #' @param vertices the vertices to update.
 #' @param newCaps the new capacities for the vertices.
-#'
+updateVertexCapacities <- function(this, vertices, newCaps) {
+  UseMethod("updateVertexCapacities")
+}
+
 #' @rdname   updateVertexCapacities
 #' @name     updateVertexCapacities.FlowGraph
 #' @usage    \method{updateVertexCapacities}{FlowGraph}(this, vertices, newCaps)
@@ -115,10 +130,17 @@ setMethodS3("updateVertexCapacities", "FlowGraph", function(this, vertices, newC
 
 #' Update edge capacities.
 #'
+#' @name updateEdgeCapacities
+#' @export updateEdgeCapacities
+#'
+#' @param this the flow graph object
 #' @param edges the vertices to update (as a 2xr matrix with ith row
 #'        corresponding to the edge edges[i,1]->edges[i,2].
 #' @param newCaps the new capacities for the edges
-#'
+updateEdgeCapacities <- function(this, edges, newCaps) {
+  UseMethod("updateEdgeCapacities")
+}
+
 #' @rdname   updateEdgeCapacities
 #' @name     updateEdgeCapacities.FlowGraph
 #' @usage    \method{updateEdgeCapacities}{FlowGraph}(this, edges, newCaps)

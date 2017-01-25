@@ -163,7 +163,7 @@ generalGenericID <- function(L, O, idStepFunctions, tianDecompose = T) {
   m = nrow(L)
 
   mixedGraph = MixedGraph(L, O)
-  unsolvedParents = lapply(1:m, function(node) { mixedGraph$allParents(node) })
+  unsolvedParents = lapply(1:m, function(node) { mixedGraph$parents(node) })
   solvedParents = rep(list(numeric(0)), m)
 
   if (!tianDecompose) {
@@ -185,11 +185,11 @@ generalGenericID <- function(L, O, idStepFunctions, tianDecompose = T) {
     }
     if (length(unlist(unsolvedParents)) == 0) {
       identifier = createSimpleBiDirIdentifier(identifier)
-      solvedSiblings = lapply(1:m, FUN = function(x) { mixedGraph$allSiblings(x) })
+      solvedSiblings = lapply(1:m, FUN = function(x) { mixedGraph$siblings(x) })
       unsolvedSiblings = rep(list(integer(0)), m)
     } else {
       solvedSiblings = rep(list(integer(0)), m)
-      unsolvedSiblings = lapply(1:m, FUN = function(x) { mixedGraph$allSiblings(x) })
+      unsolvedSiblings = lapply(1:m, FUN = function(x) { mixedGraph$siblings(x) })
     }
   } else {
     solvedSiblings = rep(list(integer(0)), m)
@@ -210,8 +210,8 @@ generalGenericID <- function(L, O, idStepFunctions, tianDecompose = T) {
       identifiers[[i]] = result$identifier
     }
 
-    unsolvedParents = lapply(1:m, FUN = function(x) { setdiff(mixedGraph$allParents(x), solvedParents[[x]]) })
-    unsolvedSiblings = lapply(1:m, FUN = function(x) { setdiff(mixedGraph$allSiblings(x), solvedSiblings[[x]]) })
+    unsolvedParents = lapply(1:m, FUN = function(x) { setdiff(mixedGraph$parents(x), solvedParents[[x]]) })
+    unsolvedSiblings = lapply(1:m, FUN = function(x) { setdiff(mixedGraph$siblings(x), solvedSiblings[[x]]) })
     identifier = tianIdentifier(identifiers, cComps)
   }
   return(list(solvedParents = solvedParents,

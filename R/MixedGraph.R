@@ -10,6 +10,7 @@
 #'
 #' @name MixedGraphFixedOrder
 #' @usage MixedGraphFixedOrder(L = matrix(0,1,1), O = matrix(0,1,1))
+#' @export
 #'
 #' @param L see \code{\link{graphID}} for the appropriate form of L.
 #' @param O as for L.
@@ -33,6 +34,15 @@ setConstructorS3("MixedGraphFixedOrder",
 
 #' Number of nodes in the graph.
 #'
+#' @name numNodes
+#' @export numNodes
+#'
+#' @param this the mixed graph object
+#'
+numNodes <- function(this) {
+  UseMethod("numNodes")
+}
+
 #' @rdname   numNodes
 #' @name     numNodes.MixedGraphFixedOrder
 #' @usage    \method{numNodes}{MixedGraphFixedOrder}(this)
@@ -43,25 +53,38 @@ setMethodS3("numNodes", "MixedGraphFixedOrder", function(this) {
 
 #' All siblings of a collection of nodes
 #'
+#' @name siblings
+#' @export siblings
+#'
 #' @param nodes a vector of nodes of which to find the siblings.
 #'
 #' @return a vector of all of the siblings.
-#'
-#' @rdname   allSiblings
-#' @name     allSiblings.MixedGraphFixedOrder
-#' @usage    \method{allSiblings}{MixedGraphFixedOrder}(this, nodes)
-#' @S3method allSiblings MixedGraphFixedOrder
-setMethodS3("allSiblings", "MixedGraphFixedOrder", function(this, nodes) {
+siblings <- function(this, nodes) {
+  UseMethod("siblings")
+}
+
+#' @rdname   siblings
+#' @name     siblings.MixedGraphFixedOrder
+#' @usage    \method{siblings}{MixedGraphFixedOrder}(this, nodes)
+#' @S3method siblings MixedGraphFixedOrder
+setMethodS3("siblings", "MixedGraphFixedOrder", function(this, nodes) {
   return(which(rowSums(this$.O[,nodes,drop = F]) != 0))
 }, appendVarArgs = F)
 
 #' Are two nodes siblings?
 #'
+#' @name isSibling
+#' @export isSibling
+#'
+#' @param this the mixed graph object
 #' @param node1 a node
 #' @param node2 a second node
 #'
 #' @return TRUE if the nodes are siblings in the graph, FALSE otherwise
-#'
+isSibling <- function(this, node1, node2) {
+  UseMethod("isSibling")
+}
+
 #' @rdname   isSibling
 #' @name     isSibling.MixedGraphFixedOrder
 #' @usage    \method{isSibling}{MixedGraphFixedOrder}(this, node1, node2)
@@ -72,15 +95,22 @@ setMethodS3("isSibling", "MixedGraphFixedOrder", function(this, node1, node2) {
 
 #' All parents a collection of nodes.
 #'
+#' @name parents
+#' @export parents
+#'
+#' @param this the mixed graph object.
 #' @param nodes nodes the nodes of which to find the parents.
 #'
 #' @return a vector of parents of the nodes.
-#'
-#' @rdname   allParents
-#' @name     allParents.MixedGraphFixedOrder
-#' @usage    \method{allParents}{MixedGraphFixedOrder}(this, nodes)
-#' @S3method allParents MixedGraphFixedOrder
-setMethodS3("allParents", "MixedGraphFixedOrder", function(this, nodes) {
+parents <- function(this, nodes) {
+  UseMethod("parents")
+}
+
+#' @rdname   parents
+#' @name     parents.MixedGraphFixedOrder
+#' @usage    \method{parents}{MixedGraphFixedOrder}(this, nodes)
+#' @S3method parents MixedGraphFixedOrder
+setMethodS3("parents", "MixedGraphFixedOrder", function(this, nodes) {
   return(which(rowSums(this$.L[,nodes,drop=F]) != 0))
 }, appendVarArgs = F)
 
@@ -89,12 +119,19 @@ setMethodS3("allParents", "MixedGraphFixedOrder", function(this, nodes) {
 #' Finds all the ancestors of a collection of nodes. These ancestors DO include
 #' the nodes themselves (every node is considered an ancestor of itself).
 #'
-#' @param nodes the nodes from which to find all ancestors
+#' @name ancestors
+#' @export ancestors
 #'
+#' @param this the mixed graph object
+#' @param nodes the nodes from which to find all ancestors
+ancestors <- function(this, nodes) {
+  UseMethod("ancestors")
+}
+
 #' @rdname   ancestors
 #' @name     ancestors.MixedGraphFixedOrder
 #' @usage    \method{ancestors}{MixedGraphFixedOrder}(this, nodes)
-#' @S3method allParents MixedGraphFixedOrder
+#' @S3method ancestors MixedGraphFixedOrder
 setMethodS3("ancestors", "MixedGraphFixedOrder", function(this, nodes) {
   return(as.numeric(
     unique(
@@ -107,6 +144,14 @@ setMethodS3("ancestors", "MixedGraphFixedOrder", function(this, nodes) {
 
 #' Helper function to create a graph encoding htr relationships.
 #'
+#' @name createHtrGraph
+#' @export createHtrGraph
+#'
+#' @param this the mixed graph object
+createHtrGraph <- function(this) {
+  UseMethod("createHtrGraph")
+}
+
 #' @rdname   createHtrGraph
 #' @name     createHtrGraph.MixedGraphFixedOrder
 #' @usage    \method{createHtrGraph}{MixedGraphFixedOrder}(this)
@@ -129,10 +174,16 @@ setMethodS3("createHtrGraph", "MixedGraphFixedOrder", function(this) {
 
 #' Half trek reachable nodes.
 #'
+#' @name htrFrom
+#' @export htrFrom
+#' @param this the mixed graph object
 #' @param node the node from which to get all half-trek reachable nodes.
 #'
 #' @return a vector of all nodes half-trek reachable from node.
-#'
+htrFrom <- function(this, node) {
+  UseMethod("htrFrom")
+}
+
 #' @rdname   htrFrom
 #' @name     htrFrom.MixedGraphFixedOrder
 #' @usage    \method{htrFrom}{MixedGraphFixedOrder}(this, node)
@@ -155,6 +206,14 @@ setMethodS3("htrFrom", "MixedGraphFixedOrder", function(this, node) {
 
 #' Helper function to create a flow graph.
 #'
+#' @name createHalfTrekFlowGraph
+#' @export createHalfTrekFlowGraph
+#'
+#' @param this the mixed graph object
+createHalfTrekFlowGraph <- function(this) {
+  UseMethod("createHalfTrekFlowGraph")
+}
+
 #' @rdname   createHalfTrekFlowGraph
 #' @name     createHalfTrekFlowGraph.MixedGraphFixedOrder
 #' @usage    \method{createHalfTrekFlowGraph}{MixedGraphFixedOrder}(this)
@@ -172,6 +231,10 @@ setMethodS3("createHalfTrekFlowGraph", "MixedGraphFixedOrder", function(this) {
 
 #' Determines if a half-trek system exists in the mixed graph.
 #'
+#' @name getHalfTrekSystem
+#' @export getHalfTrekSystem
+#'
+#' @param this the mixed graph object
 #' @param fromNodes the nodes from which the half-trek system should start.
 #'        If length(fromNodes) > length(toNodes) will find if there exists
 #'        any half-trek system from any subset of fromNodes of size
@@ -181,7 +244,10 @@ setMethodS3("createHalfTrekFlowGraph", "MixedGraphFixedOrder", function(this) {
 #' @return a list with two named components, \code{systemExists} (TRUE if a
 #'         system exists, FALSE otherwise) and \code{activeFrom} (the subset
 #'         of fromNodes from which the maximal half-trek system was started).
-#'
+getHalfTrekSystem <- function(this, fromNodes, toNodes) {
+  UseMethod("getHalfTrekSystem")
+}
+
 #' @rdname   getHalfTrekSystem
 #' @name     getHalfTrekSystem.MixedGraphFixedOrder
 #' @usage    \method{getHalfTrekSystem}{MixedGraphFixedOrder}(this, fromNodes,
@@ -200,11 +266,18 @@ setMethodS3("getHalfTrekSystem", "MixedGraphFixedOrder", function(this, fromNode
 
 
 #' Helper function to create a graph encoding trek reachable relationships.
+#' @name createTrGraph
+#' @export createTrGraph
 #'
+#' @param this the mixed graph object
+createTrGraph <- function(this) {
+  UseMethod("createTrGraph")
+}
+
 #' @rdname   createTrGraph
 #' @name     createTrGraph.MixedGraphFixedOrder
 #' @usage    \method{createTrGraph}{MixedGraphFixedOrder}(this)
-#' @S3method createHalfTrekFlowGraph MixedGraphFixedOrder
+#' @S3method createTrGraph MixedGraphFixedOrder
 setMethodS3("createTrGraph", "MixedGraphFixedOrder", function(this) {
   m = this$numNodes()
   adjMat = matrix(0, 2 * m, 2 * m)
@@ -229,8 +302,15 @@ setMethodS3("createTrGraph", "MixedGraphFixedOrder", function(this) {
 #' Like \code{\link{htrFrom}} but for the nodes that are trek-reachable from a
 #' node
 #'
-#' @param node the node from which to find trek-reachable nodes.
+#' @name trFrom
+#' @export trFrom
 #'
+#' @param this the mixed graph object
+#' @param node the node from which to find trek-reachable nodes.
+trFrom <- function(this, node) {
+  UseMethod("trFrom")
+}
+
 #' @rdname   trFrom
 #' @name     trFrom.MixedGraphFixedOrder
 #' @usage    \method{trFrom}{MixedGraphFixedOrder}(this, node)
@@ -249,6 +329,14 @@ setMethodS3("trFrom", "MixedGraphFixedOrder", function(this, node) {
 
 #' Helper function to create a flow graph.
 #'
+#' @name createTrekFlowGraph
+#' @export createTrekFlowGraph
+#'
+#' @param this the mixed graph object
+createTrekFlowGraph <- function(this) {
+  UseMethod("createTrekFlowGraph")
+}
+
 #' @rdname   createTrekFlowGraph
 #' @name     createTrekFlowGraph.MixedGraphFixedOrder
 #' @usage    \method{createTrekFlowGraph}{MixedGraphFixedOrder}(this)
@@ -267,12 +355,19 @@ setMethodS3("createTrekFlowGraph", "MixedGraphFixedOrder", function(this) {
 
 #' Determines if a trek system exists in the mixed graph.
 #'
+#' @name getTrekSystem
+#' @export getTrekSystem
+#'
+#' @param this the mixed graph object
 #' @param fromNodes the start nodes
 #' @param toNodes the end nodes
 #' @param avoidEdgesOnRight a collection of edges in the graph that should not
 #'                          be used on any right hand side of any trek in the
 #'                          trek system.
-#'
+getTrekSystem <- function(this, fromNodes, toNodes, avoidEdgesOnRight) {
+  UseMethod("getTrekSystem")
+}
+
 #' @rdname   getTrekSystem
 #' @name     getTrekSystem.MixedGraphFixedOrder
 #' @usage    \method{getTrekSystem}{MixedGraphFixedOrder}(this, fromNodes,
@@ -309,6 +404,14 @@ setMethodS3("getTrekSystem", "MixedGraphFixedOrder", function(this, fromNodes, t
 #'
 #' Get the strongly connected components of a graph
 #'
+#' @name stronglyConnectedComponents
+#' @export stronglyConnectedComponents
+#'
+#' @param this the mixed graph object
+stronglyConnectedComponents <- function(this) {
+  UseMethod("stronglyConnectedComponents")
+}
+
 #' @rdname   stronglyConnectedComponents
 #' @name     stronglyConnectedComponents.MixedGraphFixedOrder
 #' @usage    \method{stronglyConnectedComponents}{MixedGraphFixedOrder}(this)
@@ -332,8 +435,15 @@ setMethodS3("stronglyConnectedComponents", "MixedGraphFixedOrder", function(this
 #' Get the strongly connected component for a node i in the directed part of
 #' the graph.
 #'
-#' @param node the node for which to get the strongly connected component.
+#' @name stronglyConnectedComponent
+#' @export stronglyConnectedComponent
 #'
+#' @param this the mixed graph object
+#' @param node the node for which to get the strongly connected component.
+stronglyConnectedComponent <- function(this, node) {
+  UseMethod("stronglyConnectedComponent")
+}
+
 #' @rdname   stronglyConnectedComponent
 #' @name     stronglyConnectedComponent.MixedGraphFixedOrder
 #' @usage    \method{stronglyConnectedComponent}{MixedGraphFixedOrder}(this, node)
@@ -351,13 +461,20 @@ setMethodS3("stronglyConnectedComponent", "MixedGraphFixedOrder", function(this,
 #' Finds all descendents of a node, this DOES include the node itself (every
 #' node is considered a descendant of itself).
 #'
-#' @param node the node from which to get the descendents.
+#' @name descendants
+#' @export descendants
 #'
-#' @rdname   allDescendants
-#' @name     allDescendants.MixedGraphFixedOrder
-#' @usage    \method{allDescendants}{MixedGraphFixedOrder}(this, node)
-#' @S3method allDescendants MixedGraphFixedOrder
-setMethodS3("allDescendants", "MixedGraphFixedOrder", function(this, node) {
+#' @param this the mixed graph object
+#' @param node the node from which to get the descendents.
+descendants <- function(this, node) {
+  UseMethod("descendants")
+}
+
+#' @rdname   descendants
+#' @name     descendants.MixedGraphFixedOrder
+#' @usage    \method{descendants}{MixedGraphFixedOrder}(this, node)
+#' @S3method descendants MixedGraphFixedOrder
+setMethodS3("descendants", "MixedGraphFixedOrder", function(this, node) {
   return(as.numeric(
     igraph::neighborhood(this$.dirGraph, order = this$numNodes(),
                          nodes = node, mode = "out")[[1]]))
@@ -375,6 +492,7 @@ setMethodS3("allDescendants", "MixedGraphFixedOrder", function(this, node) {
 #' @name MixedGraph
 #' @usage MixedGraph(L = matrix(0,1,1), O = matrix(0,1,1),
 #'                   vertexNums = 1:nrow(L))
+#' @export MixedGraph
 #'
 #' @param L see \code{\link{graphID}} for the appropriate form of L.
 #' @param O as for L.
@@ -412,8 +530,15 @@ setConstructorS3("MixedGraph",
 
 #' Transforms a vector of given node indices into their internal numbering
 #'
-#' @param nodes the nodes to transform
+#' @name toIn
+#' @export toIn
 #'
+#' @param this the mixed graph object
+#' @param nodes the nodes to transform
+toIn <- function(this, nodes) {
+  UseMethod("toIn")
+}
+
 #' @rdname   toIn
 #' @name     toIn.MixedGraph
 #' @usage    \method{toIn}{MixedGraph}(this, nodes)
@@ -424,8 +549,15 @@ setMethodS3("toIn", "MixedGraph", function(this, nodes) {
 
 #' Transforms a vector of node indices in the internal rep. into external numbering
 #'
-#' @param nodes the nodes to transform
+#' @name toEx
+#' @export toEx
 #'
+#' @param this the mixed graph object
+#' @param nodes the nodes to transform
+toEx <- function(this, nodes) {
+  UseMethod("toEx")
+}
+
 #' @rdname   toEx
 #' @name     toEx.MixedGraph
 #' @usage    \method{toEx}{MixedGraph}(this, nodes)
@@ -436,6 +568,14 @@ setMethodS3("toEx", "MixedGraph", function(this, nodes) {
 
 #' Get adjacency matrix for directed part.
 #'
+#' @name L
+#' @export L
+#'
+#' @param this the mixed graph object
+L <- function(this) {
+  UseMethod("L")
+}
+
 #' @rdname   L
 #' @name     L.MixedGraph
 #' @usage    \method{L}{MixedGraph}(this)
@@ -447,6 +587,14 @@ setMethodS3("L", "MixedGraph", function(this) {
 
 #' Get adjacency matrix for bidirected part.
 #'
+#' @name O
+#' @export O
+#'
+#' @param this the mixed graph object
+O <- function(this) {
+  UseMethod("O")
+}
+
 #' @rdname   O
 #' @name     O.MixedGraph
 #' @usage    \method{O}{MixedGraph}(this)
@@ -458,6 +606,14 @@ setMethodS3("O", "MixedGraph", function(this) {
 
 #' Get all nodes in the graph.
 #'
+#' @name nodes
+#' @export nodes
+#'
+#' @param this the mixed graph object
+nodes <- function(this) {
+  UseMethod("nodes")
+}
+
 #' @rdname   nodes
 #' @name     nodes.MixedGraph
 #' @usage    \method{nodes}{MixedGraph}(this)
@@ -476,13 +632,13 @@ setMethodS3("numNodes", "MixedGraph", function(this) {
   return(this$.internalGraph$numNodes())
 }, appendVarArgs = F)
 
-#' @rdname   allSiblings
-#' @name     allSiblings.MixedGraph
-#' @usage    \method{allSiblings}{MixedGraph}(this, nodes)
-#' @S3method allSiblings MixedGraph
-#' @export   allSiblings.MixedGraph
-setMethodS3("allSiblings", "MixedGraph", function(this, nodes) {
-  return(this$toEx(this$.internalGraph$allSiblings(this$toIn(nodes))))
+#' @rdname   siblings
+#' @name     siblings.MixedGraph
+#' @usage    \method{siblings}{MixedGraph}(this, nodes)
+#' @S3method siblings MixedGraph
+#' @export   siblings.MixedGraph
+setMethodS3("siblings", "MixedGraph", function(this, nodes) {
+  return(this$toEx(this$.internalGraph$siblings(this$toIn(nodes))))
 }, appendVarArgs = F)
 
 #' @rdname   isSibling
@@ -494,13 +650,13 @@ setMethodS3("isSibling", "MixedGraph", function(this, node1, node2) {
   return(this$.internalGraph$isSibling(this$toIn(node1), this$toIn(node2)))
 }, appendVarArgs = F)
 
-#' @rdname   allParents
-#' @name     allParents.MixedGraph
-#' @usage    \method{allParents}{MixedGraph}(this, nodes)
-#' @S3method allParents MixedGraph
-#' @export   allParents.MixedGraph
-setMethodS3("allParents", "MixedGraph", function(this, nodes) {
-  return(this$toEx(this$.internalGraph$allParents(this$toIn(nodes))))
+#' @rdname   parents
+#' @name     parents.MixedGraph
+#' @usage    \method{parents}{MixedGraph}(this, nodes)
+#' @S3method parents MixedGraph
+#' @export   parents.MixedGraph
+setMethodS3("parents", "MixedGraph", function(this, nodes) {
+  return(this$toEx(this$.internalGraph$parents(this$toIn(nodes))))
 }, appendVarArgs = F)
 
 #' @rdname   ancestors
@@ -567,19 +723,26 @@ setMethodS3("stronglyConnectedComponent", "MixedGraph", function(this, node) {
   return(this$toEx(this$.internalGraph$stronglyConnectedComponent(this$toIn(node))))
 }, appendVarArgs = F)
 
-#' @rdname   allDescendants
-#' @name     allDescendants.MixedGraph
-#' @usage    \method{allDescendants}{MixedGraph}(this, node)
-#' @S3method allDescendants MixedGraph
-#' @export   allDescendants.MixedGraph
-setMethodS3("allDescendants", "MixedGraph", function(this, node) {
-  return(this$toEx(this$.internalGraph$allDescendants(this$toIn(node))))
+#' @rdname   descendants
+#' @name     descendants.MixedGraph
+#' @usage    \method{descendants}{MixedGraph}(this, node)
+#' @S3method descendants MixedGraph
+#' @export   descendants.MixedGraph
+setMethodS3("descendants", "MixedGraph", function(this, node) {
+  return(this$toEx(this$.internalGraph$descendants(this$toIn(node))))
 }, appendVarArgs = F)
 
 #' Get the induced subgraph on a collection of nodes
 #'
-#' @param nodes the nodes on which to create the induced subgraph.
+#' @name inducedSubgraph
+#' @export inducedSubgraph
 #'
+#' @param this the mixed graph object
+#' @param nodes the nodes on which to create the induced subgraph.
+inducedSubgraph <- function(this, nodes) {
+  UseMethod("inducedSubgraph")
+}
+
 #' @rdname   inducedSubgraph
 #' @name     inducedSubgraph.MixedGraph
 #' @usage    \method{inducedSubgraph}{MixedGraph}(this, nodes)
@@ -600,11 +763,19 @@ setMethodS3("inducedSubgraph", "MixedGraph", function(this, nodes) {
 #' in that if they graph is not acyclic the bidirected components are
 #' combined whenever they are connected by a directed loop.
 #'
+#' @name tianDecompose
+#' @export tianDecompose
+#'
+#' @param this the mixed graph object
+#'
 #' @references
 #' Jin Tian. 2005. Identifying direct causal effects in linear models. In
 #' \emph{Proceedings of the 20th national conference on Artificial intelligence
 #' - Volume 1} (AAAI'05), Anthony Cohn (Ed.), Vol. 1. AAAI Press 346-352.
-#'
+tianDecompose <- function(this) {
+  UseMethod("tianDecompose")
+}
+
 #' @rdname   tianDecompose
 #' @name     tianDecompose.MixedGraph
 #' @usage    \method{tianDecompose}{MixedGraph}(this)
@@ -640,7 +811,7 @@ setMethodS3("tianDecompose", "MixedGraph", function(this) {
   for (i in 1:max(biComponents)) {
     superNodes = which(biComponents == i)
     internal = topOrder[topOrder %in% unlist(components[superNodes])]
-    incoming = topOrder[topOrder %in% setdiff(this$.internalGraph$allParents(internal), internal)]
+    incoming = topOrder[topOrder %in% setdiff(this$.internalGraph$parents(internal), internal)]
     allOrdered = topOrder[topOrder %in% c(internal, incoming)]
 
     indsInt = which(allOrdered %in% internal)
@@ -665,13 +836,20 @@ setMethodS3("tianDecompose", "MixedGraph", function(this) {
 
 #' Returns the Tian c-component of a node
 #'
-#' @param node the node for which to return its c-component
+#' @name tianComponent
+#' @export tianComponent
 #'
-#' @rdname   tianDecompose
-#' @name     tianDecompose.MixedGraph
-#' @usage    \method{tianDecompose}{MixedGraph}(this, node)
-#' @S3method tianDecompose MixedGraph
-#' @export   tianDecompose.MixedGraph
+#' @param this the mixed graph object
+#' @param node the node for which to return its c-component
+tianComponent <- function(this, node) {
+  UseMethod("tianComponent")
+}
+
+#' @rdname   tianComponent
+#' @name     tianComponent.MixedGraph
+#' @usage    \method{tianComponent}{MixedGraph}(this, node)
+#' @S3method tianComponent MixedGraph
+#' @export   tianComponent.MixedGraph
 setMethodS3("tianComponent", "MixedGraph", function(this, node) {
   cComponents = this$tianDecompose()
   for (i in 1:length(cComponents)) {
@@ -684,9 +862,11 @@ setMethodS3("tianComponent", "MixedGraph", function(this, node) {
 
 #' Plots the mixed graph
 #'
+#' @param this the mixed graph object
+#'
 #' @rdname   plot
 #' @name     plot.MixedGraph
-#' @usage    \method{plot}{MixedGraph}(this, node)
+#' @usage    \method{plot}{MixedGraph}(this)
 #' @S3method plot MixedGraph
 #' @export   plot.MixedGraph
 setMethodS3("plot", "MixedGraph", function(this) {

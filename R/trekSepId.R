@@ -65,7 +65,7 @@ trekSeparationIdentifyStep = function(mixedGraph, unsolvedParents,
     component = mixedGraph$stronglyConnectedComponent(i)
     if (length(unsolvedBefore) != 0 && length(component) == 1) {
       allButI = setdiff(1:m, i)
-      iDescendants = mixedGraph$allDescendants(i)
+      iDescendants = mixedGraph$descendants(i)
       nonIDescendants = setdiff(allButI, iDescendants)
       for (j in unsolvedBefore) {
         edgeIdentified = F

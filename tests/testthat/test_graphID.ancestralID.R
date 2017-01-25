@@ -1,4 +1,5 @@
 library(SEMID)
+library(igraph)
 context("Testing known examples on graphID.ancestralID.")
 
 source("graphExamples.R")

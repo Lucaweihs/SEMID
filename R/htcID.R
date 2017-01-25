@@ -123,9 +123,9 @@ htcIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
                                       FUN = function(x) { length(x) == 0 }))
   for (i in setdiff(allNodes, solvedNodes)) {
     htrFromNode = mixedGraph$htrFrom(i)
-    allowedNodes = setdiff(solvedNodes, mixedGraph$allSiblings(i))
+    allowedNodes = setdiff(solvedNodes, mixedGraph$siblings(i))
     allowedNodes = union(setdiff(allNodes, htrFromNode), allowedNodes)
-    nodeParents = mixedGraph$allParents(i)
+    nodeParents = mixedGraph$parents(i)
     if (length(allowedNodes) < length(nodeParents)) {
       next
     }

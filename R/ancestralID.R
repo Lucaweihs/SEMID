@@ -114,12 +114,12 @@ ancestralIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
         ancestralComps[[i]]$ancestors = nodeAncestors
       }
 
-      nodeParents = ancGraph$allParents(i)
+      nodeParents = ancGraph$parents(i)
 
       # Using the first ancestor graph
       ancGraph = ancestralComps[[i]]$mixedGraph
       htrFromNode = ancGraph$htrFrom(i)
-      allowedNodes = setdiff(solvedNodes, ancGraph$allSiblings(i))
+      allowedNodes = setdiff(solvedNodes, ancGraph$siblings(i))
       allowedNodes = union(setdiff(ancGraph$nodes(), htrFromNode), allowedNodes)
       allowedNodes = intersect(ancGraph$nodes(), allowedNodes)
       if (length(allowedNodes) >= length(nodeParents)) {
@@ -141,17 +141,17 @@ ancestralIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
 
       # Using the second ancestor graph
       nodeAncestors = mixedGraph$ancestors(i)
-      nodeAncSibs = union(nodeAncestors, mixedGraph$allSiblings(nodeAncestors))
+      nodeAncSibs = union(nodeAncestors, mixedGraph$siblings(nodeAncestors))
       allowedAncSibs = intersect(nodeAncSibs,
                                  setdiff(union(solvedNodes,
                                        setdiff(1:m, mixedGraph$htrFrom(i))),
-                                       c(i, mixedGraph$allSiblings(i))))
+                                       c(i, mixedGraph$siblings(i))))
       ancGraph = mixedGraph$inducedSubgraph(mixedGraph$ancestors(c(i,allowedAncSibs)))
       tianComp = ancGraph$tianComponent(i)
       allowedNodes = union(intersect(allowedAncSibs, tianComp$internal), tianComp$incoming)
 
       htrFromNode = ancGraph$htrFrom(i)
-      allowedNodes = setdiff(solvedNodes, ancGraph$allSiblings(i))
+      allowedNodes = setdiff(solvedNodes, ancGraph$siblings(i))
       allowedNodes = union(setdiff(ancGraph$nodes(), htrFromNode), allowedNodes)
       allowedNodes = intersect(ancGraph$nodes(), allowedNodes)
 
@@ -227,7 +227,7 @@ getSiblings <- function(g, nodes) {
   sort(unique(unlist(neighborhood(g, 1, nodes = nodes, mode = "all"))))
 }
 
-#' Getdescendants of nodes in a graph.
+#' Get descendants of nodes in a graph.
 #'
 #' Gets the descendants of a collection of nodes in a graph (all nodes that can
 #' be reached by following directed edges from those nodes). Descendants DO
@@ -237,7 +237,7 @@ getSiblings <- function(g, nodes) {
 #' @inheritParams getAncestors
 #'
 #' @return a sorted vector of all descendants of nodes.
-descendants <- function(g, nodes) {
+getDescendants <- function(g, nodes) {
   if (vcount(g) == 0 || length(nodes) == 0) {
     return(numeric(0))
   }
@@ -265,7 +265,7 @@ htr <- function(dG, bG, nodes) {
   if (vcount(dG) == 0 || length(nodes) == 0) {
     return(numeric(0))
   }
-  return(descendants(dG, getSiblings(bG, nodes)))
+  return(getDescendants(dG, getSiblings(bG, nodes)))
 }
 
 #' Get the mixed component of a node in a mixed subgraph.
