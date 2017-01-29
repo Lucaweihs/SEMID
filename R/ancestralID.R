@@ -185,13 +185,16 @@ ancestralIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
 #'
 #' @export
 #'
-#' @inheritParams htcID
+#' @inheritParams generalGenericID
+#' @inheritParams semID
 #' @inheritParams ancestralIdentifyStep
 #'
-#' @return see the return of \code{\link{htcID}}.
-ancestralID <- function(L, O, tianDecompose = T) {
-  return(generalGenericID(L, O, list(ancestralIdentifyStep),
-                                     tianDecompose = tianDecompose))
+#' @return see the return of \code{\link{generalGenericID}}.
+ancestralID <- function(mixedGraph, tianDecompose = T) {
+  result = generalGenericID(mixedGraph, list(ancestralIdentifyStep),
+                            tianDecompose = tianDecompose)
+  result$call = match.call()
+  return(result)
 }
 
 #' Get getAncestors of nodes in a graph.

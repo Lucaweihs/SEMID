@@ -4,9 +4,11 @@
 \alias{edgewiseID}
 \title{Determines which edges in a mixed graph are edgewiseID-identifiable}
 \usage{
-edgewiseID(L, O, tianDecompose = T, subsetSizeControl = 3)
+edgewiseID(mixedGraph, tianDecompose = T, subsetSizeControl = 3)
 }
 \arguments{
+\item{mixedGraph}{a \code{\link{MixedGraph}} object representing the L-SEM.}
+
 \item{tianDecompose}{TRUE or FALSE determining whether or not the Tian
 decomposition should be used before running the
 current generic identification algorithm. In general
@@ -23,7 +25,7 @@ parameter smaller means the algorithm will be faster
 but less exhaustive (and hence less powerful).}
 }
 \value{
-see the return of \code{\link{htcID}}.
+see the return of \code{\link{generalGenericID}}.
 }
 \description{
 Uses the edgewise identification criterion of Weihs, Robeva, Robinson, et al.

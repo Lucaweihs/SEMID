@@ -1,3 +1,150 @@
+#' Checks a MixedGraph has appropriate node numbering
+#'
+#' Checks that the input mixed graph has vertices are numbered from 1
+#' to mixedGraph$numNodes(). Throws an error if they are not.
+#'
+#' @param mixedGraph the mixed graph object
+mixedGraphHasSimpleNumbering <- function(mixedGraph) {
+  nodes = mixedGraph$nodes()
+  if (any(nodes != 1:length(nodes))) {
+    stop(paste("Currently only mixed graphs whose vertices are numbered from 1",
+               "to mixedGraph$numNodes() in order are supported. The inputted mixed",
+               "graph as vertices numbered as mixedGraph$nodes() == c(",
+               paste(nodes, collapse = ", "), ")."))
+
+  }
+}
+
+#' Identifiability of linear structural equation models.
+#'
+#' This function can be used to check global and generic identifiability of
+#' linear structural equation models (L-SEMs). In particular, this function
+#' takes a \code{\link{MixedGraph}} object corresponding to the L-SEM and
+#' checks different conditions known for global and generic identifiability.
+#'
+#' @export
+#'
+#' @param mixedGraph a \code{\link{MixedGraph}} object representing the L-SEM.
+#' @param testGlobalID TRUE or FALSE if the graph should be tested for global
+#'        identifiabliity. This uses the \code{\link{graphID.globalID}}
+#'        function.
+#' @param testGenericNonID TRUE of FALSE if the graph should be tested for
+#'        generic non-identifiablity, that is, if for every generic choice
+#'        of parameters for the L-SEM there are infinitely many
+#'        other choices that lead to the same covariance matrix.
+#' @param genericIdStepFunctions a list of the generic identifier step functions
+#'        that should be used for testing generic identifiablity. See
+#'        \code{\link{generalGenericID}} for a discussion of such functions. If
+#'        this list is empty then generic identifiability is not tested. By
+#'        default this will (only) run the half-trek criterion (see
+#'        \code{\link{htcIdentifyStep}}) for generic identifiability.
+#' @param tianDecompose TRUE or FALSE if the mixed graph should be Tian
+#'                      decomposed before running the identification algorithms
+#'                      (when appropriate). In general letting this be TRUE will
+#'                      make the algorithm faster and more powerful. Note that
+#'                      this is a version of the Tian decomposition that works
+#'                      also with cyclic graphs.
+#' @inheritParams generalGenericID
+#'
+#' @return returns an object of \link{class} "\code{SEMIDResult}," this
+#'         object is just a list with 6 components:
+#' \describe{
+#'   \item{\code{isGlobalID}}{If testGlobalID == TRUE, then TRUE or FALSE if
+#'   the graph is globally identifiable. If testGlobalID == FALSE then NA.}
+#'   \item{\code{isGenericNonID}}{If testGenericNonID == TRUE, then TRUE if the
+#'   graph is generically non-identifiable or FALSE the test is inconclusive.
+#'   If testGenericNonID == FALSE then NA.
+#'   \item{\code{genericIDResult}}{If length(genericIdStepFunctions) != 0 then
+#'   a \code{GenericIDResult} object as returned by
+#'   \code{\link{generalGenericID}}. Otherwise a list of length 0.}
+#'   \item{\code{mixedGraph}}{the inputted mixed graph object.}
+#'   \item{\code{tianDecompose}}{the argument tianDecompose.}
+#'   \item{\code{call}}{the call made to this function.}
+#' }
+semID <- function(mixedGraph, testGlobalID = TRUE, testGenericNonID = TRUE,
+                  genericIdStepFunctions = list(htcIdentifyStep),
+                  tianDecompose = TRUE) {
+  isGlobalID = NA
+  if (testGlobalID) {
+    isGlobalID = graphID.globalID(mixedGraph$L(), mixedGraph$O())
+  }
+
+  isGenericNonID = NA
+  if (testGenericNonID) {
+    if (tianDecompose) {
+      isGenericNonID = FALSE
+      for (cComponent in mixedGraph$tianDecompose()) {
+        isGenericNonID = isGenericNonID || graphID.nonHtcID(cComponent$L,
+                                                            cComponent$O)
+        if (isGenericNonID) {
+          break;
+        }
+      }
+    } else {
+      isGenericNonID = graphID.nonHtcID(mixedGraph$L(), mixedGraph$O())
+    }
+  }
+
+  genericIDResult = list()
+  if (length(genericIdStepFunctions) != 0 ) {
+    genericIDResult = generalGenericID(mixedGraph,
+                                       idStepFunctions = genericIdStepFunctions,
+                                       tianDecompose = tianDecompose)
+  }
+
+  result = list(isGlobalID = isGlobalID, isGenericNonID = isGenericNonID,
+                genericIDResult = genericIDResult, mixedGraph = mixedGraph,
+                tianDecompose = tianDecompose, call = match.call())
+  class(result) = "SEMIDResult"
+  return(result)
+}
+
+#' Prints a SEMIDResult object
+#'
+#' Prints a SEMIDResult object as returned by
+#' \code{\link{semID}}. Invisibly returns its argument via
+#' \code{\link{invisible}(x)} as most print functions do.
+#'
+#' @export
+#'
+#' @param x the SEMIDResult object
+#' @param ... optional parameters, currently unused.
+print.SEMIDResult <- function(x, ...) {
+  cat("Call: ")
+  print(x$call)
+
+  cat("\nDid Tian decomposition?\n")
+  cat(x$tianDecompose, "\n")
+
+  if (!is.na(x$isGlobalID)) {
+    cat(paste("\nIs globally identifiable?:\n", x$isGlobalID, "\n",
+              sep = ""))
+  }
+
+  if (!is.na(x$isGenericNonID)) {
+    cat(paste("\nHas a generically infinite-to-one parameterization?:\n",
+              if (x$isGenericNonID) {
+                "TRUE"
+              } else if (length(x$genericIDResult) != 0 &&
+                         length(unlist(x$genericIDResult$unsolvedParents)) == 0) {
+                "FALSE"
+              } else { "INCONCLUSIVE" }, "\n",
+        sep = ""))
+  }
+
+  if (length(x$genericIDResult) != 0) {
+    cat(paste("\nNumber of parameters shown generically identifiable:\n"))
+    cat(paste("Directed edges:",
+              length(unlist(x$genericIDResult$solvedParents)), "out of",
+              sum(x$genericIDResult$mixedGraph$L()), "\n"))
+    cat(paste("Bidirected edges:",
+              length(unlist(x$genericIDResult$solvedSiblings)) / 2, "out of",
+              sum(x$genericIDResult$mixedGraph$O()) / 2, "\n"))
+  }
+
+  invisible(x)
+}
+
 #' A helper function to validate input matrices.
 #'
 #' This helper function validates that the two input matrices, L and O, are of
@@ -159,22 +306,45 @@ tianIdentifier <- function(idFuncs, cComponents) {
 #'
 #' @export
 #'
-#' @inheritParams htcID
+#' @inheritParams semID
+#' @param tianDecompose TRUE or FALSE determining whether or not the Tian
+#'                      decomposition should be used before running the
+#'                      current generic identification algorithm. In general
+#'                      letting this be TRUE will make the algorithm faster and
+#'                      more powerful.
 #' @param idStepFunctions a list of identification step functions
-#' @param tianDecompose True if the mixed graph be decomposed into Tian's
-#'        C-components before running the identification algorithms.
 #'
-#' @return see the return of \code{\link{htcID}}.
-generalGenericID <- function(L, O, idStepFunctions, tianDecompose = T) {
-  O = 1 * ((O + t(O)) != 0)
-  m = nrow(L)
-
-  mixedGraph = MixedGraph(L, O)
+#' @return returns an object of \link{class} "\code{GenericIDResult}," this
+#'         object is just a list with 9 components:
+#' \describe{
+#'   \item{\code{solvedParents}}{a list whose ith element contains a vector
+#'   containing the subsets of parents of node i for which the edge j->i could
+#'   be shown to be generically identifiable.}
+#'   \item{\code{unsolvedParents}}{as for \code{solvedParents} but for the
+#'   unsolved parents.}
+#'   \item{\code{solvedSiblings}}{as for \code{solvedParents} but for the
+#'   siblings of node i (i.e. the bidirected neighbors of i).}
+#'   \item{\code{unsolvedSiblings}}{as for \code{solvedSilbings} but for the
+#'   unsolved siblings of node i (i.e. the bidirected neighbors of i).}
+#'   \item{\code{identifier}}{a function that takes a (generic) covariance
+#'   matrix corresponding to the graph and identifies the edges parameters
+#'   from solvedParents and solvedSiblings. See \code{\link{htcIdentifyStep}}
+#'   for a more in-depth discussion of identifier functions.}
+#'   \item{\code{mixedGraph}}{a mixed graph object of the graph.}
+#'   \item{\code{idStepFunctions}}{a list of functions used to generically
+#'   identify parameters. For instance, htcID uses the function
+#'   \code{\link{htcIdentifyStep}} to identify edges.}
+#'   \item{\code{tianDecompose}}{the argument tianDecompose.}
+#'   \item{\code{call}}{the call made to this function.}
+#' }
+generalGenericID <- function(mixedGraph, idStepFunctions, tianDecompose = T) {
+  mixedGraphHasSimpleNumbering(mixedGraph)
+  m = mixedGraph$numNodes()
   unsolvedParents = lapply(1:m, function(node) { mixedGraph$parents(node) })
   solvedParents = rep(list(numeric(0)), m)
 
   if (!tianDecompose) {
-    identifier = createIdentifierBaseCase(L, O)
+    identifier = createIdentifierBaseCase(mixedGraph$L(), mixedGraph$O())
 
     changeFlag = T
     while (changeFlag) {
@@ -206,7 +376,8 @@ generalGenericID <- function(L, O, idStepFunctions, tianDecompose = T) {
     identifiers = vector("list", length(cComps))
 
     for (i in 1:length(cComps)) {
-      result = generalGenericID(cComps[[i]]$L, cComps[[i]]$O, idStepFunctions, tianDecompose = F)
+      result = generalGenericID(MixedGraph(cComps[[i]]$L, cComps[[i]]$O),
+                                idStepFunctions, tianDecompose = F)
       topOrder = cComps[[i]]$topOrder
       compResults[[i]] = result
       for (j in 1:length(topOrder)) {
@@ -221,11 +392,99 @@ generalGenericID <- function(L, O, idStepFunctions, tianDecompose = T) {
     unsolvedSiblings = lapply(1:m, FUN = function(x) { setdiff(mixedGraph$siblings(x), solvedSiblings[[x]]) })
     identifier = tianIdentifier(identifiers, cComps)
   }
-  return(list(solvedParents = solvedParents,
-              unsolvedParents = unsolvedParents,
-              solvedSiblings = solvedSiblings,
-              unsolvedSiblings = unsolvedSiblings,
-              identifier = identifier))
+  result = list(solvedParents = solvedParents,
+                unsolvedParents = unsolvedParents,
+                solvedSiblings = solvedSiblings,
+                unsolvedSiblings = unsolvedSiblings,
+                identifier = identifier,
+                mixedGraph = mixedGraph,
+                idStepFunctions = idStepFunctions,
+                tianDecompose = tianDecompose,
+                call = match.call())
+  class(result) = "GenericIDResult"
+  return(result)
+}
+
+#' Prints a GenericIDResult object
+#'
+#' Prints a GenericIDResult object as returned by
+#' \code{\link{generalGenericID}}. Invisibly returns its argument via
+#' \code{\link{invisible}(x)} as most print functions do.
+#'
+#' @export
+#'
+#' @param x the GenericIDResult object
+#' @param ... optional parameters, currently unused.
+print.GenericIDResult <- function(x, ...) {
+  cat("Call: ")
+  print(x$call)
+
+  solvedParents = x$solvedParents
+  solvedSiblings = x$solvedSiblings
+  n = length(x$solvedParents)
+
+  cat(paste("\nMixed Graph Info.\n"))
+  cat(paste("# nodes:", n, "\n"))
+  cat(paste("# dir. edges:", sum(x$mixedGraph$L()), "\n"))
+  cat(paste("# bi. edges:", sum(x$mixedGraph$O()) / 2, "\n"))
+
+  cat(paste("\nGeneric Identifiability Summary\n"))
+  cat(paste("# dir. edges shown gen. identifiable:",
+            length(unlist(solvedParents)), "\n"))
+  cat(paste("# bi. edges shown gen. identifiable:",
+            length(unlist(solvedSiblings)) / 2, "\n"))
+
+  cat("\nGenerically identifiable dir. edges:\n")
+  edges = character(min(length(unlist(solvedParents)) / 2, 11))
+  k = 0
+  for (i in 1:n) {
+    if (length(solvedParents[[i]]) != 0) {
+      for (j in solvedParents[[i]]) {
+        k = k + 1
+        edges[k] = paste(j, "->", i, sep="")
+
+        if (k == 10) {
+          edges[11] = "..."
+          break
+        }
+      }
+      if (k == 10) {
+        break
+      }
+    }
+  }
+  if (length(edges) == 0) {
+    cat("None\n")
+  } else {
+    cat(paste(paste(edges, collapse = ", "), "\n"))
+  }
+
+  cat("\nGenerically identifiable bi. edges:\n")
+  edges = character(min(length(unlist(solvedSiblings)) / 2, 11))
+  k = 0
+  for (i in 1:n) {
+    solvedSibs = setdiff(solvedSiblings[[i]], 1:i)
+    if (length(solvedSibs) != 0) {
+      for (j in solvedSibs) {
+        k = k + 1
+        edges[k] = paste(i, "<->", j, sep="")
+
+        if (k == 10) {
+          edges[11] = "..."
+          break
+        }
+      }
+      if (k == 10) {
+        break
+      }
+    }
+  }
+  if (length(edges) == 0) {
+    cat("None\n")
+  } else {
+    cat(paste(paste(edges, collapse = ", "), "\n"))
+  }
+  invisible(x)
 }
 
 #' Returns all subsets of a certain size

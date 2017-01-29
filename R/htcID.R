@@ -149,7 +149,7 @@ htcIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
 
 #' Determines which edges in a mixed graph are HTC-identifiable.
 #'
-#' Uses the half-trek criterion of Foygel, Draisma, and Drton (2013) determine
+#' Uses the half-trek criterion of Foygel, Draisma, and Drton (2012) determine
 #' which edges in a mixed graph are generically identifiable. Depending on your
 #' application it faster to use the \code{\link{graphID.htcID}} function
 #' instead of this one, this function has the advantage of returning additional
@@ -157,29 +157,10 @@ htcIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
 #'
 #' @export
 #'
-#' @inheritParams graphID
-#' @param tianDecompose TRUE or FALSE determining whether or not the Tian
-#'                      decomposition should be used before running the
-#'                      current generic identification algorithm. In general
-#'                      letting this be TRUE will make the algorithm faster and
-#'                      more powerful.
+#' @inheritParams generalGenericID
+#' @inheritParams semID
 #'
-#' @return a list with 5 names arguments:
-#' \describe{
-#'   \item{\code{solvedParents}}{a list whose ith element contains a vector
-#'   containing the subsets of parents of node i for which the edge j->i could
-#'   be shown to be generically identifiable.}
-#'   \item{\code{unsolvedParents}}{as for \code{solvedParents} but for the
-#'   unsolved parents.}
-#'   \item{\code{solvedSiblings}}{as for \code{solvedParents} but for the
-#'   siblings of node i (i.e. the bidirected neighbors of i).}
-#'   \item{\code{unsolvedSiblings}}{as for \code{solvedSilbings} but for the
-#'   unsolved siblings of node i (i.e. the bidirected neighbors of i).}
-#'   \item{\code{identifier}}{a function that takes a (generic) covariance
-#'   matrix corresponding to the graph and identifies the edges parameters
-#'   from solvedParents and solvedSiblings. See \code{\link{htcIdentifyStep}}
-#'   for a more in-depth discussion of identifier functions.}
-#' }
+#' @return see the return value of \code{\link{generalGenericID}}.
 #'
 #' @references
 #' Foygel, R., Draisma, J., and Drton, M.  (2012) Half-trek criterion for
@@ -189,9 +170,11 @@ htcIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
 #' Jin Tian. 2005. Identifying direct causal effects in linear models. In
 #' \emph{Proceedings of the 20th national conference on Artificial intelligence
 #' - Volume 1} (AAAI'05), Anthony Cohn (Ed.), Vol. 1. AAAI Press 346-352.
-htcID <- function(L, O, tianDecompose = T) {
-  return(generalGenericID(L, O, list(htcIdentifyStep),
-                          tianDecompose = tianDecompose))
+htcID <- function(mixedGraph, tianDecompose = T) {
+  result = generalGenericID(mixedGraph, list(htcIdentifyStep),
+                            tianDecompose = tianDecompose)
+  result$call = match.call()
+  return(result)
 }
 
 #' Determines if a mixed graph is HTC-identifiable.

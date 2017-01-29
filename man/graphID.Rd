@@ -61,6 +61,8 @@ A list or printed matrix indicating the identifiability status of the
   information is printed.
 }
 \description{
+NOTE: \code{graphID} has been deprecated, use \code{\link{semID}} instead.
+
 This function checks global and generic identifiability of linear
 structural equation models. For generic identifiability the function
 checks a sufficient criterion as well as a necessary criterion but this

@@ -4,27 +4,43 @@
 \alias{generalGenericID}
 \title{A general generic identification algorithm template.}
 \usage{
-generalGenericID(L, O, idStepFunctions, tianDecompose = T)
+generalGenericID(mixedGraph, idStepFunctions, tianDecompose = T)
 }
 \arguments{
-\item{L}{Adjacency matrix for the directed part of the path
-diagram/mixed graph; an edge pointing from i to j is encoded as L[i,j]=1 and
-the lack of an edge between i and j is encoded as L[i,j]=0. There should be
-no directed self loops, i.e. no i such that L[i,i]=1.}
-
-\item{O}{Adjacency matrix for the bidirected part of the path diagram/mixed
-graph. Edges are encoded as for the L parameter. Again there should be no
-self loops. Also this matrix will be coerced to be symmetric so it is only
-necessary to specify an edge once, i.e. if O[i,j]=1 you may, but are not
-required to, also have O[j,i]=1.}
+\item{mixedGraph}{a \code{\link{MixedGraph}} object representing the L-SEM.}
 
 \item{idStepFunctions}{a list of identification step functions}
 
-\item{tianDecompose}{True if the mixed graph be decomposed into Tian's
-C-components before running the identification algorithms.}
+\item{tianDecompose}{TRUE or FALSE determining whether or not the Tian
+decomposition should be used before running the
+current generic identification algorithm. In general
+letting this be TRUE will make the algorithm faster and
+more powerful.}
 }
 \value{
-see the return of \code{\link{htcID}}.
+returns an object of \link{class} "\code{GenericIDResult}," this
+        object is just a list with 9 components:
+\describe{
+  \item{\code{solvedParents}}{a list whose ith element contains a vector
+  containing the subsets of parents of node i for which the edge j->i could
+  be shown to be generically identifiable.}
+  \item{\code{unsolvedParents}}{as for \code{solvedParents} but for the
+  unsolved parents.}
+  \item{\code{solvedSiblings}}{as for \code{solvedParents} but for the
+  siblings of node i (i.e. the bidirected neighbors of i).}
+  \item{\code{unsolvedSiblings}}{as for \code{solvedSilbings} but for the
+  unsolved siblings of node i (i.e. the bidirected neighbors of i).}
+  \item{\code{identifier}}{a function that takes a (generic) covariance
+  matrix corresponding to the graph and identifies the edges parameters
+  from solvedParents and solvedSiblings. See \code{\link{htcIdentifyStep}}
+  for a more in-depth discussion of identifier functions.}
+  \item{\code{mixedGraph}}{a mixed graph object of the graph.}
+  \item{\code{idStepFunctions}}{a list of functions used to generically
+  identify parameters. For instance, htcID uses the function
+  \code{\link{htcIdentifyStep}} to identify edges.}
+  \item{\code{tianDecompose}}{the argument tianDecompose.}
+  \item{\code{call}}{the call made to this function.}
+}
 }
 \description{
 A function that encapsulates the general structure of our algorithms for

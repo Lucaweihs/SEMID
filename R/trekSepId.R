@@ -114,12 +114,13 @@ trekSeparationIdentifyStep = function(mixedGraph, unsolvedParents,
 #'
 #' @export
 #'
-#' @inheritParams htcID
+#' @inheritParams generalGenericID
+#' @inheritParams semID
 #' @inheritParams edgewiseIdentifyStep
 #' @inheritParams trekSeparationIdentifyStep
 #'
-#' @return see the return of \code{\link{htcID}}.
-edgewiseTSID <- function(L, O, tianDecompose = T, subsetSizeControl = 3,
+#' @return see the return of \code{\link{generalGenericID}}.
+edgewiseTSID <- function(mixedGraph, tianDecompose = T, subsetSizeControl = 3,
                          maxSubsetSize = 3) {
   eid <- function(mixedGraph, unsolvedParents, solvedParents, identifier) {
     return(edgewiseIdentifyStep(mixedGraph, unsolvedParents, solvedParents,
@@ -131,6 +132,8 @@ edgewiseTSID <- function(L, O, tianDecompose = T, subsetSizeControl = 3,
                                       solvedParents, identifier,
                                       maxSubsetSize = maxSubsetSize))
   }
-  return(generalGenericID(L, O, list(htcIdentifyStep, eid, tsid),
-                          tianDecompose = tianDecompose))
+  result = generalGenericID(mixedGraph, list(htcIdentifyStep, eid, tsid),
+                            tianDecompose = tianDecompose)
+  result$call = match.call()
+  return(result)
 }

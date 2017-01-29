@@ -3,10 +3,6 @@ context("Components related to generic identifiability by ancestor decomposition
 
 source("helperFunctions.R")
 
-ancestralID = function(L, O) {
-  return(generalGenericID(L, O, list(ancestralIdentifyStep), tianDecompose = F))
-}
-
 test_that("Ancestral identification does not identify edges erroneously.", {
   # Random test
   set.seed(3634)
@@ -18,8 +14,9 @@ test_that("Ancestral identification does not identify edges erroneously.", {
       for (i in 1:sims) {
         L = rDirectedAdjMatrix(n, p)
         O = rUndirectedAdjMat(n, p)
-        gid = htcID(L, O)
-        aid = ancestralID(L, O)
+        g = MixedGraph(L, O)
+        gid = htcID(g)
+        aid = ancestralID(g)
 
         expect_true(all(sapply(1:n, FUN = function(x) {
           all(gid$solvedParents[[x]] %in% aid$solvedParents[[x]])
@@ -43,7 +40,7 @@ test_that("Old and new ancestralID implementations agree.", {
         L = rAcyclicDirectedAdjMatrix(n, p)
         O = rConnectedAdjMatrix(n, p)
         gia = sort(graphID.ancestralID(L, O))
-        aid = ancestralID(L, O)
+        aid = ancestralID(MixedGraph(L, O))
         solvedAid = setdiff(1:n, which(sapply(aid$unsolvedParents,
                                         FUN = function(x) { length(x) != 0 })))
         randomIdentificationTest(aid$identifier, L, O, aid$solvedParents)

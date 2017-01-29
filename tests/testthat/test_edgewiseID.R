@@ -3,10 +3,6 @@ context("Components related to edgewise identification.")
 
 source("helperFunctions.R")
 
-edgewiseID = function(L, O, maxTrekSepSubsetSize = 3) {
-  return(generalGenericID(L, O, list(edgewiseIdentifyStep)))
-}
-
 test_that("Edgewise identification does not identify edges erroneously.", {
   # Random test
   set.seed(2323)
@@ -18,8 +14,9 @@ test_that("Edgewise identification does not identify edges erroneously.", {
       for (i in 1:sims) {
         L = rDirectedAdjMatrix(n, p)
         O = rUndirectedAdjMat(n, p)
-        gid = htcID(L, O)
-        eid = edgewiseID(L, O)
+        g = MixedGraph(L, O)
+        gid = htcID(g)
+        eid = edgewiseID(g)
 
         expect_true(all(sapply(1:n, FUN = function(x) {
           all(gid$solvedParents[[x]] %in% eid$solvedParents[[x]])

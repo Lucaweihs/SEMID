@@ -1,5 +1,8 @@
 #' Identifiability of linear structural equation models.
 #'
+#' @description
+#' NOTE: \code{graphID} has been deprecated, use \code{\link{semID}} instead.
+#'
 #' This function checks global and generic identifiability of linear
 #' structural equation models. For generic identifiability the function
 #' checks a sufficient criterion as well as a necessary criterion but this
@@ -80,6 +83,7 @@
 graphID <- function(L, O, output.type = 'matrix', file.name = NULL,
                     decomp.if.acyclic = TRUE, test.globalID = TRUE,
                     test.genericID = TRUE, test.nonID = TRUE) {
+  .Deprecated("semID", package = "SEMID")
   if (!is.matrix(L) || !is.matrix(O)) {
     print('L and O must be two square matrices of the same size')
     return(NULL)
@@ -506,6 +510,7 @@ graphID.globalID <- function(L, O) {
 #' {Drton}, M. and {Weihs}, L. (2015) Generic Identifiability of Linear
 #' Structural Equation Models by Ancestor Decomposition. arXiv 1504.02992
 graphID.genericID <- function(L, O) {
+  .Deprecated("semID", package = "SEMID")
   if (is.dag(igraph::graph.adjacency(L, mode = "directed"))) {
     return(graphID.ancestralID(L, O))
   } else {

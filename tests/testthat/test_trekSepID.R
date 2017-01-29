@@ -3,14 +3,14 @@ context("Components related to trek separation identification.")
 
 source("helperFunctions.R")
 
-trekSepId <- function(L, O, maxTrekSepSubsetSize = 3) {
+trekSepId <- function(mixedGraph, maxTrekSepSubsetSize = 3) {
   tsIdStep = function(mixedGraph, unsolvedParents,
                       solvedParents, identifier) {
     return(trekSeparationIdentifyStep(mixedGraph, unsolvedParents,
                                       solvedParents, identifier,
                                       maxSubsetSize = maxTrekSepSubsetSize))
   }
-  return(generalGenericID(L, O, list(tsIdStep)))
+  return(generalGenericID(mixedGraph, list(tsIdStep)))
 }
 
 test_that("Edgewise identification does not identify edges erroneously.", {
@@ -24,7 +24,7 @@ test_that("Edgewise identification does not identify edges erroneously.", {
       for (i in 1:sims) {
         L = rDirectedAdjMatrix(n, p)
         O = rUndirectedAdjMat(n, p)
-        tsid = trekSepId(L, O)
+        tsid = trekSepId(MixedGraph(L, O))
 
         randomIdentificationTest(tsid$identifier, L, O, tsid$solvedParents)
       }

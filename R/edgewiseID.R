@@ -160,16 +160,19 @@ edgewiseIdentifyStep = function(mixedGraph, unsolvedParents, solvedParents,
 #'
 #' @export
 #'
-#' @inheritParams htcID
+#' @inheritParams generalGenericID
+#' @inheritParams semID
 #' @inheritParams edgewiseIdentifyStep
 #'
-#' @return see the return of \code{\link{htcID}}.
-edgewiseID <- function(L, O, tianDecompose = T, subsetSizeControl = 3) {
+#' @return see the return of \code{\link{generalGenericID}}.
+edgewiseID <- function(mixedGraph, tianDecompose = T, subsetSizeControl = 3) {
   eid <- function(mixedGraph, unsolvedParents, solvedParents, identifier) {
     return(edgewiseIdentifyStep(mixedGraph, unsolvedParents, solvedParents,
                                 identifier,
                                 subsetSizeControl = subsetSizeControl))
   }
-  return(generalGenericID(L, O, list(eid),
-                          tianDecompose = tianDecompose))
+  result = generalGenericID(mixedGraph, list(eid),
+                            tianDecompose = tianDecompose)
+  result$call = match.call()
+  return(result)
 }
