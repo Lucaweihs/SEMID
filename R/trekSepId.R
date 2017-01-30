@@ -1,8 +1,13 @@
 #' Create an trek separation identification function
 #'
-#' A helper function for \link{\code{trekSeparationIdentifyStep}}, creates an
+#' A helper function for \code{\link{trekSeparationIdentifyStep}}, creates an
 #' identifier function based on its given parameters. This created identifier
 #' function will identify the directed edge from 'parent' to 'node.'
+#'
+#' @inheritParams createHtcIdentifier
+#' @param parent the parent of node for which the edge node -> parent should
+#'               be generically identified.
+#' @param solvedParents the parents of node that have been solved
 #'
 #' @return an identification function
 createTrekSeparationIdentifier <- function(idFunc, sources, targets, node,

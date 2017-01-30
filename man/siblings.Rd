@@ -13,6 +13,8 @@ siblings(this, nodes)
 \method{siblings}{MixedGraph}(this, nodes)
 }
 \arguments{
+\item{this}{the mixed graph object}
+
 \item{nodes}{a vector of nodes of which to find the siblings.}
 }
 \value{

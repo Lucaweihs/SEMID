@@ -4,6 +4,7 @@
 #' of a mixed graph, plots a representation of the graph.
 #'
 #' @inheritParams graphID
+#' @param main the plot title.
 #' @param vertexLabels labels to use for the vertices.
 #'
 #' @export

@@ -1,6 +1,6 @@
 #' Create an htc identification function.
 #'
-#' A helper function for \link{\code{htcIdentifyStep}}, creates an identifier
+#' A helper function for \code{\link{htcIdentifyStep}}, creates an identifier
 #' function based on its given parameters. This created identifier function will
 #' identify the directed edges from 'targets' to 'node.'
 #'

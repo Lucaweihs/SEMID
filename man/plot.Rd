@@ -4,10 +4,12 @@
 \alias{plot.MixedGraph}
 \title{Plots the mixed graph}
 \usage{
-\method{plot}{MixedGraph}(this)
+\method{plot}{MixedGraph}(x, ...)
 }
 \arguments{
-\item{this}{the mixed graph object}
+\item{x}{the mixed graph object}
+
+\item{...}{additional plotting arguments. Currently ignored.}
 }
 \description{
 Plots the mixed graph

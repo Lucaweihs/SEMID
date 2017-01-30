@@ -18,6 +18,8 @@ self loops. Also this matrix will be coerced to be symmetric so it is only
 necessary to specify an edge once, i.e. if O[i,j]=1 you may, but are not
 required to, also have O[j,i]=1.}
 
+\item{main}{the plot title.}
+
 \item{vertexLabels}{labels to use for the vertices.}
 }
 \description{

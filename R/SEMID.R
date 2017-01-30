@@ -11,6 +11,7 @@
 #' @import utils
 #' @importFrom R.oo Object setConstructorS3 extend
 #' @importFrom R.methodsS3 setMethodS3 throw
+#' @importFrom graphics plot
 #'
 #' @name SEMID-package
 NULL

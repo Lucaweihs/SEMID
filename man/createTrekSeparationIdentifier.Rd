@@ -7,11 +7,31 @@
 createTrekSeparationIdentifier(idFunc, sources, targets, node, parent,
   solvedParents)
 }
+\arguments{
+\item{idFunc}{identification of edge coefficients often requires that other
+edge coefficients already be identified. This argument should be a
+function that produces all such identifications. The newly created
+identifier function will return these identifications along with its
+own.}
+
+\item{sources}{the sources of the half-trek system.}
+
+\item{targets}{the targets of the half-trek system (these should be the
+parents of node).}
+
+\item{node}{the node for which all incoming edges are to be identified
+(the tails of which are targets).}
+
+\item{parent}{the parent of node for which the edge node -> parent should
+be generically identified.}
+
+\item{solvedParents}{the parents of node that have been solved}
+}
 \value{
 an identification function
 }
 \description{
-A helper function for \link{\code{trekSeparationIdentifyStep}}, creates an
+A helper function for \code{\link{trekSeparationIdentifyStep}}, creates an
 identifier function based on its given parameters. This created identifier
 function will identify the directed edge from 'parent' to 'node.'
 }

@@ -11,13 +11,14 @@ semID(mixedGraph, testGlobalID = TRUE, testGenericNonID = TRUE,
 \item{mixedGraph}{a \code{\link{MixedGraph}} object representing the L-SEM.}
 
 \item{testGlobalID}{TRUE or FALSE if the graph should be tested for global
-identifiabliity. This uses the \code{\link{graphID.globalID}}
+identifiability. This uses the \code{\link{graphID.globalID}}
 function.}
 
 \item{testGenericNonID}{TRUE of FALSE if the graph should be tested for
 generic non-identifiablity, that is, if for every generic choice
 of parameters for the L-SEM there are infinitely many
-other choices that lead to the same covariance matrix.}
+other choices that lead to the same covariance matrix. This currently
+uses the \code{\link{graphID.nonHtcID}} function.}
 
 \item{genericIdStepFunctions}{a list of the generic identifier step functions
 that should be used for testing generic identifiablity. See

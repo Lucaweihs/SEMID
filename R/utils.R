@@ -26,12 +26,13 @@ mixedGraphHasSimpleNumbering <- function(mixedGraph) {
 #'
 #' @param mixedGraph a \code{\link{MixedGraph}} object representing the L-SEM.
 #' @param testGlobalID TRUE or FALSE if the graph should be tested for global
-#'        identifiabliity. This uses the \code{\link{graphID.globalID}}
+#'        identifiability. This uses the \code{\link{graphID.globalID}}
 #'        function.
 #' @param testGenericNonID TRUE of FALSE if the graph should be tested for
 #'        generic non-identifiablity, that is, if for every generic choice
 #'        of parameters for the L-SEM there are infinitely many
-#'        other choices that lead to the same covariance matrix.
+#'        other choices that lead to the same covariance matrix. This currently
+#'        uses the \code{\link{graphID.nonHtcID}} function.
 #' @param genericIdStepFunctions a list of the generic identifier step functions
 #'        that should be used for testing generic identifiablity. See
 #'        \code{\link{generalGenericID}} for a discussion of such functions. If
@@ -60,6 +61,27 @@ mixedGraphHasSimpleNumbering <- function(mixedGraph) {
 #'   \item{\code{mixedGraph}}{the inputted mixed graph object.}
 #'   \item{\code{tianDecompose}}{the argument tianDecompose.}
 #'   \item{\code{call}}{the call made to this function.}
+#' }
+#'
+#' \dontrun{
+#' L = t(matrix(
+#'   c(0, 1, 0, 0, 0,
+#'     0, 0, 1, 0, 0,
+#'     0, 0, 0, 1, 0,
+#'     0, 0, 0, 0, 1,
+#'     0, 0, 0, 0, 0), 5, 5))
+#' O = t(matrix(
+#'   c(0, 0, 1, 1, 0,
+#'     0, 0, 0, 1, 1,
+#'     0, 0, 0, 0, 0,
+#'     0, 0, 0, 0, 0,
+#'     0, 0, 0, 0, 0), 5, 5))
+#' O = O + t(O)
+#' graph = MixedGraph(L,O)
+#' semID(graph)
+#'
+#' ## Examples from Foygel, Draisma & Drton (2012)
+#' demo(SEMID)
 #' }
 semID <- function(mixedGraph, testGlobalID = TRUE, testGenericNonID = TRUE,
                   genericIdStepFunctions = list(htcIdentifyStep),
@@ -113,7 +135,7 @@ print.SEMIDResult <- function(x, ...) {
   cat("Call: ")
   print(x$call)
 
-  cat("\nDid Tian decomposition?\n")
+  cat("\nAttempted Tian decomposition?\n")
   cat(x$tianDecompose, "\n")
 
   if (!is.na(x$isGlobalID)) {

@@ -5,8 +5,6 @@
 #' identify the directed edges from 'targets' to 'node.'
 #'
 #' @inheritParams createHtcIdentifier
-#' @param idFunc
-#'
 #' @param ancestralSubset an ancestral subset of the graph containing node.
 #' @param cComponent a list corresponding to the c-component containing node
 #'        in the subgraph induced by ancestralSubset. See

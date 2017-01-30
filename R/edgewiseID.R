@@ -1,8 +1,13 @@
 #' Create an edgewise identification function
 #'
-#' A helper function for \link{\code{edgewiseIdentifyStep}}, creates an
+#' A helper function for \code{\link{edgewiseIdentifyStep}}, creates an
 #' identifier function based on its given parameters. This created identifier
 #' function will identify the directed edges from 'targets' to 'node.'
+#'
+#' @inheritParams createHtcIdentifier
+#' @param solvedNodeParents the parents of node that have been solved
+#' @param sourceParentsToRemove a list of the parents of the sources that should
+#'        have their edge to their respect source removed.
 #'
 #' @return an identification function
 createEdgewiseIdentifier <- function(idFunc, sources, targets, node,

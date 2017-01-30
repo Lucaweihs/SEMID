@@ -63,6 +63,7 @@
 #' \emph{Ann. Statist.} 40(3): 1682-1713.
 #'
 #' @examples
+#' \dontrun{
 #' L = t(matrix(
 #'   c(0, 1, 0, 0, 0,
 #'     0, 0, 1, 0, 0,
@@ -78,8 +79,10 @@
 #' O=O+t(O)
 #' graphID(L,O)
 #'
+#'
 #' ## Examples from Foygel, Draisma & Drton (2012)
 #' demo(SEMID)
+#' }
 graphID <- function(L, O, output.type = 'matrix', file.name = NULL,
                     decomp.if.acyclic = TRUE, test.globalID = TRUE,
                     test.genericID = TRUE, test.nonID = TRUE) {

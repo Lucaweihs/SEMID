@@ -69,6 +69,7 @@ checks a sufficient criterion as well as a necessary criterion but this
 check may be inconclusive.
 }
 \examples{
+\dontrun{
 L = t(matrix(
   c(0, 1, 0, 0, 0,
     0, 0, 1, 0, 0,
@@ -84,8 +85,10 @@ O = t(matrix(
 O=O+t(O)
 graphID(L,O)
 
+
 ## Examples from Foygel, Draisma & Drton (2012)
 demo(SEMID)
+}
 }
 \references{
 Drton, M., Foygel, R., and Sullivant, S.  (2011) Global

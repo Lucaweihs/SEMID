@@ -8,7 +8,11 @@ createAncestralIdentifier(idFunc, sources, targets, node, htrSources,
   ancestralSubset, cComponent)
 }
 \arguments{
-\item{idFunc}{}
+\item{idFunc}{identification of edge coefficients often requires that other
+edge coefficients already be identified. This argument should be a
+function that produces all such identifications. The newly created
+identifier function will return these identifications along with its
+own.}
 
 \item{sources}{the sources of the half-trek system.}
 

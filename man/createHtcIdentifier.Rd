@@ -29,7 +29,7 @@ idFunc for the newly created identification function to work.}
 an identification function
 }
 \description{
-A helper function for \link{\code{htcIdentifyStep}}, creates an identifier
+A helper function for \code{\link{htcIdentifyStep}}, creates an identifier
 function based on its given parameters. This created identifier function will
 identify the directed edges from 'targets' to 'node.'
 }

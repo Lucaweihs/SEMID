@@ -56,6 +56,7 @@ setMethodS3("numNodes", "MixedGraphFixedOrder", function(this) {
 #' @name siblings
 #' @export siblings
 #'
+#' @param this the mixed graph object
 #' @param nodes a vector of nodes of which to find the siblings.
 #'
 #' @return a vector of all of the siblings.
@@ -883,14 +884,15 @@ setMethodS3("tianComponent", "MixedGraph", function(this, node) {
 
 #' Plots the mixed graph
 #'
-#' @param this the mixed graph object
+#' @param x the mixed graph object
+#' @param ... additional plotting arguments. Currently ignored.
 #'
 #' @rdname   plot
 #' @name     plot.MixedGraph
-#' @usage    \method{plot}{MixedGraph}(this)
+#' @usage    \method{plot}{MixedGraph}(x, ...)
 #' @S3method plot MixedGraph
 #' @export   plot.MixedGraph
-setMethodS3("plot", "MixedGraph", function(this) {
-  plotMixedGraph(this$L(), this$O(), vertexLabels = this$.vertexNums)
+setMethodS3("plot", "MixedGraph", function(x, ...) {
+  plotMixedGraph(x$L(), x$O(), vertexLabels = x$.vertexNums)
 }, appendVarArgs = F)
 
