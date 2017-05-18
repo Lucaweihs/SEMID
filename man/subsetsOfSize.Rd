@@ -18,4 +18,3 @@ a list of all subsets of x of a given size k
 For an input vector x, returns in a list, the collection of all subsets
 of x of size k.
 }
-

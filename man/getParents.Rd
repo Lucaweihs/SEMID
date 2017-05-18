@@ -18,4 +18,3 @@ a sorted vector of all parent nodes.
 Get the getParents of a collection of nodes in a graph g, the getParents DO include
 the input nodes themselves.
 }
-

@@ -2,15 +2,11 @@
 % Please edit documentation in R/MixedGraph.R
 \name{descendants}
 \alias{descendants}
-\alias{descendants.MixedGraph}
 \alias{descendants.MixedGraphFixedOrder}
+\alias{descendants.MixedGraph}
 \title{Get descendants of a node}
 \usage{
 descendants(this, node)
-
-\method{descendants}{MixedGraphFixedOrder}(this, node)
-
-\method{descendants}{MixedGraph}(this, node)
 }
 \arguments{
 \item{this}{the mixed graph object}
@@ -21,4 +17,3 @@ descendants(this, node)
 Finds all descendents of a node, this DOES include the node itself (every
 node is considered a descendant of itself).
 }
-

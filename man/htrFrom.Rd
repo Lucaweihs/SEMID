@@ -2,15 +2,11 @@
 % Please edit documentation in R/MixedGraph.R
 \name{htrFrom}
 \alias{htrFrom}
-\alias{htrFrom.MixedGraph}
 \alias{htrFrom.MixedGraphFixedOrder}
+\alias{htrFrom.MixedGraph}
 \title{Half trek reachable nodes.}
 \usage{
 htrFrom(this, node)
-
-\method{htrFrom}{MixedGraphFixedOrder}(this, node)
-
-\method{htrFrom}{MixedGraph}(this, node)
 }
 \arguments{
 \item{this}{the mixed graph object}
@@ -23,4 +19,3 @@ a vector of all nodes half-trek reachable from node.
 \description{
 Half trek reachable nodes.
 }
-

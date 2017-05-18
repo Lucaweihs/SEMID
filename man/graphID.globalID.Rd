@@ -30,4 +30,3 @@ Drton, Mathias; Foygel, Rina; Sullivant, Seth. Global identifiability of
 linear structural equation models. \emph{Ann. Statist.}  39 (2011), no. 2,
 865--886.
 }
-

@@ -2,15 +2,11 @@
 % Please edit documentation in R/MixedGraph.R
 \name{numNodes}
 \alias{numNodes}
-\alias{numNodes.MixedGraph}
 \alias{numNodes.MixedGraphFixedOrder}
+\alias{numNodes.MixedGraph}
 \title{Number of nodes in the graph.}
 \usage{
 numNodes(this)
-
-\method{numNodes}{MixedGraphFixedOrder}(this)
-
-\method{numNodes}{MixedGraph}(this)
 }
 \arguments{
 \item{this}{the mixed graph object}
@@ -18,4 +14,3 @@ numNodes(this)
 \description{
 Number of nodes in the graph.
 }
-

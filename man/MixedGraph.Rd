@@ -42,4 +42,3 @@ available to be used on the mixed graph include
 }
 see the individual function documentation for more information.
 }
-

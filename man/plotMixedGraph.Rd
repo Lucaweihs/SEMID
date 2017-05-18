@@ -26,4 +26,3 @@ required to, also have O[j,i]=1.}
 Given adjacency matrices representing the directed and bidirected portions
 of a mixed graph, plots a representation of the graph.
 }
-

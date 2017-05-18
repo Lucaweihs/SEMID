@@ -19,4 +19,3 @@ Gets the descendants of a collection of nodes in a graph (all nodes that can
 be reached by following directed edges from those nodes). Descendants DO
 include the nodes themselves.
 }
-

@@ -24,4 +24,3 @@ of the algorithm is somewhat different from Drton and Weihs (2015) in that it
 also works on cyclic graphs. The original version of the algorithm can be
 found in the function \code{\link{graphID.ancestralID}}.
 }
-

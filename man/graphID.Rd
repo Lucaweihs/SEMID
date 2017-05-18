@@ -99,4 +99,3 @@ Foygel, R., Draisma, J., and Drton, M.  (2012) Half-trek criterion for
 generic identifiability of linear structural equation models.
 \emph{Ann. Statist.} 40(3): 1682-1713.
 }
-

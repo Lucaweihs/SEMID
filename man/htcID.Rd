@@ -34,4 +34,3 @@ Jin Tian. 2005. Identifying direct causal effects in linear models. In
 \emph{Proceedings of the 20th national conference on Artificial intelligence
 - Volume 1} (AAAI'05), Anthony Cohn (Ed.), Vol. 1. AAAI Press 346-352.
 }
-

@@ -45,4 +45,3 @@ A list with two named components:
 Split a graph into mixed Tian components and solve each separately
 using the HTC.
 }
-

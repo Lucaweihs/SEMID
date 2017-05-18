@@ -13,4 +13,3 @@ mixedGraphHasSimpleNumbering(mixedGraph)
 Checks that the input mixed graph has vertices are numbered from 1
 to mixedGraph$numNodes(). Throws an error if they are not.
 }
-

@@ -6,8 +6,6 @@
 \title{Returns the Tian c-component of a node}
 \usage{
 tianComponent(this, node)
-
-\method{tianComponent}{MixedGraph}(this, node)
 }
 \arguments{
 \item{this}{the mixed graph object}
@@ -17,4 +15,3 @@ tianComponent(this, node)
 \description{
 Returns the Tian c-component of a node
 }
-

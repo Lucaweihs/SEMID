@@ -2,15 +2,11 @@
 % Please edit documentation in R/MixedGraph.R
 \name{isSibling}
 \alias{isSibling}
-\alias{isSibling.MixedGraph}
 \alias{isSibling.MixedGraphFixedOrder}
+\alias{isSibling.MixedGraph}
 \title{Are two nodes siblings?}
 \usage{
 isSibling(this, node1, node2)
-
-\method{isSibling}{MixedGraphFixedOrder}(this, node1, node2)
-
-\method{isSibling}{MixedGraph}(this, node1, node2)
 }
 \arguments{
 \item{this}{the mixed graph object}
@@ -25,4 +21,3 @@ TRUE if the nodes are siblings in the graph, FALSE otherwise
 \description{
 Are two nodes siblings?
 }
-

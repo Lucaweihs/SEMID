@@ -36,4 +36,3 @@ generic identifiability of linear structural equation models.
 {Drton}, M. and {Weihs}, L. (2015) Generic Identifiability of Linear
 Structural Equation Models by Ancestor Decomposition. arXiv 1504.02992
 }
-

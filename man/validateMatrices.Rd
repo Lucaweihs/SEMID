@@ -20,4 +20,3 @@ the appropriate form to be interpreted by the other functions. In particular
 they should be square matrices of 1's and 0's with all 0's along their
 diagonals. We do not require O to be symmetric here.
 }
-

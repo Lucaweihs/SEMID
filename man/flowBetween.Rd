@@ -6,8 +6,6 @@
 \title{Flow from one set of nodes to another.}
 \usage{
 flowBetween(this, sources, sinks)
-
-\method{flowBetween}{FlowGraph}(this, sources, sinks)
 }
 \arguments{
 \item{this}{the flow graph object}
@@ -25,4 +23,3 @@ a list with two named components, \code{value} (the size of the
 \description{
 Flow from one set of nodes to another.
 }
-

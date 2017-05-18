@@ -34,10 +34,47 @@ make the algorithm faster and more powerful. Note that
 this is a version of the Tian decomposition that works
 also with cyclic graphs.}
 }
+\value{
+returns an object of \link{class} '\code{SEMIDResult},' this
+        object is just a list with 6 components:
+\describe{
+  \item{\code{isGlobalID}}{If testGlobalID == TRUE, then TRUE or FALSE if
+  the graph is globally identifiable. If testGlobalID == FALSE then NA.}
+  \item{\code{isGenericNonID}}{If testGenericNonID == TRUE, then TRUE if the
+  graph is generically non-identifiable or FALSE the test is inconclusive.
+  If testGenericNonID == FALSE then NA.}
+  \item{\code{genericIDResult}}{If length(genericIdStepFunctions) != 0 then
+  a \code{GenericIDResult} object as returned by
+  \code{\link{generalGenericID}}. Otherwise a list of length 0.}
+  \item{\code{mixedGraph}}{the inputted mixed graph object.}
+  \item{\code{tianDecompose}}{the argument tianDecompose.}
+  \item{\code{call}}{the call made to this function.}
+}
+
+\dontrun{
+L = t(matrix(
+  c(0, 1, 0, 0, 0,
+    0, 0, 1, 0, 0,
+    0, 0, 0, 1, 0,
+    0, 0, 0, 0, 1,
+    0, 0, 0, 0, 0), 5, 5))
+O = t(matrix(
+  c(0, 0, 1, 1, 0,
+    0, 0, 0, 1, 1,
+    0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0), 5, 5))
+O = O + t(O)
+graph = MixedGraph(L,O)
+semID(graph)
+
+## Examples from Foygel, Draisma & Drton (2012)
+demo(SEMID)
+}
+}
 \description{
 This function can be used to check global and generic identifiability of
 linear structural equation models (L-SEMs). In particular, this function
 takes a \code{\link{MixedGraph}} object corresponding to the L-SEM and
 checks different conditions known for global and generic identifiability.
 }
-

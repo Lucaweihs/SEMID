@@ -16,4 +16,3 @@ Prints a GenericIDResult object as returned by
 \code{\link{generalGenericID}}. Invisibly returns its argument via
 \code{\link{invisible}(x)} as most print functions do.
 }
-

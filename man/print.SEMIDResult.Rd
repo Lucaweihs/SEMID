@@ -16,4 +16,3 @@ Prints a SEMIDResult object as returned by
 \code{\link{semID}}. Invisibly returns its argument via
 \code{\link{invisible}(x)} as most print functions do.
 }
-

@@ -20,4 +20,3 @@ Creates an identification function which combines the identification
 functions created on a collection of c-components into a identification
 for the full mixed graph.
 }
-

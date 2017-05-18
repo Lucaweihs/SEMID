@@ -35,4 +35,3 @@ takes as input the matrices, L and O, defining G and creates an identifer
 that does not identify any of the coefficients of G. This is useful as a
 base case when building more complex identification functions.
 }
-

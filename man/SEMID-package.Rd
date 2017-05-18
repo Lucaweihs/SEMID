@@ -12,4 +12,3 @@ The only function you're likely to need from \pkg{SEMID} is
 \code{\link{graphID}}. Otherwise refer to the individual function
 documentation.
 }
-

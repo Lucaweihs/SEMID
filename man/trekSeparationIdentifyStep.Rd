@@ -54,4 +54,3 @@ A function that does one step through all the nodes in a mixed graph
 and tries to identify new edge coefficients using trek-separation as
 described in Weihs, Robeva, Robinson, et al. (2017).
 }
-

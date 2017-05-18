@@ -57,4 +57,3 @@ A function that does one step through all the nodes in a mixed graph
 and tries to identify new edge coefficients using the existence of
 half-trek systems as described in Weihs, Robeva, Robinson, et al. (2017).
 }
-

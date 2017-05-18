@@ -24,4 +24,3 @@ An object representing the FlowGraph
 \description{
 Creates an object representing a flow graph.
 }
-

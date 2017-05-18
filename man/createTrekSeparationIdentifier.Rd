@@ -35,4 +35,3 @@ A helper function for \code{\link{trekSeparationIdentifyStep}}, creates an
 identifier function based on its given parameters. This created identifier
 function will identify the directed edge from 'parent' to 'node.'
 }
-

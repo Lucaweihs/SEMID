@@ -2,15 +2,11 @@
 % Please edit documentation in R/MixedGraph.R
 \name{parents}
 \alias{parents}
-\alias{parents.MixedGraph}
 \alias{parents.MixedGraphFixedOrder}
+\alias{parents.MixedGraph}
 \title{All parents a collection of nodes.}
 \usage{
 parents(this, nodes)
-
-\method{parents}{MixedGraphFixedOrder}(this, nodes)
-
-\method{parents}{MixedGraph}(this, nodes)
 }
 \arguments{
 \item{this}{the mixed graph object.}
@@ -23,4 +19,3 @@ a vector of parents of the nodes.
 \description{
 All parents a collection of nodes.
 }
-

@@ -5,14 +5,14 @@
 #'
 #' @param mixedGraph the mixed graph object
 mixedGraphHasSimpleNumbering <- function(mixedGraph) {
-  nodes = mixedGraph$nodes()
-  if (any(nodes != 1:length(nodes))) {
-    stop(paste("Currently only mixed graphs whose vertices are numbered from 1",
-               "to mixedGraph$numNodes() in order are supported. The inputted mixed",
-               "graph as vertices numbered as mixedGraph$nodes() == c(",
-               paste(nodes, collapse = ", "), ")."))
-
-  }
+    nodes <- mixedGraph$nodes()
+    if (any(nodes != 1:length(nodes))) {
+        stop(paste("Currently only mixed graphs whose vertices are numbered from 1", 
+            "to mixedGraph$numNodes() in order are supported. The inputted mixed", 
+            "graph as vertices numbered as mixedGraph$nodes() == c(", paste(nodes, 
+                collapse = ", "), ")."))
+        
+    }
 }
 
 #' Identifiability of linear structural equation models.
@@ -47,14 +47,14 @@ mixedGraphHasSimpleNumbering <- function(mixedGraph) {
 #'                      also with cyclic graphs.
 #' @inheritParams generalGenericID
 #'
-#' @return returns an object of \link{class} "\code{SEMIDResult}," this
+#' @return returns an object of \link{class} '\code{SEMIDResult},' this
 #'         object is just a list with 6 components:
 #' \describe{
 #'   \item{\code{isGlobalID}}{If testGlobalID == TRUE, then TRUE or FALSE if
 #'   the graph is globally identifiable. If testGlobalID == FALSE then NA.}
 #'   \item{\code{isGenericNonID}}{If testGenericNonID == TRUE, then TRUE if the
 #'   graph is generically non-identifiable or FALSE the test is inconclusive.
-#'   If testGenericNonID == FALSE then NA.
+#'   If testGenericNonID == FALSE then NA.}
 #'   \item{\code{genericIDResult}}{If length(genericIdStepFunctions) != 0 then
 #'   a \code{GenericIDResult} object as returned by
 #'   \code{\link{generalGenericID}}. Otherwise a list of length 0.}
@@ -83,42 +83,39 @@ mixedGraphHasSimpleNumbering <- function(mixedGraph) {
 #' ## Examples from Foygel, Draisma & Drton (2012)
 #' demo(SEMID)
 #' }
-semID <- function(mixedGraph, testGlobalID = TRUE, testGenericNonID = TRUE,
-                  genericIdStepFunctions = list(htcIdentifyStep),
-                  tianDecompose = TRUE) {
-  isGlobalID = NA
-  if (testGlobalID) {
-    isGlobalID = graphID.globalID(mixedGraph$L(), mixedGraph$O())
-  }
-
-  isGenericNonID = NA
-  if (testGenericNonID) {
-    if (tianDecompose) {
-      isGenericNonID = FALSE
-      for (cComponent in mixedGraph$tianDecompose()) {
-        isGenericNonID = isGenericNonID || graphID.nonHtcID(cComponent$L,
-                                                            cComponent$O)
-        if (isGenericNonID) {
-          break;
-        }
-      }
-    } else {
-      isGenericNonID = graphID.nonHtcID(mixedGraph$L(), mixedGraph$O())
+semID <- function(mixedGraph, testGlobalID = TRUE, testGenericNonID = TRUE, genericIdStepFunctions = list(htcIdentifyStep), 
+    tianDecompose = TRUE) {
+    isGlobalID <- NA
+    if (testGlobalID) {
+        isGlobalID <- graphID.globalID(mixedGraph$L(), mixedGraph$O())
     }
-  }
-
-  genericIDResult = list()
-  if (length(genericIdStepFunctions) != 0 ) {
-    genericIDResult = generalGenericID(mixedGraph,
-                                       idStepFunctions = genericIdStepFunctions,
-                                       tianDecompose = tianDecompose)
-  }
-
-  result = list(isGlobalID = isGlobalID, isGenericNonID = isGenericNonID,
-                genericIDResult = genericIDResult, mixedGraph = mixedGraph,
-                tianDecompose = tianDecompose, call = match.call())
-  class(result) = "SEMIDResult"
-  return(result)
+    
+    isGenericNonID <- NA
+    if (testGenericNonID) {
+        if (tianDecompose) {
+            isGenericNonID <- FALSE
+            for (cComponent in mixedGraph$tianDecompose()) {
+                isGenericNonID <- isGenericNonID || graphID.nonHtcID(cComponent$L, 
+                  cComponent$O)
+                if (isGenericNonID) {
+                  break
+                }
+            }
+        } else {
+            isGenericNonID <- graphID.nonHtcID(mixedGraph$L(), mixedGraph$O())
+        }
+    }
+    
+    genericIDResult <- list()
+    if (length(genericIdStepFunctions) != 0) {
+        genericIDResult <- generalGenericID(mixedGraph, idStepFunctions = genericIdStepFunctions, 
+            tianDecompose = tianDecompose)
+    }
+    
+    result <- list(isGlobalID = isGlobalID, isGenericNonID = isGenericNonID, genericIDResult = genericIDResult, 
+        mixedGraph = mixedGraph, tianDecompose = tianDecompose, call = match.call())
+    class(result) <- "SEMIDResult"
+    return(result)
 }
 
 #' Prints a SEMIDResult object
@@ -132,39 +129,36 @@ semID <- function(mixedGraph, testGlobalID = TRUE, testGenericNonID = TRUE,
 #' @param x the SEMIDResult object
 #' @param ... optional parameters, currently unused.
 print.SEMIDResult <- function(x, ...) {
-  cat("Call: ")
-  print(x$call)
-
-  cat("\nAttempted Tian decomposition?\n")
-  cat(x$tianDecompose, "\n")
-
-  if (!is.na(x$isGlobalID)) {
-    cat(paste("\nIs globally identifiable?:\n", x$isGlobalID, "\n",
-              sep = ""))
-  }
-
-  if (!is.na(x$isGenericNonID)) {
-    cat(paste("\nHas a generically infinite-to-one parameterization?:\n",
-              if (x$isGenericNonID) {
-                "TRUE"
-              } else if (length(x$genericIDResult) != 0 &&
-                         length(unlist(x$genericIDResult$unsolvedParents)) == 0) {
-                "FALSE"
-              } else { "INCONCLUSIVE" }, "\n",
-        sep = ""))
-  }
-
-  if (length(x$genericIDResult) != 0) {
-    cat(paste("\nNumber of parameters shown generically identifiable:\n"))
-    cat(paste("Directed edges:",
-              length(unlist(x$genericIDResult$solvedParents)), "out of",
-              sum(x$genericIDResult$mixedGraph$L()), "\n"))
-    cat(paste("Bidirected edges:",
-              length(unlist(x$genericIDResult$solvedSiblings)) / 2, "out of",
-              sum(x$genericIDResult$mixedGraph$O()) / 2, "\n"))
-  }
-
-  invisible(x)
+    cat("Call: ")
+    print(x$call)
+    
+    cat("\nAttempted Tian decomposition?\n")
+    cat(x$tianDecompose, "\n")
+    
+    if (!is.na(x$isGlobalID)) {
+        cat(paste("\nIs globally identifiable?:\n", x$isGlobalID, "\n", sep = ""))
+    }
+    
+    if (!is.na(x$isGenericNonID)) {
+        cat(paste("\nHas a generically infinite-to-one parameterization?:\n", if (x$isGenericNonID) {
+            "TRUE"
+        } else if (length(x$genericIDResult) != 0 && length(unlist(x$genericIDResult$unsolvedParents)) == 
+            0) {
+            "FALSE"
+        } else {
+            "INCONCLUSIVE"
+        }, "\n", sep = ""))
+    }
+    
+    if (length(x$genericIDResult) != 0) {
+        cat(paste("\nNumber of parameters shown generically identifiable:\n"))
+        cat(paste("Directed edges:", length(unlist(x$genericIDResult$solvedParents)), 
+            "out of", sum(x$genericIDResult$mixedGraph$L()), "\n"))
+        cat(paste("Bidirected edges:", length(unlist(x$genericIDResult$solvedSiblings))/2, 
+            "out of", sum(x$genericIDResult$mixedGraph$O())/2, "\n"))
+    }
+    
+    invisible(x)
 }
 
 #' A helper function to validate input matrices.
@@ -179,18 +173,18 @@ print.SEMIDResult <- function(x, ...) {
 #'
 #' @return This function has no return value.
 validateMatrices <- function(L, O) {
-  if (!is.matrix(L) || !is.matrix(O)) {
-    stop("L and O must be matrices.")
-  } else if (length(unique(c(dim(L), dim(O)))) != 1) {
-    stop("L and O must both be square matrices of the same dimensions.")
-  }
-  t1 = all(L %in% c(0, 1))
-  t2 = all(O %in% c(0, 1))
-  if (!t1 || !t2) {
-    stop("L and O must contain only 1's and 0's.")
-  } else if (any(diag(L) != 0) || any(diag(O) != 0)) {
-    stop("L and O must have 0's along their diagonals.")
-  }
+    if (!is.matrix(L) || !is.matrix(O)) {
+        stop("L and O must be matrices.")
+    } else if (length(unique(c(dim(L), dim(O)))) != 1) {
+        stop("L and O must both be square matrices of the same dimensions.")
+    }
+    t1 <- all(L %in% c(0, 1))
+    t2 <- all(O %in% c(0, 1))
+    if (!t1 || !t2) {
+        stop("L and O must contain only 1's and 0's.")
+    } else if (any(diag(L) != 0) || any(diag(O) != 0)) {
+        stop("L and O must have 0's along their diagonals.")
+    }
 }
 
 #' Identify bidirected edges if all directed edges are identified
@@ -203,19 +197,17 @@ validateMatrices <- function(L, O) {
 #'
 #' @return a new identifier function that identifies everything.
 createSimpleBiDirIdentifier <- function(idFunc) {
-  idFunc <- idFunc
-  return(
-    function(Sigma) {
-      m <- nrow(Sigma)
-      identifiedParams <- idFunc(Sigma)
-      Lambda <- identifiedParams$Lambda
-      if (!any(is.na(Lambda))) {
-        Omega = t(diag(m) - Lambda) %*% Sigma %*% (diag(m) - Lambda)
-        return(list(Lambda = Lambda, Omega = Omega))
-      }
-      return(list(Lambda = Lambda, Omega = identifiedParams$Omega))
-    }
-  )
+    idFunc <- idFunc
+    return(function(Sigma) {
+        m <- nrow(Sigma)
+        identifiedParams <- idFunc(Sigma)
+        Lambda <- identifiedParams$Lambda
+        if (!any(is.na(Lambda))) {
+            Omega <- t(diag(m) - Lambda) %*% Sigma %*% (diag(m) - Lambda)
+            return(list(Lambda = Lambda, Omega = Omega))
+        }
+        return(list(Lambda = Lambda, Omega = identifiedParams$Omega))
+    })
 }
 
 #' Globally identify the covariance matrix of a C-component
@@ -242,34 +234,35 @@ createSimpleBiDirIdentifier <- function(idFunc) {
 #'
 #' @return the new Sigma corresponding to the c-component
 tianSigmaForComponent <- function(Sigma, internal, incoming, topOrder) {
-  if (length(incoming) == 0) {
-    return(Sigma[topOrder, topOrder, drop = F])
-  }
-  newSigmaInv = matrix(0, length(topOrder), length(topOrder))
-  for (j in 1:length(topOrder)) {
-    node = topOrder[j]
-    if (node %in% internal) {
-      if (j == 1) {
-        newSigmaInv[j, j] = newSigmaInv[j,j] + 1 / Sigma[node, node,drop = F]
-      } else {
-        inds = topOrder[1:(j - 1)]
-
-        SigmaIndsInv = solve(Sigma[inds, inds, drop = F])
-        schurInv = solve(Sigma[node,node,drop = F] -
-                           Sigma[node, inds, drop = F] %*% SigmaIndsInv %*%
-                           Sigma[inds, node, drop = F])
-        newSigmaInv[j, j] = newSigmaInv[j,j] + schurInv
-        meanMat = as.numeric(solve(Sigma[inds,inds]) %*% Sigma[inds, node] %*% schurInv)
-        newSigmaInv[j, 1:(j-1)] = newSigmaInv[j, 1:(j-1)] - meanMat
-        newSigmaInv[1:(j-1), j] = newSigmaInv[j, 1:(j-1)]
-        newSigmaInv[1:(j-1), 1:(j-1)] = newSigmaInv[1:(j-1), 1:(j-1)] + SigmaIndsInv %*% Sigma[inds, node] %*% meanMat
-      }
+    if (length(incoming) == 0) {
+        return(Sigma[topOrder, topOrder, drop = F])
     }
-  }
-  newSigmaInv[topOrder %in% incoming, topOrder %in% incoming] =
-    newSigmaInv[topOrder %in% incoming, topOrder %in% incoming] + diag(length(incoming))
-  newSigma = solve(newSigmaInv)
-  return(newSigma)
+    newSigmaInv <- matrix(0, length(topOrder), length(topOrder))
+    for (j in 1:length(topOrder)) {
+        node <- topOrder[j]
+        if (node %in% internal) {
+            if (j == 1) {
+                newSigmaInv[j, j] <- newSigmaInv[j, j] + 1/Sigma[node, node, drop = F]
+            } else {
+                inds <- topOrder[1:(j - 1)]
+                
+                SigmaIndsInv <- solve(Sigma[inds, inds, drop = F])
+                schurInv <- solve(Sigma[node, node, drop = F] - Sigma[node, inds, 
+                  drop = F] %*% SigmaIndsInv %*% Sigma[inds, node, drop = F])
+                newSigmaInv[j, j] <- newSigmaInv[j, j] + schurInv
+                meanMat <- as.numeric(solve(Sigma[inds, inds]) %*% Sigma[inds, node] %*% 
+                  schurInv)
+                newSigmaInv[j, 1:(j - 1)] <- newSigmaInv[j, 1:(j - 1)] - meanMat
+                newSigmaInv[1:(j - 1), j] <- newSigmaInv[j, 1:(j - 1)]
+                newSigmaInv[1:(j - 1), 1:(j - 1)] <- newSigmaInv[1:(j - 1), 1:(j - 
+                  1)] + SigmaIndsInv %*% Sigma[inds, node] %*% meanMat
+            }
+        }
+    }
+    newSigmaInv[topOrder %in% incoming, topOrder %in% incoming] <- newSigmaInv[topOrder %in% 
+        incoming, topOrder %in% incoming] + diag(length(incoming))
+    newSigma <- solve(newSigmaInv)
+    return(newSigma)
 }
 
 #' Identifies components in a tian decomposition
@@ -284,31 +277,29 @@ tianSigmaForComponent <- function(Sigma, internal, incoming, topOrder) {
 #'
 #' @return a new identifier function
 tianIdentifier <- function(idFuncs, cComponents) {
-  idFuncs <- idFuncs
-  cComponents <- cComponents
-  return(
-    function(Sigma) {
-      Lambda = matrix(NA, ncol(Sigma), ncol(Sigma))
-      Omega = matrix(NA, ncol(Sigma), ncol(Sigma))
-
-      for (i in 1:length(cComponents)) {
-        internal = cComponents[[i]]$internal
-        incoming = cComponents[[i]]$incoming
-        topOrder = cComponents[[i]]$topOrder
-
-        newSigma = tianSigmaForComponent(Sigma, internal, incoming, topOrder)
-
-        result = idFuncs[[i]](newSigma)
-        internalInds = which(topOrder %in% internal)
-        Lambda[topOrder, internal] = result$Lambda[,internalInds]
-        Lambda[-topOrder, internal] = 0
-        Omega[internal, internal] = result$Omega[internalInds, internalInds]
-        Omega[-internal, internal] = 0
-        Omega[internal, -internal] = 0
-      }
-      return(list(Lambda = Lambda, Omega = Omega))
-    }
-  )
+    idFuncs <- idFuncs
+    cComponents <- cComponents
+    return(function(Sigma) {
+        Lambda <- matrix(NA, ncol(Sigma), ncol(Sigma))
+        Omega <- matrix(NA, ncol(Sigma), ncol(Sigma))
+        
+        for (i in 1:length(cComponents)) {
+            internal <- cComponents[[i]]$internal
+            incoming <- cComponents[[i]]$incoming
+            topOrder <- cComponents[[i]]$topOrder
+            
+            newSigma <- tianSigmaForComponent(Sigma, internal, incoming, topOrder)
+            
+            result <- idFuncs[[i]](newSigma)
+            internalInds <- which(topOrder %in% internal)
+            Lambda[topOrder, internal] <- result$Lambda[, internalInds]
+            Lambda[-topOrder, internal] <- 0
+            Omega[internal, internal] <- result$Omega[internalInds, internalInds]
+            Omega[-internal, internal] <- 0
+            Omega[internal, -internal] <- 0
+        }
+        return(list(Lambda = Lambda, Omega = Omega))
+    })
 }
 
 #' A general generic identification algorithm template.
@@ -336,7 +327,55 @@ tianIdentifier <- function(idFuncs, cComponents) {
 #'                      more powerful.
 #' @param idStepFunctions a list of identification step functions
 #'
-#' @return returns an object of \link{class} "\code{GenericIDResult}," this
+#' @return returns an object of \link{class} '\code{GenericIDResult},' this
+#'         object is just a list with 9 components:
+#' \describe{
+#'   \item{\code{solvedParents}}{a list whose ith element contains a vector
+#'   containing the subsets of parents of node i for which the edge j->i could
+#'   be shown to be generically identifiable.}
+#'   \item{\code{unsolvedParents}}{as for \code{solvedParents} but for the
+#'   unsolved parents.}
+#'   \item{\code{solvedSiblings}}{as for \code{solvedParents} but for the
+#'   siblings of node i (i.e. the bidirected neighbors of i).}
+#'   \item{\code{unsolvedSiblings}}{as for \code{solvedSilbings} but for the
+#'   unsolved siblings of node i (i.e. the bidirected neighbors of i).}
+#'   \item{\code{identifier}}{a function that takes a (generic) covariance
+#'   matrix corresponding to the graph and identifies the edges parameters
+#'   from solvedParents and solvedSiblings. See \code{\link{htcIdentifyStep}}
+#'   for a more in-depth discussion of identifier functions.}
+#'   \item{\code{mixedGraph}}{a mixed graph object of the graph.}
+#'   \item{\code{idStepFunctions}}{a list of functions used to generically
+#'   identify parameters. For instance, htcID uses the function
+#'   \code{\link{htcIdentifyStep}} to identify edges.}
+#'   \item{\code{tianDecompose}}{the argument tianDecompose.}
+#'   \item{\code{call}}{the call made to this function.}
+#' }
+#' A general generic identification algorithm template.
+#'
+#' A function that encapsulates the general structure of our algorithms for
+#' testing generic identifiability. Allows for various identification algorithms
+#' to be used in concert, in particular it will use the identifier functions
+#' in the list \code{idStepFunctions} sequentially until it can find no more
+#' identifications. The step functions that are currently available for use are
+#' in \code{idStepFunctions}
+#' \enumerate{
+#'   \item htcIdentifyStep
+#'   \item ancestralIdentifyStep
+#'   \item edgewiseIdentifyStep
+#'   \item trekSeparationIdentifyStep
+#' }
+#'
+#' @export
+#'
+#' @inheritParams semID
+#' @param tianDecompose TRUE or FALSE determining whether or not the Tian
+#'                      decomposition should be used before running the
+#'                      current generic identification algorithm. In general
+#'                      letting this be TRUE will make the algorithm faster and
+#'                      more powerful.
+#' @param idStepFunctions a list of identification step functions
+#'
+#' @return returns an object of \link{class} '\code{GenericIDResult},' this
 #'         object is just a list with 9 components:
 #' \describe{
 #'   \item{\code{solvedParents}}{a list whose ith element contains a vector
@@ -360,71 +399,83 @@ tianIdentifier <- function(idFuncs, cComponents) {
 #'   \item{\code{call}}{the call made to this function.}
 #' }
 generalGenericID <- function(mixedGraph, idStepFunctions, tianDecompose = T) {
-  mixedGraphHasSimpleNumbering(mixedGraph)
-  m = mixedGraph$numNodes()
-  unsolvedParents = lapply(1:m, function(node) { mixedGraph$parents(node) })
-  solvedParents = rep(list(numeric(0)), m)
-
-  if (!tianDecompose) {
-    identifier = createIdentifierBaseCase(mixedGraph$L(), mixedGraph$O())
-
-    changeFlag = T
-    while (changeFlag) {
-      for (idStepFunction in idStepFunctions) {
-        idResult = idStepFunction(mixedGraph, unsolvedParents,
-                                  solvedParents, identifier)
-        changeFlag = length(idResult$identifiedEdges) != 0
-        unsolvedParents = idResult$unsolvedParents
-        solvedParents = idResult$solvedParents
-        identifier = idResult$identifier
-        if (changeFlag) {
-          break
+    mixedGraphHasSimpleNumbering(mixedGraph)
+    m <- mixedGraph$numNodes()
+    unsolvedParents <- lapply(1:m, function(node) {
+        mixedGraph$parents(node)
+    })
+    solvedParents <- rep(list(numeric(0)), m)
+    
+    if (!tianDecompose) {
+        identifier <- createIdentifierBaseCase(mixedGraph$L(), mixedGraph$O())
+        
+        changeFlag <- T
+        while (changeFlag) {
+            for (idStepFunction in idStepFunctions) {
+                idResult <- idStepFunction(mixedGraph, unsolvedParents, solvedParents, 
+                  identifier)
+                changeFlag <- length(idResult$identifiedEdges) != 0
+                unsolvedParents <- idResult$unsolvedParents
+                solvedParents <- idResult$solvedParents
+                identifier <- idResult$identifier
+                if (changeFlag) {
+                  break
+                }
+            }
         }
-      }
-    }
-    if (length(unlist(unsolvedParents)) == 0) {
-      identifier = createSimpleBiDirIdentifier(identifier)
-      solvedSiblings = lapply(1:m, FUN = function(x) { mixedGraph$siblings(x) })
-      unsolvedSiblings = rep(list(integer(0)), m)
+        if (length(unlist(unsolvedParents)) == 0) {
+            identifier <- createSimpleBiDirIdentifier(identifier)
+            solvedSiblings <- lapply(1:m, FUN = function(x) {
+                mixedGraph$siblings(x)
+            })
+            unsolvedSiblings <- rep(list(integer(0)), m)
+        } else {
+            solvedSiblings <- rep(list(integer(0)), m)
+            unsolvedSiblings <- lapply(1:m, FUN = function(x) {
+                mixedGraph$siblings(x)
+            })
+        }
     } else {
-      solvedSiblings = rep(list(integer(0)), m)
-      unsolvedSiblings = lapply(1:m, FUN = function(x) { mixedGraph$siblings(x) })
+        solvedSiblings <- rep(list(integer(0)), m)
+        cComps <- mixedGraph$tianDecompose()
+        
+        compResults <- vector("list", length(cComps))
+        identifiers <- vector("list", length(cComps))
+        
+        for (i in 1:length(cComps)) {
+            result <- generalGenericID(MixedGraph(cComps[[i]]$L, cComps[[i]]$O), 
+                idStepFunctions, tianDecompose = F)
+            topOrder <- cComps[[i]]$topOrder
+            compResults[[i]] <- result
+            for (j in 1:length(topOrder)) {
+                solvedParents[[topOrder[j]]] <- c(solvedParents[[topOrder[j]]], topOrder[result$solvedParents[[j]]])
+                solvedSiblings[[topOrder[j]]] <- c(solvedSiblings[[topOrder[j]]], 
+                  topOrder[result$solvedSiblings[[j]]])
+            }
+            
+            identifiers[[i]] <- result$identifier
+        }
+        
+        unsolvedParents <- lapply(1:m, FUN = function(x) {
+            setdiff(mixedGraph$parents(x), solvedParents[[x]])
+        })
+        unsolvedSiblings <- lapply(1:m, FUN = function(x) {
+            setdiff(mixedGraph$siblings(x), solvedSiblings[[x]])
+        })
+        identifier <- tianIdentifier(identifiers, cComps)
     }
-  } else {
-    solvedSiblings = rep(list(integer(0)), m)
-    cComps = mixedGraph$tianDecompose()
-
-    compResults = vector("list", length(cComps))
-    identifiers = vector("list", length(cComps))
-
-    for (i in 1:length(cComps)) {
-      result = generalGenericID(MixedGraph(cComps[[i]]$L, cComps[[i]]$O),
-                                idStepFunctions, tianDecompose = F)
-      topOrder = cComps[[i]]$topOrder
-      compResults[[i]] = result
-      for (j in 1:length(topOrder)) {
-        solvedParents[[topOrder[j]]] = c(solvedParents[[topOrder[j]]], topOrder[result$solvedParents[[j]]])
-        solvedSiblings[[topOrder[j]]] = c(solvedSiblings[[topOrder[j]]], topOrder[result$solvedSiblings[[j]]])
-      }
-
-      identifiers[[i]] = result$identifier
-    }
-
-    unsolvedParents = lapply(1:m, FUN = function(x) { setdiff(mixedGraph$parents(x), solvedParents[[x]]) })
-    unsolvedSiblings = lapply(1:m, FUN = function(x) { setdiff(mixedGraph$siblings(x), solvedSiblings[[x]]) })
-    identifier = tianIdentifier(identifiers, cComps)
-  }
-  result = list(solvedParents = solvedParents,
-                unsolvedParents = unsolvedParents,
-                solvedSiblings = solvedSiblings,
-                unsolvedSiblings = unsolvedSiblings,
-                identifier = identifier,
-                mixedGraph = mixedGraph,
-                idStepFunctions = idStepFunctions,
-                tianDecompose = tianDecompose,
-                call = match.call())
-  class(result) = "GenericIDResult"
-  return(result)
+    result <- list()
+    class(result) <- "GenericIDResult"
+    result$solvedParents <- solvedParents
+    result$unsolvedParents <- unsolvedParents
+    result$solvedSiblings <- solvedSiblings
+    result$unsolvedSiblings <- unsolvedSiblings
+    result$identifier <- identifier
+    result$mixedGraph <- mixedGraph
+    result$idStepFunctions <- idStepFunctions
+    result$tianDecompose <- tianDecompose
+    result$call <- match.call()
+    return(result)
 }
 
 #' Prints a GenericIDResult object
@@ -438,75 +489,75 @@ generalGenericID <- function(mixedGraph, idStepFunctions, tianDecompose = T) {
 #' @param x the GenericIDResult object
 #' @param ... optional parameters, currently unused.
 print.GenericIDResult <- function(x, ...) {
-  cat("Call: ")
-  print(x$call)
-
-  solvedParents = x$solvedParents
-  solvedSiblings = x$solvedSiblings
-  n = length(x$solvedParents)
-
-  cat(paste("\nMixed Graph Info.\n"))
-  cat(paste("# nodes:", n, "\n"))
-  cat(paste("# dir. edges:", sum(x$mixedGraph$L()), "\n"))
-  cat(paste("# bi. edges:", sum(x$mixedGraph$O()) / 2, "\n"))
-
-  cat(paste("\nGeneric Identifiability Summary\n"))
-  cat(paste("# dir. edges shown gen. identifiable:",
-            length(unlist(solvedParents)), "\n"))
-  cat(paste("# bi. edges shown gen. identifiable:",
-            length(unlist(solvedSiblings)) / 2, "\n"))
-
-  cat("\nGenerically identifiable dir. edges:\n")
-  edges = character(min(length(unlist(solvedParents)) / 2, 11))
-  k = 0
-  for (i in 1:n) {
-    if (length(solvedParents[[i]]) != 0) {
-      for (j in solvedParents[[i]]) {
-        k = k + 1
-        edges[k] = paste(j, "->", i, sep="")
-
-        if (k == 10) {
-          edges[11] = "..."
-          break
+    cat("Call: ")
+    print(x$call)
+    
+    solvedParents <- x$solvedParents
+    solvedSiblings <- x$solvedSiblings
+    n <- length(x$solvedParents)
+    
+    cat(paste("\nMixed Graph Info.\n"))
+    cat(paste("# nodes:", n, "\n"))
+    cat(paste("# dir. edges:", sum(x$mixedGraph$L()), "\n"))
+    cat(paste("# bi. edges:", sum(x$mixedGraph$O())/2, "\n"))
+    
+    cat(paste("\nGeneric Identifiability Summary\n"))
+    cat(paste("# dir. edges shown gen. identifiable:", length(unlist(solvedParents)), 
+        "\n"))
+    cat(paste("# bi. edges shown gen. identifiable:", length(unlist(solvedSiblings))/2, 
+        "\n"))
+    
+    cat("\nGenerically identifiable dir. edges:\n")
+    edges <- character(min(length(unlist(solvedParents))/2, 11))
+    k <- 0
+    for (i in 1:n) {
+        if (length(solvedParents[[i]]) != 0) {
+            for (j in solvedParents[[i]]) {
+                k <- k + 1
+                edges[k] <- paste(j, "->", i, sep = "")
+                
+                if (k == 10) {
+                  edges[11] <- "..."
+                  break
+                }
+            }
+            if (k == 10) {
+                break
+            }
         }
-      }
-      if (k == 10) {
-        break
-      }
     }
-  }
-  if (length(edges) == 0) {
-    cat("None\n")
-  } else {
-    cat(paste(paste(edges, collapse = ", "), "\n"))
-  }
-
-  cat("\nGenerically identifiable bi. edges:\n")
-  edges = character(min(length(unlist(solvedSiblings)) / 2, 11))
-  k = 0
-  for (i in 1:n) {
-    solvedSibs = setdiff(solvedSiblings[[i]], 1:i)
-    if (length(solvedSibs) != 0) {
-      for (j in solvedSibs) {
-        k = k + 1
-        edges[k] = paste(i, "<->", j, sep="")
-
-        if (k == 10) {
-          edges[11] = "..."
-          break
+    if (length(edges) == 0) {
+        cat("None\n")
+    } else {
+        cat(paste(paste(edges, collapse = ", "), "\n"))
+    }
+    
+    cat("\nGenerically identifiable bi. edges:\n")
+    edges <- character(min(length(unlist(solvedSiblings))/2, 11))
+    k <- 0
+    for (i in 1:n) {
+        solvedSibs <- setdiff(solvedSiblings[[i]], 1:i)
+        if (length(solvedSibs) != 0) {
+            for (j in solvedSibs) {
+                k <- k + 1
+                edges[k] <- paste(i, "<->", j, sep = "")
+                
+                if (k == 10) {
+                  edges[11] <- "..."
+                  break
+                }
+            }
+            if (k == 10) {
+                break
+            }
         }
-      }
-      if (k == 10) {
-        break
-      }
     }
-  }
-  if (length(edges) == 0) {
-    cat("None\n")
-  } else {
-    cat(paste(paste(edges, collapse = ", "), "\n"))
-  }
-  invisible(x)
+    if (length(edges) == 0) {
+        cat("None\n")
+    } else {
+        cat(paste(paste(edges, collapse = ", "), "\n"))
+    }
+    invisible(x)
 }
 
 #' Returns all subsets of a certain size
@@ -519,16 +570,16 @@ print.GenericIDResult <- function(x, ...) {
 #'
 #' @return a list of all subsets of x of a given size k
 subsetsOfSize <- function(x, k) {
-  if (k > length(x)) {
-    return(list())
-  }
-  if (k == 0) {
-    return(list(numeric(0)))
-  }
-  if (length(x) == k) {
-    return(list(x))
-  }
-  return(combn(x, k, simplify = F))
+    if (k > length(x)) {
+        return(list())
+    }
+    if (k == 0) {
+        return(list(numeric(0)))
+    }
+    if (length(x) == k) {
+        return(list(x))
+    }
+    return(combn(x, k, simplify = F))
 }
 
 #' Create an identifier base case
@@ -550,16 +601,16 @@ subsetsOfSize <- function(x, k) {
 #'         When building more complex identifiers these NAs will be replaced
 #'         by the value that can be identified from Sigma.
 createIdentifierBaseCase <- function(L, O) {
-  # Redundant assignment puts L into the environment of the, below returned,
-  # function
-  validateMatrices(L, O)
-  L <- L
-  O <- O
-  return(function(Sigma) {
-    Lambda <- matrix(NA, nrow(L), nrow(L))
-    Lambda[L == 0] <- 0
-    Omega <- matrix(NA, nrow(O), nrow(O))
-    Omega[(O == 0) && !(diag(nrow(O)))] <- 0
-    return(list(Lambda = Lambda, Omega = Omega))
-  })
+    # Redundant assignment puts L into the environment of the, below returned,
+    # function
+    validateMatrices(L, O)
+    L <- L
+    O <- O
+    return(function(Sigma) {
+        Lambda <- matrix(NA, nrow(L), nrow(L))
+        Lambda[L == 0] <- 0
+        Omega <- matrix(NA, nrow(O), nrow(O))
+        Omega[(O == 0) && !(diag(nrow(O)))] <- 0
+        return(list(Lambda = Lambda, Omega = Omega))
+    })
 }

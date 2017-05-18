@@ -6,8 +6,6 @@
 \title{Helper function to create a flow graph.}
 \usage{
 createHalfTrekFlowGraph(this)
-
-\method{createHalfTrekFlowGraph}{MixedGraphFixedOrder}(this)
 }
 \arguments{
 \item{this}{the mixed graph object}
@@ -15,4 +13,3 @@ createHalfTrekFlowGraph(this)
 \description{
 Helper function to create a flow graph.
 }
-

@@ -17,4 +17,3 @@ An object representing the MixedGraphFixedOrder
 \description{
 Creates an object representing a mixed graph.
 }
-

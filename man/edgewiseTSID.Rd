@@ -41,4 +41,3 @@ identifiable. In particular this algorithm iterates between the half-trek,
 edgewise, and trek-separation identification algorithms in an attempt to
 identify as many edges as possible, this may be very slow.
 }
-

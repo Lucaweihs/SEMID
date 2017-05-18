@@ -29,4 +29,3 @@ For an input mixed graph H and set of nodes A, let GA be the subgraph of
 H on the nodes A. This function returns the mixed component of GA containing
 a specified node.
 }
-

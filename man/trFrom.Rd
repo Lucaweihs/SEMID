@@ -2,15 +2,11 @@
 % Please edit documentation in R/MixedGraph.R
 \name{trFrom}
 \alias{trFrom}
-\alias{trFrom.MixedGraph}
 \alias{trFrom.MixedGraphFixedOrder}
+\alias{trFrom.MixedGraph}
 \title{Trek reachable nodes.}
 \usage{
 trFrom(this, node)
-
-\method{trFrom}{MixedGraphFixedOrder}(this, node)
-
-\method{trFrom}{MixedGraph}(this, node)
 }
 \arguments{
 \item{this}{the mixed graph object}
@@ -21,4 +17,3 @@ trFrom(this, node)
 Like \code{\link{htrFrom}} but for the nodes that are trek-reachable from a
 node
 }
-

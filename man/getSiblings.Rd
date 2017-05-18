@@ -18,4 +18,3 @@ a sorted vector of all getSiblings of nodes.
 Get the getSiblings of a collection of nodes in a graph g, the getSiblings DO
 include the input nodes themselves.
 }
-

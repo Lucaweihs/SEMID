@@ -32,4 +32,3 @@ algorithm 1 of Drton and Weihs (2015).
 {Drton}, M. and {Weihs}, L. (2015) Generic Identifiability of Linear
 Structural Equation Models by Ancestor Decomposition. arXiv 1504.02992
 }
-

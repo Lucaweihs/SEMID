@@ -32,4 +32,3 @@ Uses the edgewise identification criterion of Weihs, Robeva, Robinson, et al.
 (2017) to determine which edges in a mixed graph are generically
 identifiable.
 }
-

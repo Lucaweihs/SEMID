@@ -24,4 +24,3 @@ WARNING: Often the half-trek reachable nodes from a vertex v are defined to
 not include the vertex v or its getSiblings. We DO NOT follow this convention,
 the returned set will include input nodes and their getSiblings.
 }
-

@@ -2,16 +2,11 @@
 % Please edit documentation in R/MixedGraph.R
 \name{getHalfTrekSystem}
 \alias{getHalfTrekSystem}
-\alias{getHalfTrekSystem.MixedGraph}
 \alias{getHalfTrekSystem.MixedGraphFixedOrder}
+\alias{getHalfTrekSystem.MixedGraph}
 \title{Determines if a half-trek system exists in the mixed graph.}
 \usage{
 getHalfTrekSystem(this, fromNodes, toNodes)
-
-\method{getHalfTrekSystem}{MixedGraphFixedOrder}(this, fromNodes,
-                                                           toNodes)
-
-\method{getHalfTrekSystem}{MixedGraph}(this, fromNodes, toNodes)
 }
 \arguments{
 \item{this}{the mixed graph object}
@@ -31,4 +26,3 @@ a list with two named components, \code{systemExists} (TRUE if a
 \description{
 Determines if a half-trek system exists in the mixed graph.
 }
-

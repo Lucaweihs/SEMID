@@ -32,4 +32,3 @@ This function takes the covariance matrix Sigma corresponding to G and
 a collection of node sets which specify the c-component, and returns the
 Sigma' corresponding to the c-component.
 }
-

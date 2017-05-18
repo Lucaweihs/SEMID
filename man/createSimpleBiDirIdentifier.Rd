@@ -17,4 +17,3 @@ Creates an identifier function that assumes that all directed edges have
 already been identified and then is able to identify all bidirected edges
 simultaneously.
 }
-

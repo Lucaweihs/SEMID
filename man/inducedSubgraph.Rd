@@ -6,8 +6,6 @@
 \title{Get the induced subgraph on a collection of nodes}
 \usage{
 inducedSubgraph(this, nodes)
-
-\method{inducedSubgraph}{MixedGraph}(this, nodes)
 }
 \arguments{
 \item{this}{the mixed graph object}
@@ -17,4 +15,3 @@ inducedSubgraph(this, nodes)
 \description{
 Get the induced subgraph on a collection of nodes
 }
-

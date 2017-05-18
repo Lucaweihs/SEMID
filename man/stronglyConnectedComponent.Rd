@@ -2,15 +2,11 @@
 % Please edit documentation in R/MixedGraph.R
 \name{stronglyConnectedComponent}
 \alias{stronglyConnectedComponent}
-\alias{stronglyConnectedComponent.MixedGraph}
 \alias{stronglyConnectedComponent.MixedGraphFixedOrder}
+\alias{stronglyConnectedComponent.MixedGraph}
 \title{Strongly connected component}
 \usage{
 stronglyConnectedComponent(this, node)
-
-\method{stronglyConnectedComponent}{MixedGraphFixedOrder}(this, node)
-
-\method{stronglyConnectedComponent}{MixedGraph}(this, node)
 }
 \arguments{
 \item{this}{the mixed graph object}
@@ -21,4 +17,3 @@ stronglyConnectedComponent(this, node)
 Get the strongly connected component for a node i in the directed part of
 the graph.
 }
-

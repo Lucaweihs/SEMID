@@ -6,8 +6,6 @@
 \title{Get all nodes in the graph.}
 \usage{
 nodes(this)
-
-\method{nodes}{MixedGraph}(this)
 }
 \arguments{
 \item{this}{the mixed graph object}
@@ -15,4 +13,3 @@ nodes(this)
 \description{
 Get all nodes in the graph.
 }
-

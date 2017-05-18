@@ -40,4 +40,3 @@ A helper function for ancestralIdentifyStep, creates an identifier function
 based on its given parameters. This created identifier function will
 identify the directed edges from 'targets' to 'node.'
 }
-

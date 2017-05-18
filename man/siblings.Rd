@@ -2,15 +2,11 @@
 % Please edit documentation in R/MixedGraph.R
 \name{siblings}
 \alias{siblings}
-\alias{siblings.MixedGraph}
 \alias{siblings.MixedGraphFixedOrder}
+\alias{siblings.MixedGraph}
 \title{All siblings of a collection of nodes}
 \usage{
 siblings(this, nodes)
-
-\method{siblings}{MixedGraphFixedOrder}(this, nodes)
-
-\method{siblings}{MixedGraph}(this, nodes)
 }
 \arguments{
 \item{this}{the mixed graph object}
@@ -23,4 +19,3 @@ a vector of all of the siblings.
 \description{
 All siblings of a collection of nodes
 }
-

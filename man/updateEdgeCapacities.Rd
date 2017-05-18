@@ -6,8 +6,6 @@
 \title{Update edge capacities.}
 \usage{
 updateEdgeCapacities(this, edges, newCaps)
-
-\method{updateEdgeCapacities}{FlowGraph}(this, edges, newCaps)
 }
 \arguments{
 \item{this}{the flow graph object}
@@ -20,4 +18,3 @@ corresponding to the edge edges[i,1]->edges[i,2].}
 \description{
 Update edge capacities.
 }
-

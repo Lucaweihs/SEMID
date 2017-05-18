@@ -18,4 +18,3 @@ a sorted vector of all ancestor nodes.
 Get the getAncestors of a collection of nodes in a graph g, the getAncestors DO
 include the the nodes themselves.
 }
-

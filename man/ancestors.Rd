@@ -2,15 +2,11 @@
 % Please edit documentation in R/MixedGraph.R
 \name{ancestors}
 \alias{ancestors}
-\alias{ancestors.MixedGraph}
 \alias{ancestors.MixedGraphFixedOrder}
+\alias{ancestors.MixedGraph}
 \title{All ancestors of a collection of nodes}
 \usage{
 ancestors(this, nodes)
-
-\method{ancestors}{MixedGraphFixedOrder}(this, nodes)
-
-\method{ancestors}{MixedGraph}(this, nodes)
 }
 \arguments{
 \item{this}{the mixed graph object}
@@ -21,4 +17,3 @@ ancestors(this, nodes)
 Finds all the ancestors of a collection of nodes. These ancestors DO include
 the nodes themselves (every node is considered an ancestor of itself).
 }
-
