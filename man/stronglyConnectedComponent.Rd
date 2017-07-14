@@ -7,6 +7,10 @@
 \title{Strongly connected component}
 \usage{
 stronglyConnectedComponent(this, node)
+
+\method{stronglyConnectedComponent}{MixedGraphFixedOrder}(this, node)
+
+\method{stronglyConnectedComponent}{MixedGraph}(this, node)
 }
 \arguments{
 \item{this}{the mixed graph object}

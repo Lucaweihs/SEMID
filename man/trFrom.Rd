@@ -7,6 +7,10 @@
 \title{Trek reachable nodes.}
 \usage{
 trFrom(this, node)
+
+\method{trFrom}{MixedGraphFixedOrder}(this, node)
+
+\method{trFrom}{MixedGraph}(this, node)
 }
 \arguments{
 \item{this}{the mixed graph object}

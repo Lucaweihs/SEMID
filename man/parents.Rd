@@ -7,6 +7,10 @@
 \title{All parents a collection of nodes.}
 \usage{
 parents(this, nodes)
+
+\method{parents}{MixedGraphFixedOrder}(this, nodes)
+
+\method{parents}{MixedGraph}(this, nodes)
 }
 \arguments{
 \item{this}{the mixed graph object.}

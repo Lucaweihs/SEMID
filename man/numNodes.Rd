@@ -7,6 +7,10 @@
 \title{Number of nodes in the graph.}
 \usage{
 numNodes(this)
+
+\method{numNodes}{MixedGraphFixedOrder}(this)
+
+\method{numNodes}{MixedGraph}(this)
 }
 \arguments{
 \item{this}{the mixed graph object}

@@ -6,6 +6,8 @@
 \title{Helper function to create a flow graph.}
 \usage{
 createTrekFlowGraph(this)
+
+\method{createTrekFlowGraph}{MixedGraphFixedOrder}(this)
 }
 \arguments{
 \item{this}{the mixed graph object}

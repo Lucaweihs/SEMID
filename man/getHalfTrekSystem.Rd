@@ -7,6 +7,10 @@
 \title{Determines if a half-trek system exists in the mixed graph.}
 \usage{
 getHalfTrekSystem(this, fromNodes, toNodes)
+
+\method{getHalfTrekSystem}{MixedGraphFixedOrder}(this, fromNodes, toNodes)
+
+\method{getHalfTrekSystem}{MixedGraph}(this, fromNodes, toNodes)
 }
 \arguments{
 \item{this}{the mixed graph object}

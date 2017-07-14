@@ -7,6 +7,10 @@
 \title{Get descendants of a node}
 \usage{
 descendants(this, node)
+
+\method{descendants}{MixedGraphFixedOrder}(this, node)
+
+\method{descendants}{MixedGraph}(this, node)
 }
 \arguments{
 \item{this}{the mixed graph object}

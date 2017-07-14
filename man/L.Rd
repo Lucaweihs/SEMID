@@ -6,6 +6,8 @@
 \title{Get adjacency matrix for directed part.}
 \usage{
 L(this)
+
+\method{L}{MixedGraph}(this)
 }
 \arguments{
 \item{this}{the mixed graph object}

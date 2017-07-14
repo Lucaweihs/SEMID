@@ -7,6 +7,12 @@
 \title{Determines if a trek system exists in the mixed graph.}
 \usage{
 getTrekSystem(this, fromNodes, toNodes, avoidEdgesOnRight)
+
+\method{getTrekSystem}{MixedGraphFixedOrder}(this, fromNodes, toNodes,
+  avoidEdgesOnRight = NULL)
+
+\method{getTrekSystem}{MixedGraph}(this, fromNodes, toNodes,
+  avoidEdgesOnRight = NULL)
 }
 \arguments{
 \item{this}{the mixed graph object}

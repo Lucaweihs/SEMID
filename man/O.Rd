@@ -6,6 +6,8 @@
 \title{Get adjacency matrix for bidirected part.}
 \usage{
 O(this)
+
+\method{O}{MixedGraph}(this)
 }
 \arguments{
 \item{this}{the mixed graph object}

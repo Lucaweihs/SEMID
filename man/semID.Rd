@@ -50,7 +50,14 @@ returns an object of \link{class} '\code{SEMIDResult},' this
   \item{\code{tianDecompose}}{the argument tianDecompose.}
   \item{\code{call}}{the call made to this function.}
 }
-
+}
+\description{
+This function can be used to check global and generic identifiability of
+linear structural equation models (L-SEMs). In particular, this function
+takes a \code{\link{MixedGraph}} object corresponding to the L-SEM and
+checks different conditions known for global and generic identifiability.
+}
+\examples{
 \dontrun{
 L = t(matrix(
   c(0, 1, 0, 0, 0,
@@ -71,10 +78,4 @@ semID(graph)
 ## Examples from Foygel, Draisma & Drton (2012)
 demo(SEMID)
 }
-}
-\description{
-This function can be used to check global and generic identifiability of
-linear structural equation models (L-SEMs). In particular, this function
-takes a \code{\link{MixedGraph}} object corresponding to the L-SEM and
-checks different conditions known for global and generic identifiability.
 }

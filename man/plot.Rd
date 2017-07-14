@@ -3,6 +3,9 @@
 \name{plot.MixedGraph}
 \alias{plot.MixedGraph}
 \title{Plots the mixed graph}
+\usage{
+\method{plot}{MixedGraph}(x, ...)
+}
 \arguments{
 \item{x}{the mixed graph object}
 

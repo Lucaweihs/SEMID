@@ -6,6 +6,8 @@
 \title{Transforms a vector of node indices in the internal rep. into external numbering}
 \usage{
 toEx(this, nodes)
+
+\method{toEx}{MixedGraph}(this, nodes)
 }
 \arguments{
 \item{this}{the mixed graph object}

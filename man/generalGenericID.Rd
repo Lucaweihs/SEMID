@@ -16,54 +16,8 @@ decomposition should be used before running the
 current generic identification algorithm. In general
 letting this be TRUE will make the algorithm faster and
 more powerful.}
-
-\item{tianDecompose}{TRUE or FALSE determining whether or not the Tian
-decomposition should be used before running the
-current generic identification algorithm. In general
-letting this be TRUE will make the algorithm faster and
-more powerful.}
-
-\item{idStepFunctions}{a list of identification step functions}
 }
 \value{
-returns an object of \link{class} '\code{GenericIDResult},' this
-        object is just a list with 9 components:
-\describe{
-  \item{\code{solvedParents}}{a list whose ith element contains a vector
-  containing the subsets of parents of node i for which the edge j->i could
-  be shown to be generically identifiable.}
-  \item{\code{unsolvedParents}}{as for \code{solvedParents} but for the
-  unsolved parents.}
-  \item{\code{solvedSiblings}}{as for \code{solvedParents} but for the
-  siblings of node i (i.e. the bidirected neighbors of i).}
-  \item{\code{unsolvedSiblings}}{as for \code{solvedSilbings} but for the
-  unsolved siblings of node i (i.e. the bidirected neighbors of i).}
-  \item{\code{identifier}}{a function that takes a (generic) covariance
-  matrix corresponding to the graph and identifies the edges parameters
-  from solvedParents and solvedSiblings. See \code{\link{htcIdentifyStep}}
-  for a more in-depth discussion of identifier functions.}
-  \item{\code{mixedGraph}}{a mixed graph object of the graph.}
-  \item{\code{idStepFunctions}}{a list of functions used to generically
-  identify parameters. For instance, htcID uses the function
-  \code{\link{htcIdentifyStep}} to identify edges.}
-  \item{\code{tianDecompose}}{the argument tianDecompose.}
-  \item{\code{call}}{the call made to this function.}
-}
-A general generic identification algorithm template.
-
-A function that encapsulates the general structure of our algorithms for
-testing generic identifiability. Allows for various identification algorithms
-to be used in concert, in particular it will use the identifier functions
-in the list \code{idStepFunctions} sequentially until it can find no more
-identifications. The step functions that are currently available for use are
-in \code{idStepFunctions}
-\enumerate{
-  \item htcIdentifyStep
-  \item ancestralIdentifyStep
-  \item edgewiseIdentifyStep
-  \item trekSeparationIdentifyStep
-}
-
 returns an object of \link{class} '\code{GenericIDResult},' this
         object is just a list with 9 components:
 \describe{

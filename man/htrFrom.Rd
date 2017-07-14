@@ -7,6 +7,10 @@
 \title{Half trek reachable nodes.}
 \usage{
 htrFrom(this, node)
+
+\method{htrFrom}{MixedGraphFixedOrder}(this, node)
+
+\method{htrFrom}{MixedGraph}(this, node)
 }
 \arguments{
 \item{this}{the mixed graph object}

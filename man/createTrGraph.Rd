@@ -6,6 +6,8 @@
 \title{Helper function to create a graph encoding trek reachable relationships.}
 \usage{
 createTrGraph(this)
+
+\method{createTrGraph}{MixedGraphFixedOrder}(this)
 }
 \arguments{
 \item{this}{the mixed graph object}

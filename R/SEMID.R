@@ -10,6 +10,8 @@
 #' @import igraph
 #' @import utils
 #' @importFrom graphics plot
+#' @importFrom R.oo setConstructorS3
+#' @importFrom R.methodsS3 setMethodS3
 #'
 #' @name SEMID-package
 NULL

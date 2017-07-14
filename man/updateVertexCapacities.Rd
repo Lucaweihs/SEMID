@@ -6,6 +6,8 @@
 \title{Update vertex capacities.}
 \usage{
 updateVertexCapacities(this, vertices, newCaps)
+
+\method{updateVertexCapacities}{FlowGraph}(this, vertices, newCaps)
 }
 \arguments{
 \item{this}{the flow graph object}

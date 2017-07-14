@@ -6,6 +6,8 @@
 \title{Transforms a vector of given node indices into their internal numbering}
 \usage{
 toIn(this, nodes)
+
+\method{toIn}{MixedGraph}(this, nodes)
 }
 \arguments{
 \item{this}{the mixed graph object}

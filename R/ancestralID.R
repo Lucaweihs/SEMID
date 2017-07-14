@@ -11,7 +11,7 @@
 #'        \code{\link{tianDecompose}} for how such c-component lists are formed.
 #'
 #' @return an identification function
-createAncestralIdentifier <- function(idFunc, sources, targets, node, htrSources, 
+createAncestralIdentifier <- function(idFunc, sources, targets, node, htrSources,
     ancestralSubset, cComponent) {
     # Necessary 'redundant' assignments
     idFunc <- idFunc
@@ -25,9 +25,9 @@ createAncestralIdentifier <- function(idFunc, sources, targets, node, htrSources
         m <- nrow(Sigma)
         identifiedParams <- idFunc(Sigma)
         Lambda <- identifiedParams$Lambda
-        
+
         topOrder <- cComponent$topOrder
-        
+
         afterAnc <- function(x) {
             which(x == ancestralSubset)
         }
@@ -38,11 +38,11 @@ createAncestralIdentifier <- function(idFunc, sources, targets, node, htrSources
         internalAfterAnc <- sapply(cComponent$internal, afterAnc)
         incomingAfterAnc <- sapply(cComponent$incoming, afterAnc)
         nodeAfterAnc <- afterAnc(node)
-        
+
         SigmaAnc <- Sigma[ancestralSubset, ancestralSubset]
-        SigmaAncTian <- tianSigmaForComponent(SigmaAnc, internalAfterAnc, incomingAfterAnc, 
+        SigmaAncTian <- tianSigmaForComponent(SigmaAnc, internalAfterAnc, incomingAfterAnc,
             topOrderAfterAnc)
-        
+
         afterAncTian <- function(x) {
             which(x == topOrderAfterAnc)
         }
@@ -50,30 +50,30 @@ createAncestralIdentifier <- function(idFunc, sources, targets, node, htrSources
         targetsAfterAncTian <- sapply(targetsAfterAnc, afterAncTian)
         htrSourcesAfterAncTian <- sapply(htrSourcesAfterAnc, afterAncTian)
         nodeAfterAncTian <- afterAncTian(nodeAfterAnc)
-        
+
         LambdaAfterAncTian <- Lambda[ancestralSubset, ancestralSubset, drop = F]
-        LambdaAfterAncTian <- LambdaAfterAncTian[topOrderAfterAnc, topOrderAfterAnc, 
+        LambdaAfterAncTian <- LambdaAfterAncTian[topOrderAfterAnc, topOrderAfterAnc,
             drop = F]
-        
+
         SigmaMinus <- SigmaAncTian
         for (source in htrSourcesAfterAncTian) {
-            SigmaMinus[source, ] <- SigmaAncTian[source, ] - t(LambdaAfterAncTian[, 
+            SigmaMinus[source, ] <- SigmaAncTian[source, ] - t(LambdaAfterAncTian[,
                 source, drop = F]) %*% SigmaAncTian
         }
-        
-        if (abs(det(SigmaMinus[sourcesAfterAncTian, targetsAfterAncTian, drop = F])) < 
+
+        if (abs(det(SigmaMinus[sourcesAfterAncTian, targetsAfterAncTian, drop = F])) <
             10^-10) {
             stop("In identification, found near-singular system. Is the input matrix generic?")
         }
-        
-        sols <- solve(SigmaMinus[sourcesAfterAncTian, targetsAfterAncTian, drop = F], 
+
+        sols <- solve(SigmaMinus[sourcesAfterAncTian, targetsAfterAncTian, drop = F],
             SigmaMinus[sourcesAfterAncTian, nodeAfterAncTian, drop = F])
-        
+
         undoAncTian <- function(x) {
             ancestralSubset[topOrderAfterAnc[x]]
         }
         Lambda[undoAncTian(targetsAfterAncTian), node] <- sols
-        
+
         return(list(Lambda = Lambda, Omega = identifiedParams$Omega))
     })
 }
@@ -106,7 +106,7 @@ ancestralIdentifyStep <- function(mixedGraph, unsolvedParents, solvedParents, id
     for (i in 1:m) {
         unsolved <- unsolvedParents[[i]]
         if (length(unsolved) != 0) {
-            
+
             if (length(ancestralComps[[i]]) == 0) {
                 nodeAncestors <- mixedGraph$ancestors(i)
                 ancGraph <- mixedGraph$inducedSubgraph(nodeAncestors)
@@ -115,9 +115,9 @@ ancestralIdentifyStep <- function(mixedGraph, unsolvedParents, solvedParents, id
                 ancestralComps[[i]] <- tianComp
                 ancestralComps[[i]]$ancestors <- nodeAncestors
             }
-            
+
             nodeParents <- ancGraph$parents(i)
-            
+
             # Using the first ancestor graph
             ancGraph <- ancestralComps[[i]]$mixedGraph
             htrFromNode <- ancGraph$htrFrom(i)
@@ -125,14 +125,14 @@ ancestralIdentifyStep <- function(mixedGraph, unsolvedParents, solvedParents, id
             allowedNodes <- union(setdiff(ancGraph$nodes(), htrFromNode), allowedNodes)
             allowedNodes <- intersect(ancGraph$nodes(), allowedNodes)
             if (length(allowedNodes) >= length(nodeParents)) {
-                halfTrekSystemResult <- ancGraph$getHalfTrekSystem(allowedNodes, 
+                halfTrekSystemResult <- ancGraph$getHalfTrekSystem(allowedNodes,
                   nodeParents)
                 if (halfTrekSystemResult$systemExists) {
-                  identifiedEdges <- c(identifiedEdges, as.integer(rbind(nodeParents, 
+                  identifiedEdges <- c(identifiedEdges, as.integer(rbind(nodeParents,
                     i)))
                   activeFrom <- halfTrekSystemResult$activeFrom
-                  identifier <- createAncestralIdentifier(identifier, activeFrom, 
-                    nodeParents, i, intersect(activeFrom, htrFromNode), ancestralComps[[i]]$ancestors, 
+                  identifier <- createAncestralIdentifier(identifier, activeFrom,
+                    nodeParents, i, intersect(activeFrom, htrFromNode), ancestralComps[[i]]$ancestors,
                     ancestralComps[[i]])
                   solvedParents[[i]] <- nodeParents
                   unsolvedParents[[i]] <- integer(0)
@@ -140,31 +140,31 @@ ancestralIdentifyStep <- function(mixedGraph, unsolvedParents, solvedParents, id
                 }
                 next
             }
-            
+
             # Using the second ancestor graph
             nodeAncestors <- mixedGraph$ancestors(i)
             nodeAncSibs <- union(nodeAncestors, mixedGraph$siblings(nodeAncestors))
-            allowedAncSibs <- intersect(nodeAncSibs, setdiff(union(solvedNodes, setdiff(1:m, 
+            allowedAncSibs <- intersect(nodeAncSibs, setdiff(union(solvedNodes, setdiff(1:m,
                 mixedGraph$htrFrom(i))), c(i, mixedGraph$siblings(i))))
             ancGraph <- mixedGraph$inducedSubgraph(mixedGraph$ancestors(c(i, allowedAncSibs)))
             tianComp <- ancGraph$tianComponent(i)
             allowedNodes <- union(intersect(allowedAncSibs, tianComp$internal), tianComp$incoming)
-            
+
             htrFromNode <- ancGraph$htrFrom(i)
             allowedNodes <- setdiff(solvedNodes, ancGraph$siblings(i))
             allowedNodes <- union(setdiff(ancGraph$nodes(), htrFromNode), allowedNodes)
             allowedNodes <- intersect(ancGraph$nodes(), allowedNodes)
-            
+
             tianAncGraph <- MixedGraph(tianComp$L, tianComp$O, tianComp$topOrder)
             if (length(allowedNodes) >= length(nodeParents)) {
-                halfTrekSystemResult <- tianAncGraph$getHalfTrekSystem(allowedNodes, 
+                halfTrekSystemResult <- tianAncGraph$getHalfTrekSystem(allowedNodes,
                   nodeParents)
                 if (halfTrekSystemResult$systemExists) {
-                  identifiedEdges <- c(identifiedEdges, as.integer(rbind(nodeParents, 
+                  identifiedEdges <- c(identifiedEdges, as.integer(rbind(nodeParents,
                     i)))
                   activeFrom <- halfTrekSystemResult$activeFrom
-                  identifier <- createAncestralIdentifier(identifier, activeFrom, 
-                    nodeParents, i, intersect(activeFrom, htrFromNode), ancGraph$nodes(), 
+                  identifier <- createAncestralIdentifier(identifier, activeFrom,
+                    nodeParents, i, intersect(activeFrom, htrFromNode), ancGraph$nodes(),
                     tianComp)
                   solvedParents[[i]] <- nodeParents
                   unsolvedParents[[i]] <- integer(0)
@@ -173,7 +173,7 @@ ancestralIdentifyStep <- function(mixedGraph, unsolvedParents, solvedParents, id
             }
         }
     }
-    return(list(identifiedEdges = identifiedEdges, unsolvedParents = unsolvedParents, 
+    return(list(identifiedEdges = identifiedEdges, unsolvedParents = unsolvedParents,
         solvedParents = solvedParents, identifier = identifier))
 }
 
@@ -260,7 +260,7 @@ getDescendants <- function(g, nodes) {
     if (vcount(g) == 0 || length(nodes) == 0) {
         return(numeric(0))
     }
-    as.integer(sort(graph.bfs(g, nodes, neimode = "out", unreachable = F)$order, 
+    as.integer(sort(graph.bfs(g, nodes, neimode = "out", unreachable = F)$order,
         na.last = NA))
     # sort(unique(unlist(neighborhood(g, vcount(g), nodes=nodes, mode='out'))))
 }
@@ -308,15 +308,30 @@ getMixedCompForNode <- function(dG, bG, subNodes, node) {
     VdG <- V(dG)
     VbG <- V(bG)
     m <- vcount(dG)
-    if (is.null(VdG$names) || is.null(VbG$names) || any(VdG$names != 1:m) || any(VbG$names != 
+    if (is.null(VdG$names) || is.null(VbG$names) || any(VdG$names != 1:m) || any(VbG$names !=
         1:m)) {
-        stop(paste("Input graphs to getMixedCompForNode must have vertices named", 
+        stop(paste("Input graphs to getMixedCompForNode must have vertices named",
             "1:m in order."))
     }
-    
-    bidirectedComp <- as.integer(sort(graph.bfs(bG, root = node, restricted = subNodes - 
-        1, neimode = "total", unreachable = F)$order))
-    incomingNodes <- intersect(setdiff(getParents(dG, bidirectedComp), bidirectedComp), 
+
+    ## This is a workaround of a graph.bfs bug in igraph
+    ## versions 1.0.1 and before
+    restricted = subNodes
+    if (utils::packageVersion("igraph") <= "1.0.1") {
+      restricted = restricted - 1
+    }
+
+    bidirectedComp <- as.integer(sort(graph.bfs(bG, root = node,
+                                                restricted = restricted,
+                                                neimode = "total",
+                                                unreachable = F)$order))
+
+    bidirectedComp =
+      as.integer(sort(graph.bfs(bG, root = node, restricted = restricted,
+                                neimode = "total", unreachable = F)$order))
+
+
+    incomingNodes <- intersect(setdiff(getParents(dG, bidirectedComp), bidirectedComp),
         subNodes)
     return(list(biNodes = bidirectedComp, inNodes = incomingNodes))
 }
@@ -350,7 +365,7 @@ getMixedCompForNode <- function(dG, bG, subNodes, node) {
 #' \emph{Ann. Statist.} 40(3): 1682-1713.
 getMaxFlow <- function(L, O, allowedNodes, biNodes, inNodes, node) {
     if (!(node %in% biNodes) || any(O[biNodes, inNodes] != 0)) {
-        stop(paste("When getting max flow either some in-nodes were connected to", 
+        stop(paste("When getting max flow either some in-nodes were connected to",
             "some bi-nodes or node was not in biNodes."))
     }
     if (length(intersect(allowedNodes, c(node, which(O[node, ] == 1)))) != 0) {
@@ -358,27 +373,27 @@ getMaxFlow <- function(L, O, allowedNodes, biNodes, inNodes, node) {
     }
     allowedNodes <- union(allowedNodes, inNodes)
     m <- length(biNodes) + length(inNodes)
-    
+
     if (m == 1) {
         return(0)
     }
-    
+
     oldNumToNewNum <- numeric(m)
     oldNumToNewNum[biNodes] <- 1:length(biNodes)
     oldNumToNewNum[inNodes] <- (length(biNodes) + 1):m
-    
+
     nodesToUse <- c(biNodes, inNodes)
     allowedNodes <- intersect(allowedNodes, nodesToUse)
     L[c(inNodes, biNodes), inNodes] <- 0
     O[inNodes, inNodes] <- 0
     L <- L[nodesToUse, nodesToUse]
     O <- O[nodesToUse, nodesToUse]
-    
+
     # 1 & 2 = source & target 2 + {1,...,m} = L(i) for i=1,...,m 2 + m + {1,...,m} =
     # R(i)-in for i=1,...,m 2 + 2*m + {1,...,m} = R(i)-out for i=1,...,m
-    
+
     Cap.matrix <- matrix(0, 2 + 3 * m, 2 + 3 * m)
-    
+
     for (i in 1:m) {
         # edge from L(i) to R(i)-in, and to R(j)-in for all getSiblings j of i
         Cap.matrix[2 + i, 2 + m + c(i, which(O[i, ] == 1))] <- 1
@@ -387,13 +402,13 @@ getMaxFlow <- function(L, O, allowedNodes, biNodes, inNodes, node) {
         # edge from R(i)-out to R(j)-in for all directed edges i->j
         Cap.matrix[2 + 2 * m + i, 2 + m + which(L[i, ] == 1)] <- 1
     }
-    
+
     allowedNodes <- oldNumToNewNum[allowedNodes]
     node <- oldNumToNewNum[node]
     Cap.matrix[1, 2 + allowedNodes] <- 1
     Cap.matrix[2 + 2 * m + which(L[, node] == 1), 2] <- 1
-    
-    return(igraph::graph.maxflow(igraph::graph.adjacency(Cap.matrix), source = 1, 
+
+    return(igraph::graph.maxflow(igraph::graph.adjacency(Cap.matrix), source = 1,
         target = 2)$value)
 }
 
@@ -418,48 +433,48 @@ graphID.ancestralID <- function(L, O) {
     m <- nrow(L)
     validateMatrices(L, O)
     O <- 1 * ((O + t(O)) != 0)
-    
+
     dG <- igraph::graph.adjacency(L)
     newOrder <- as.integer(topological.sort(dG))
     L <- L[newOrder, newOrder]
     O <- O[newOrder, newOrder]
-    
+
     dG <- igraph::graph.adjacency(L)
     bG <- igraph::graph.adjacency(O)
     V(dG)$names <- 1:m
     V(bG)$names <- 1:m
-    
+
     # Generates a list where, for each node v, we have a vector corresponding to all
     # the nodes that could ever be in a half-trek system for v
     halfTrekSources <- vector("list", length = m)
     for (i in 1:m) {
         halfTrekSources[[i]] <- getSiblings(bG, getAncestors(dG, i))
     }
-    
+
     # A matrix determining which nodes are half-trek reachable from each node
     Dependence.matrix <- O + diag(m)
     for (i in 1:m) {
         Dependence.matrix <- ((Dependence.matrix + Dependence.matrix %*% L) > 0)
     }
-    
+
     Solved.nodes <- rep(0, m)
     Solved.nodes[which(colSums(L) == 0)] <- 1  # nodes with no getParents
     change <- 1
     count <- 1
     while (change == 1) {
         change <- 0
-        
+
         Unsolved.nodes <- which(Solved.nodes == 0)
         for (i in Unsolved.nodes) {
             # A <- (Solved Nodes 'union' nodes not htr from i) \ ({i} 'union' sibs(i))
-            A <- setdiff(c(which(Solved.nodes > 0), which(Dependence.matrix[i, ] == 
+            A <- setdiff(c(which(Solved.nodes > 0), which(Dependence.matrix[i, ] ==
                 0)), c(i, which(O[i, ] == 1)))
             # A <- A intersect (nodes that can ever be in a HT system for i)
             A <- intersect(A, halfTrekSources[[i]])
-            
-            mixedCompList <- getMixedCompForNode(dG, bG, getAncestors(dG, c(i, A)), 
+
+            mixedCompList <- getMixedCompForNode(dG, bG, getAncestors(dG, c(i, A)),
                 i)
-            flow <- getMaxFlow(L, O, A, mixedCompList$biNodes, mixedCompList$inNodes, 
+            flow <- getMaxFlow(L, O, A, mixedCompList$biNodes, mixedCompList$inNodes,
                 i)
             if (flow == sum(L[, i])) {
                 change <- 1
@@ -467,10 +482,10 @@ graphID.ancestralID <- function(L, O) {
                 Solved.nodes[i] <- count
                 next
             }
-            
+
             mixedCompList <- getMixedCompForNode(dG, bG, getAncestors(dG, i), i)
             A <- intersect(A, unlist(mixedCompList))
-            flow <- getMaxFlow(L, O, A, mixedCompList$biNodes, mixedCompList$inNodes, 
+            flow <- getMaxFlow(L, O, A, mixedCompList$biNodes, mixedCompList$inNodes,
                 i)
             if (flow == sum(L[, i])) {
                 change <- 1
@@ -480,12 +495,12 @@ graphID.ancestralID <- function(L, O) {
             }
         }
     }
-    
+
     if (all(Solved.nodes == 0)) {
         Solved.nodes <- NULL
     } else {
         Solved.nodes <- order(Solved.nodes)[(1 + sum(Solved.nodes == 0)):m]
     }
-    
+
     return(newOrder[Solved.nodes])
 }

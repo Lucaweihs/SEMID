@@ -6,6 +6,8 @@
 \title{Helper function to create a graph encoding htr relationships.}
 \usage{
 createHtrGraph(this)
+
+\method{createHtrGraph}{MixedGraphFixedOrder}(this)
 }
 \arguments{
 \item{this}{the mixed graph object}

@@ -7,6 +7,10 @@
 \title{All ancestors of a collection of nodes}
 \usage{
 ancestors(this, nodes)
+
+\method{ancestors}{MixedGraphFixedOrder}(this, nodes)
+
+\method{ancestors}{MixedGraph}(this, nodes)
 }
 \arguments{
 \item{this}{the mixed graph object}

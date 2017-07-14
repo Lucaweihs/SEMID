@@ -6,6 +6,8 @@
 \title{Performs the tian decomposition on the mixed graph}
 \usage{
 tianDecompose(this)
+
+\method{tianDecompose}{MixedGraph}(this)
 }
 \arguments{
 \item{this}{the mixed graph object}
