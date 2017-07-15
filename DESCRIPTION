@@ -2,18 +2,18 @@ Package: SEMID
 Type: Package
 Title: Identifiability of Linear Structural Equation Models
 Version: 0.3
-Authors@R: c(person("Rina", "Foygel Barber", role=c("cre"), 
+Authors@R: c(person("Rina", "Foygel Barber", role=c("aut"), 
                    email="rina@uchicago.edu"), 
             person("Mathias", "Drton", role=c("aut"), 
                    email="md5@uw.edu"), 
-            person("Luca", "Weihs", role=c("aut"), 
+            person("Luca", "Weihs", role=c("cre"), 
                    email="lucaw@uw.edu"))
 Maintainer: Luca Weihs <lucaw@uw.edu>
 Description: Provides routines to check identifiability or non-identifiability
     of linear structural equation models as described in Drton, Foygel &
-    Sullivant (Ann. Statist., 2011) and Foygel, Draisma & Drton (Ann. Statist.,
-    2012). The routines are based on the graphical representation of
-    structural equation models by a path diagram/mixed graph.
+    Sullivant (Ann. Statist., 2011), Foygel, Draisma & Drton (Ann. Statist.,
+    2012) and other works. The routines are based on the graphical 
+    representation of structural equation models by a path diagram/mixed graph.
 License: GPL (>= 2)
 URL: https://github.com/Lucaweihs/SEMID
 BugReports: https://github.com/Lucaweihs/SEMID/issues
