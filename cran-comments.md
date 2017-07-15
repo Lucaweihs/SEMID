@@ -1,3 +1,13 @@
+## Resubmission
+This is a resubmission. In this version I have:
+
+* Provided DOIs for the references in the DESCRIPTION.
+
+Note, the package maintainer has been changed to Luca Weihs from
+Mathias Drton. The old maintainer has confirmed this change in an
+email titled "RE: CRAN submission SEMID 0.3.0" to Kurt Hornik and Uwe
+Ligges; Uwe stated that this email should be cited in this resubmission.
+
 ## Test environments
 * local OS X install, R 3.3.3
 * ubuntu 12.04 (on travis-ci), R 3.4
@@ -13,15 +23,13 @@ New maintainer:
 Old maintainer(s):
   Mathias Drton <md5@uw.edu>
 
-* I am a new maintainer of this package. Mathias Drton, the previous maintainer, 
-  is my advisor.
+* I am a new maintainer of this package. Mathias Drton, the previous maintainer, is my advisor.
 
 Possibly mis-spelled words in DESCRIPTION:
   Draisma (14:49)
   Drton (13:58, 14:59)
   Foygel (13:65, 14:41)
   Identifiability (3:8)
-  Statist (14:21, 14:71)
   Sullivant (14:5)
   identifiability (12:41, 12:64)
   
