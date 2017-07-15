@@ -29,12 +29,12 @@ mixedGraphHasSimpleNumbering <- function(mixedGraph) {
 #'        identifiability. This uses the \code{\link{graphID.globalID}}
 #'        function.
 #' @param testGenericNonID TRUE of FALSE if the graph should be tested for
-#'        generic non-identifiablity, that is, if for every generic choice
+#'        generic non-identifiability, that is, if for every generic choice
 #'        of parameters for the L-SEM there are infinitely many
 #'        other choices that lead to the same covariance matrix. This currently
 #'        uses the \code{\link{graphID.nonHtcID}} function.
 #' @param genericIdStepFunctions a list of the generic identifier step functions
-#'        that should be used for testing generic identifiablity. See
+#'        that should be used for testing generic identifiability. See
 #'        \code{\link{generalGenericID}} for a discussion of such functions. If
 #'        this list is empty then generic identifiability is not tested. By
 #'        default this will (only) run the half-trek criterion (see
@@ -540,7 +540,7 @@ subsetsOfSize <- function(x, k) {
 #' Identifiers are functions that take as input a covariance matrix Sigma
 #' corresponding to some mixed graph G and, from that covariance matrix,
 #' identify some subset of the coefficients in the mixed graph G. This function
-#' takes as input the matrices, L and O, defining G and creates an identifer
+#' takes as input the matrices, L and O, defining G and creates an identifier
 #' that does not identify any of the coefficients of G. This is useful as a
 #' base case when building more complex identification functions.
 #'

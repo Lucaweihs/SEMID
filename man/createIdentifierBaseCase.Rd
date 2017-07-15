@@ -31,7 +31,7 @@ a function that takes as input a covariance matrix compatible with
 Identifiers are functions that take as input a covariance matrix Sigma
 corresponding to some mixed graph G and, from that covariance matrix,
 identify some subset of the coefficients in the mixed graph G. This function
-takes as input the matrices, L and O, defining G and creates an identifer
+takes as input the matrices, L and O, defining G and creates an identifier
 that does not identify any of the coefficients of G. This is useful as a
 base case when building more complex identification functions.
 }

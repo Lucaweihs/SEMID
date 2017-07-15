@@ -426,14 +426,14 @@ setMethodS3("stronglyConnectedComponent", "MixedGraphFixedOrder", function(this,
 
 #' Get descendants of a node
 #'
-#' Finds all descendents of a node, this DOES include the node itself (every
+#' Finds all descendants of a node, this DOES include the node itself (every
 #' node is considered a descendant of itself).
 #'
 #' @name descendants
 #' @export descendants
 #'
 #' @param this the mixed graph object
-#' @param node the node from which to get the descendents.
+#' @param node the node from which to get the descendants.
 descendants <- function(this, node) {
     UseMethod("descendants")
 }

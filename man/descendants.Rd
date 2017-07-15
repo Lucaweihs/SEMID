@@ -15,9 +15,9 @@ descendants(this, node)
 \arguments{
 \item{this}{the mixed graph object}
 
-\item{node}{the node from which to get the descendents.}
+\item{node}{the node from which to get the descendants.}
 }
 \description{
-Finds all descendents of a node, this DOES include the node itself (every
+Finds all descendants of a node, this DOES include the node itself (every
 node is considered a descendant of itself).
 }

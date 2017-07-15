@@ -2,7 +2,7 @@
 % Please edit documentation in R/trekSepId.R
 \name{trekSeparationIdentifyStep}
 \alias{trekSeparationIdentifyStep}
-\title{Perform one iteration of trek seperation identification.}
+\title{Perform one iteration of trek separation identification.}
 \usage{
 trekSeparationIdentifyStep(mixedGraph, unsolvedParents, solvedParents,
   identifier, maxSubsetSize = 3)
