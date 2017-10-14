@@ -4,10 +4,15 @@
 * Using devtools::build_win()
 
 ## R CMD check results
-There were no ERRORs, WARNINGs, or NOTEs. On previous
-submissions certain words in the DESCRIPTION have been
-identified as mispelled, they are not (they are either names
-or statistics terminology).
+There were no ERRORs or WARNINGs. There was 1 NOTE:
+
+* Possibly mis-spelled words in DESCRIPTION:
+  Draisma (15:55)
+  Drton (14:58, 15:68)
+  Foygel (14:65, 15:47)
+  Sullivant (15:5)
+  
+  None of these words are mispelled. They are all names.
 
 ## Downstream dependencies
 There are currently no downstream dependencies for this package.
