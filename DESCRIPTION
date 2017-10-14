@@ -1,12 +1,13 @@
 Package: SEMID
 Type: Package
 Title: Identifiability of Linear Structural Equation Models
-Version: 0.3.0
+Version: 0.3.1
+Date: 2017-10-14
 Authors@R: c(person("Rina", "Foygel Barber", role=c("aut"), 
                    email="rina@uchicago.edu"), 
             person("Mathias", "Drton", role=c("aut"), 
                    email="md5@uw.edu"), 
-            person("Luca", "Weihs", role=c("cre"), 
+            person("Luca", "Weihs", role=c("cre","aut"), 
                    email="lucaw@uw.edu"))
 Maintainer: Luca Weihs <lucaw@uw.edu>
 Description: Provides routines to check identifiability or non-identifiability

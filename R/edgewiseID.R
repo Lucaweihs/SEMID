@@ -10,7 +10,7 @@
 #'        have their edge to their respect source removed.
 #'
 #' @return an identification function
-createEdgewiseIdentifier <- function(idFunc, sources, targets, node, solvedNodeParents, 
+createEdgewiseIdentifier <- function(idFunc, sources, targets, node, solvedNodeParents,
     sourceParentsToRemove) {
     # These assignments may seem redundent but they are necessary as they assign
     # these variables to the local environment of the function call.  This allows
@@ -25,30 +25,30 @@ createEdgewiseIdentifier <- function(idFunc, sources, targets, node, solvedNodeP
         m <- nrow(Sigma)
         identifiedParams <- idFunc(Sigma)
         Lambda <- identifiedParams$Lambda
-        
+
         SigmaMinus <- Sigma
         for (sourceInd in 1:length(sources)) {
             source <- sources[sourceInd]
             parentsToRemove <- sourceParentsToRemove[[sourceInd]]
             if (length(parentsToRemove) != 0) {
-                SigmaMinus[source, ] <- Sigma[source, , drop = F] - t(Lambda[parentsToRemove, 
+                SigmaMinus[source, ] <- Sigma[source, , drop = F] - t(Lambda[parentsToRemove,
                   source, drop = F]) %*% Sigma[parentsToRemove, , drop = F]
             }
         }
-        
+
         if (length(solvedNodeParents) != 0) {
-            SigmaMinus[sources, node] <- SigmaMinus[sources, node, drop = F] - SigmaMinus[sources, 
-                solvedNodeParents, drop = F] %*% Lambda[solvedNodeParents, node, 
+            SigmaMinus[sources, node] <- SigmaMinus[sources, node, drop = F] - SigmaMinus[sources,
+                solvedNodeParents, drop = F] %*% Lambda[solvedNodeParents, node,
                 drop = F]
         }
-        
+
         if (abs(det(SigmaMinus[sources, targets, drop = F])) < 10^-10) {
             stop("In identification, found near-singular system. Is the input matrix generic?")
         }
-        
-        Lambda[targets, node] <- solve(SigmaMinus[sources, targets, drop = F], SigmaMinus[sources, 
+
+        Lambda[targets, node] <- solve(SigmaMinus[sources, targets, drop = F], SigmaMinus[sources,
             node, drop = F])
-        
+
         return(list(Lambda = Lambda, Omega = identifiedParams$Omega))
     })
 }
@@ -71,7 +71,7 @@ createEdgewiseIdentifier <- function(idFunc, sources, targets, node, solvedNodeP
 #'
 #' @return see the return of \code{\link{htcIdentifyStep}}.
 #' @export
-edgewiseIdentifyStep <- function(mixedGraph, unsolvedParents, solvedParents, identifier, 
+edgewiseIdentifyStep <- function(mixedGraph, unsolvedParents, solvedParents, identifier,
     subsetSizeControl = Inf) {
     if (subsetSizeControl <= 0) {
         stop("Invalid subset size control parameter.")
@@ -84,54 +84,54 @@ edgewiseIdentifyStep <- function(mixedGraph, unsolvedParents, solvedParents, ide
         if (length(unsolved) != 0) {
             allowedNodesTrueFalse <- logical(m)
             for (j in 1:m) {
-                if (i != j && !mixedGraph$isSibling(i, j) && length(intersect(mixedGraph$htrFrom(j), 
-                  unsolved)) != 0 && length(intersect(htrFromNode, unsolvedParents[[j]])) == 
+                if (i != j && !mixedGraph$isSibling(i, j) && length(intersect(mixedGraph$htrFrom(j),
+                  unsolved)) != 0 && length(intersect(htrFromNode, unsolvedParents[[j]])) ==
                   0) {
                   allowedNodesTrueFalse[j] <- TRUE
                 }
             }
-            if (all(!allowedNodesTrueFalse)) {
+            if (!any(allowedNodesTrueFalse)) {
                 next
             }
             allowedNodes <- which(allowedNodesTrueFalse)
-            
+
             htrFromAllowedOrTrFromUnsolved <- rep(list(c()), length(allowedNodes))
             for (j in 1:length(allowedNodes)) {
                 a <- allowedNodes[j]
                 htrFromAllowedOrTrFromUnsolved[[j]] <- mixedGraph$htrFrom(a)
                 for (unsolvedForA in unsolvedParents[[a]]) {
-                  htrFromAllowedOrTrFromUnsolved[[j]] <- c(htrFromAllowedOrTrFromUnsolved[[j]], 
+                  htrFromAllowedOrTrFromUnsolved[[j]] <- c(htrFromAllowedOrTrFromUnsolved[[j]],
                     mixedGraph$trFrom(unsolvedForA))
                 }
                 htrFromAllowedOrTrFromUnsolved[[j]] <- unique(htrFromAllowedOrTrFromUnsolved[[j]])
             }
-            
+
             subsetFound <- F
-            subsetSizes <- union(length(unsolved):min(max((length(unsolved) - subsetSizeControl + 
+            subsetSizes <- union(length(unsolved):min(max((length(unsolved) - subsetSizeControl +
                 1), 1), length(unsolved)), 1:min(length(unsolved), subsetSizeControl))
-            
+
             for (k in subsetSizes) {
                 subsets <- subsetsOfSize(unsolved, k)
                 for (subset in subsets) {
                   allowedForSubsetTrueFalse <- logical(length(allowedNodes))
                   for (l in 1:length(allowedNodes)) {
                     a <- allowedNodes[l]
-                    allowedForSubsetTrueFalse[l] <- all(intersect(htrFromAllowedOrTrFromUnsolved[[l]], 
+                    allowedForSubsetTrueFalse[l] <- all(intersect(htrFromAllowedOrTrFromUnsolved[[l]],
                       unsolved) %in% subset)
                   }
                   allowedForSubset <- allowedNodes[allowedForSubsetTrueFalse]
                   if (length(allowedForSubset) == 0) {
                     next
                   }
-                  halfTrekSystemResult <- mixedGraph$getHalfTrekSystem(allowedForSubset, 
+                  halfTrekSystemResult <- mixedGraph$getHalfTrekSystem(allowedForSubset,
                     subset)
-                  
+
                   if (halfTrekSystemResult$systemExists) {
-                    identifiedEdges <- c(identifiedEdges, as.integer(rbind(subset, 
+                    identifiedEdges <- c(identifiedEdges, as.integer(rbind(subset,
                       i)))
                     subsetFound <- T
                     activeFrom <- halfTrekSystemResult$activeFrom
-                    identifier <- createEdgewiseIdentifier(identifier, activeFrom, 
+                    identifier <- createEdgewiseIdentifier(identifier, activeFrom,
                       subset, i, solvedParents[[i]], lapply(activeFrom, function(x) {
                         solvedParents[[x]]
                       }))
@@ -146,7 +146,7 @@ edgewiseIdentifyStep <- function(mixedGraph, unsolvedParents, solvedParents, ide
             }
         }
     }
-    return(list(identifiedEdges = identifiedEdges, unsolvedParents = unsolvedParents, 
+    return(list(identifiedEdges = identifiedEdges, unsolvedParents = unsolvedParents,
         solvedParents = solvedParents, identifier = identifier))
 }
 
@@ -165,7 +165,7 @@ edgewiseIdentifyStep <- function(mixedGraph, unsolvedParents, solvedParents, ide
 #' @return see the return of \code{\link{generalGenericID}}.
 edgewiseID <- function(mixedGraph, tianDecompose = T, subsetSizeControl = 3) {
     eid <- function(mixedGraph, unsolvedParents, solvedParents, identifier) {
-        return(edgewiseIdentifyStep(mixedGraph, unsolvedParents, solvedParents, identifier, 
+        return(edgewiseIdentifyStep(mixedGraph, unsolvedParents, solvedParents, identifier,
             subsetSizeControl = subsetSizeControl))
     }
     result <- generalGenericID(mixedGraph, list(eid), tianDecompose = tianDecompose)
