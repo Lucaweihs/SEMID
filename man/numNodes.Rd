@@ -17,6 +17,8 @@ numNodes(this, ...)
 }
 \arguments{
 \item{this}{the graph object}
+
+\item{...}{ignored.}
 }
 \description{
 Number of nodes in the graph.

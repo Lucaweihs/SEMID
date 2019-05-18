@@ -26,6 +26,8 @@ length(toNodes) to toNodes.}
 
 \item{toNodes}{the nodes where the half-trek system should end.}
 
+\item{...}{ignored.}
+
 \item{avoidLeftNodes}{a collection of nodes to avoid on the left}
 
 \item{avoidRightNodes}{a collection of nodes to avoid on the right}
@@ -37,6 +39,10 @@ hand side of any trek in the trek system.}
 \item{avoidLeftEdges}{a collection of edges between observed nodes
 in the graph that should not be used on any right
 hand side of any trek in the trek system.}
+
+\item{...}{ignored.}
+
+\item{...}{ignored.}
 }
 \value{
 a list with two named components, \code{systemExists} (TRUE if a

@@ -9,7 +9,8 @@
 \usage{
 stronglyConnectedComponent(this, node, ...)
 
-\method{stronglyConnectedComponent}{LatentDigraphFixedOrder}(this, node, ...)
+\method{stronglyConnectedComponent}{LatentDigraphFixedOrder}(this, node,
+  ...)
 
 \method{stronglyConnectedComponent}{LatentDigraph}(this, node, ...)
 
@@ -19,6 +20,8 @@ stronglyConnectedComponent(this, node, ...)
 \item{this}{the graph object}
 
 \item{node}{the node for which to get the strongly connected component.}
+
+\item{...}{ignored.}
 }
 \description{
 Get the strongly connected component for a node i in the graph the graph.

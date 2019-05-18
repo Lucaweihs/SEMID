@@ -9,8 +9,8 @@
 \usage{
 parents(this, nodes, ...)
 
-\method{parents}{LatentDigraphFixedOrder}(this, nodes, includeObserved = T,
-  includeLatents = T, ...)
+\method{parents}{LatentDigraphFixedOrder}(this, nodes,
+  includeObserved = T, includeLatents = T, ...)
 
 \method{parents}{LatentDigraph}(this, nodes, includeObserved = T,
   includeLatents = T, ...)
@@ -21,6 +21,8 @@ parents(this, nodes, ...)
 \item{this}{the graph object.}
 
 \item{nodes}{nodes the nodes of which to find the parents.}
+
+\item{...}{ignored.}
 
 \item{includeObserved}{if TRUE includes observed nodes in the returned set.}
 

@@ -14,6 +14,8 @@ htrFrom(this, nodes, ...)
 \item{this}{the mixed graph object}
 
 \item{nodes}{the nodes from which to get all half-trek reachable nodes.}
+
+\item{...}{ignored.}
 }
 \value{
 a vector of all nodes half-trek reachable from node.

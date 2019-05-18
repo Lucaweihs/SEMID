@@ -14,8 +14,8 @@ trFrom(this, nodes, ...)
   includeObserved = T, includeLatents = T, ...)
 
 \method{trFrom}{LatentDigraph}(this, nodes, avoidLeftNodes = integer(0),
-  avoidRightNodes = integer(0), includeObserved = T, includeLatents = T,
-  ...)
+  avoidRightNodes = integer(0), includeObserved = T,
+  includeLatents = T, ...)
 
 \method{trFrom}{MixedGraph}(this, nodes, avoidLeftNodes = integer(0),
   avoidRightNodes = integer(0), ...)
@@ -24,6 +24,8 @@ trFrom(this, nodes, ...)
 \item{this}{the graph object}
 
 \item{nodes}{the nodes from which to find trek-reachable nodes.}
+
+\item{...}{ignored.}
 
 \item{avoidLeftNodes}{a collection of nodes to avoid on the left}
 

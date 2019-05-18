@@ -4,7 +4,8 @@
 \alias{ancestralIdentifyStep}
 \title{Perform one iteration of ancestral identification.}
 \usage{
-ancestralIdentifyStep(mixedGraph, unsolvedParents, solvedParents, identifier)
+ancestralIdentifyStep(mixedGraph, unsolvedParents, solvedParents,
+  identifier)
 }
 \arguments{
 \item{mixedGraph}{a \code{\link{MixedGraph}} object representing

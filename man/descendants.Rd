@@ -22,6 +22,8 @@ descendants(this, nodes, ...)
 
 \item{nodes}{the nodes from which to get the descendants.}
 
+\item{...}{ignored.}
+
 \item{includeObserved}{if TRUE includes observed nodes in the returned set.}
 
 \item{includeLatents}{if TRUE includes latent nodes in the returned set.}

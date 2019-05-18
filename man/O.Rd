@@ -11,6 +11,8 @@ O(this, ...)
 }
 \arguments{
 \item{this}{the mixed graph object}
+
+\item{...}{ignored.}
 }
 \description{
 Get adjacency matrix for bidirected part.

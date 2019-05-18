@@ -11,6 +11,8 @@ nodes(this, ...)
 }
 \arguments{
 \item{this}{the mixed graph object}
+
+\item{...}{ignored.}
 }
 \description{
 Get all nodes in the graph.

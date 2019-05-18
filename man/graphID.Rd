@@ -5,8 +5,8 @@
 \title{Identifiability of linear structural equation models.}
 \usage{
 graphID(L, O, output.type = "matrix", file.name = NULL,
-  decomp.if.acyclic = TRUE, test.globalID = TRUE, test.genericID = TRUE,
-  test.nonID = TRUE)
+  decomp.if.acyclic = TRUE, test.globalID = TRUE,
+  test.genericID = TRUE, test.nonID = TRUE)
 }
 \arguments{
 \item{L}{Adjacency matrix for the directed part of the path

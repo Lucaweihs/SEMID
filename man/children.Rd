@@ -10,8 +10,8 @@
 \usage{
 children(this, nodes, ...)
 
-\method{children}{LatentDigraphFixedOrder}(this, nodes, includeObserved = T,
-  includeLatents = T, ...)
+\method{children}{LatentDigraphFixedOrder}(this, nodes,
+  includeObserved = T, includeLatents = T, ...)
 
 \method{children}{LatentDigraph}(this, nodes, includeObserved = T,
   includeLatents = T, ...)
@@ -22,6 +22,8 @@ children(this, nodes, ...)
 \item{this}{the graph object.}
 
 \item{nodes}{nodes the nodes of which to find the children}
+
+\item{...}{ignored.}
 
 \item{includeObserved}{if TRUE includes observed nodes in the returned set.}
 

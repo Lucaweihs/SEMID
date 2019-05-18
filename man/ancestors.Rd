@@ -9,8 +9,8 @@
 \usage{
 ancestors(this, nodes, ...)
 
-\method{ancestors}{LatentDigraphFixedOrder}(this, nodes, includeObserved = T,
-  includeLatents = T, ...)
+\method{ancestors}{LatentDigraphFixedOrder}(this, nodes,
+  includeObserved = T, includeLatents = T, ...)
 
 \method{ancestors}{LatentDigraph}(this, nodes, includeObserved = T,
   includeLatents = T, ...)
@@ -21,6 +21,8 @@ ancestors(this, nodes, ...)
 \item{this}{the graph object}
 
 \item{nodes}{the nodes from which to find all ancestors}
+
+\item{...}{ignored.}
 
 \item{includeObserved}{if TRUE includes observed nodes in the returned set.}
 

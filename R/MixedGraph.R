@@ -25,7 +25,7 @@
 #'
 #' @name MixedGraph
 #' @usage MixedGraph(L = matrix(0,1,1), O = matrix(0,1,1),
-#'                   vertexNums = 1:nrow(L))
+#'                   vertexNums = seq(1, length = nrow(L))
 #' @export MixedGraph
 #'
 #' @param L see \code{\link{graphID}} for the appropriate form of L.
@@ -76,6 +76,7 @@ setMethodS3("toEx", "MixedGraph", function(this, nodes, ...) {
 
 #' @rdname   L
 #' @name     L.MixedGraph
+#' @param ... ignored.
 #' @export
 setMethodS3("L", "MixedGraph", function(this, ...) {
   return(this$.L)
@@ -85,7 +86,7 @@ setMethodS3("L", "MixedGraph", function(this, ...) {
 #'
 #' @name O
 #' @export O
-#'
+#' @param ... ignored.
 #' @param this the mixed graph object
 O <- function(this, ...) {
     UseMethod("O")
@@ -104,6 +105,7 @@ setMethodS3("O", "MixedGraph", function(this, ...) {
 #' @export nodes
 #'
 #' @param this the mixed graph object
+#' @param ... ignored.
 nodes <- function(this, ...) {
     UseMethod("nodes")
 }
@@ -117,6 +119,7 @@ setMethodS3("nodes", "MixedGraph", function(this, ...) {
 
 #' @rdname   numNodes
 #' @name     numNodes.MixedGraph
+#' @param ... ignored.
 #' @export
 setMethodS3("numNodes", "MixedGraph", function(this, ...) {
     return(nrow(this$.L))
@@ -129,7 +132,7 @@ setMethodS3("numNodes", "MixedGraph", function(this, ...) {
 #'
 #' @param this the mixed graph object
 #' @param nodes a vector of nodes of which to find the siblings.
-#'
+#' @param ... ignored.
 #' @return a vector of all of the siblings.
 siblings <- function(this, nodes, ...) {
   UseMethod("siblings")
@@ -150,7 +153,7 @@ setMethodS3("siblings", "MixedGraph", function(this, nodes, ...) {
 #' @param this the mixed graph object
 #' @param node1 a node
 #' @param node2 a second node
-#'
+#' @param ... ignored.
 #' @return TRUE if the nodes are siblings in the graph, FALSE otherwise
 isSibling <- function(this, node1, node2, ...) {
   UseMethod("isSibling")
@@ -165,6 +168,7 @@ setMethodS3("isSibling", "MixedGraph", function(this, node1, node2, ...) {
 
 #' @rdname   parents
 #' @name     parents.MixedGraph
+#' @param ... ignored.
 #' @export
 setMethodS3("parents", "MixedGraph", function(this, nodes, ...) {
     return(this$.internalGraph$parents(nodes, includeLatents = F, ...))
@@ -172,6 +176,7 @@ setMethodS3("parents", "MixedGraph", function(this, nodes, ...) {
 
 #' @rdname   children
 #' @name     parents.MixedGraph
+#' @param ... ignored.
 #' @export
 setMethodS3("children", "MixedGraph", function(this, nodes, ...) {
   return(this$.internalGraph$children(nodes, includeLatents = F, ...))
@@ -179,6 +184,7 @@ setMethodS3("children", "MixedGraph", function(this, nodes, ...) {
 
 #' @rdname   ancestors
 #' @name     ancestors.MixedGraph
+#' @param ... ignored.
 #' @export
 setMethodS3("ancestors", "MixedGraph", function(this, nodes, ...) {
   return(this$.internalGraph$ancestors(nodes, includeLatents = F, ...))
@@ -186,6 +192,7 @@ setMethodS3("ancestors", "MixedGraph", function(this, nodes, ...) {
 
 #' @rdname   descendants
 #' @name     descendants.MixedGraph
+#' @param ... ignored.
 #' @export
 setMethodS3("descendants", "MixedGraph", function(this, nodes, ...) {
   return(this$.internalGraph$descendants(nodes, includeLatents = F, ...))
@@ -197,7 +204,7 @@ setMethodS3("descendants", "MixedGraph", function(this, nodes, ...) {
 #' @export htrFrom
 #' @param this the mixed graph object
 #' @param nodes the nodes from which to get all half-trek reachable nodes.
-#'
+#' @param ... ignored.
 #' @return a vector of all nodes half-trek reachable from node.
 htrFrom <- function(this, nodes, ...) {
   UseMethod("htrFrom")
@@ -218,6 +225,7 @@ setMethodS3("htrFrom", "MixedGraph", function(this, nodes,
 
 #' @rdname   trFrom
 #' @name     trFrom.MixedGraph
+#' @param ... ignored.
 #' @export
 setMethodS3("trFrom", "MixedGraph", function(this, nodes,
                                              avoidLeftNodes = integer(0),
@@ -240,6 +248,7 @@ setMethodS3("trFrom", "MixedGraph", function(this, nodes,
 #'        any half-trek system from any subset of fromNodes of size
 #'        length(toNodes) to toNodes.
 #' @param toNodes the nodes where the half-trek system should end.
+#' @param ... ignored.
 #'
 #' @return a list with two named components, \code{systemExists} (TRUE if a
 #'         system exists, FALSE otherwise) and \code{activeFrom} (the subset
@@ -251,6 +260,7 @@ getHalfTrekSystem <- function(this, fromNodes, toNodes, ...) {
 #' @inheritParams getTrekSystem.LatentDigraph
 #' @rdname   getHalfTrekSystem
 #' @name     getHalfTrekSystem.MixedGraph
+#' @param ... ignored.
 #' @export
 setMethodS3("getHalfTrekSystem", "MixedGraph", function(this,
                                                         fromNodes,
@@ -276,6 +286,7 @@ setMethodS3("getHalfTrekSystem", "MixedGraph", function(this,
 #' @inheritParams getTrekSystem.LatentDigraph
 #' @rdname   getHalfTrekSystem
 #' @name     getHalfTrekSystem.MixedGraph
+#' @param ... ignored.
 #' @export
 setMethodS3("getTrekSystem", "MixedGraph", function(this,
                                                     fromNodes,
@@ -297,6 +308,7 @@ setMethodS3("getTrekSystem", "MixedGraph", function(this,
 
 #' @rdname   stronglyConnectedComponent
 #' @name     stronglyConnectedComponent.MixedGraph
+#' @param ... ignored.
 #' @export
 setMethodS3("stronglyConnectedComponent", "MixedGraph", function(this, node, ...) {
   return(this$.internalGraph$stronglyConnectedComponent(node))
@@ -304,8 +316,9 @@ setMethodS3("stronglyConnectedComponent", "MixedGraph", function(this, node, ...
 
 #' @rdname   inducedSubgraph
 #' @name     inducedSubgraph.MixedGraph
+#' @param ... ignored.
 #' @export
-setMethodS3("inducedSubgraph", "MixedGraph", function(this, nodes) {
+setMethodS3("inducedSubgraph", "MixedGraph", function(this, nodes, ...) {
     nodesIn <- this$toIn(nodes)
     newL <- this$L()[nodesIn, nodesIn]
     newO <- this$O()[nodesIn, nodesIn]

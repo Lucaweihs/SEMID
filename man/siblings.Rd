@@ -13,6 +13,8 @@ siblings(this, nodes, ...)
 \item{this}{the mixed graph object}
 
 \item{nodes}{a vector of nodes of which to find the siblings.}
+
+\item{...}{ignored.}
 }
 \value{
 a vector of all of the siblings.

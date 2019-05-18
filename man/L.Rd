@@ -17,6 +17,8 @@ L(this, ...)
 }
 \arguments{
 \item{this}{the graph object}
+
+\item{...}{ignored.}
 }
 \description{
 Get directed adjacency matrix.

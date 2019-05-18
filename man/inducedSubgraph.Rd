@@ -10,12 +10,14 @@ inducedSubgraph(this, nodes, ...)
 
 \method{inducedSubgraph}{LatentDigraph}(this, nodes, ...)
 
-\method{inducedSubgraph}{MixedGraph}(this, nodes)
+\method{inducedSubgraph}{MixedGraph}(this, nodes, ...)
 }
 \arguments{
 \item{this}{the graph object}
 
 \item{nodes}{the nodes on which to create the induced subgraph.}
+
+\item{...}{ignored.}
 }
 \description{
 Get the induced subgraph on a collection of nodes

@@ -15,6 +15,8 @@ isSibling(this, node1, node2, ...)
 \item{node1}{a node}
 
 \item{node2}{a second node}
+
+\item{...}{ignored.}
 }
 \value{
 TRUE if the nodes are siblings in the graph, FALSE otherwise
