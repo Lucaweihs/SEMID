@@ -4,19 +4,19 @@ rConnectedAdjMatrix <- function(n, p) {
     weights <- runif(n * (n - 1)/2)
     g <- igraph::minimum.spanning.tree(igraph::graph.full(n), weights = weights)
     adjMatrix <- as.matrix(igraph::get.adjacency(g))
-    adjMatrix <- (upper.tri(matrix(0, n, n)) & matrix(sample(c(T, F), n^2, replace = T, 
+    adjMatrix <- (upper.tri(matrix(0, n, n)) & matrix(sample(c(T, F), n^2, replace = T,
         prob = c(p, 1 - p)), ncol = n)) | adjMatrix
     adjMatrix <- 1 * (adjMatrix | t(adjMatrix))
     return(adjMatrix)
 }
 
 rAcyclicDirectedAdjMatrix <- function(n, p) {
-    return(1 * (upper.tri(matrix(0, n, n)) & matrix(sample(c(T, F), n^2, replace = T, 
+    return(1 * (upper.tri(matrix(0, n, n)) & matrix(sample(c(T, F), n^2, replace = T,
         prob = c(p, 1 - p)), ncol = n)))
 }
 
 rDirectedAdjMatrix <- function(n, p) {
-    return((1 - diag(n)) * matrix(sample(c(T, F), n^2, replace = T, prob = c(p, 1 - 
+    return((1 - diag(n)) * matrix(sample(c(T, F), n^2, replace = T, prob = c(p, 1 -
         p)), ncol = n))
 }
 
@@ -47,12 +47,12 @@ solvedParentsToIndexMat <- function(solvedParents) {
 
 randomIdentificationTest <- function(identifier, L, O, solvedParents) {
     n <- nrow(L)
-    
+
     L1 <- L * matrix(runif(n^2, 0.1, 1), n)
     O1 <- (diag(n) + O) * matrix(runif(n^2, 0.1, 1), n)
     O1 <- O1 + t(O1)
     S1 <- t(solve(diag(n) - L1)) %*% O1 %*% solve(diag(n) - L1)
-    
+
     identifiedParams <- identifier(S1)
     toCheck <- solvedParentsToIndexMat(solvedParents)
     expect_true(all(!is.na(identifiedParams$Lambda[toCheck])))

@@ -1,6 +1,6 @@
 ## Test environments
-* local OS X install, R 3.3.3
-* ubuntu 14.04 (on travis-ci), R 3.4.2
+* local OS X install, R 3.5.3
+* ubuntu 14.04 (on travis-ci), R 3.5.2
 * Using devtools::build_win()
 
 ## R CMD check results

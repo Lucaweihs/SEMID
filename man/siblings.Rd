@@ -2,15 +2,12 @@
 % Please edit documentation in R/MixedGraph.R
 \name{siblings}
 \alias{siblings}
-\alias{siblings.MixedGraphFixedOrder}
 \alias{siblings.MixedGraph}
 \title{All siblings of a collection of nodes}
 \usage{
-siblings(this, nodes)
+siblings(this, nodes, ...)
 
-\method{siblings}{MixedGraphFixedOrder}(this, nodes)
-
-\method{siblings}{MixedGraph}(this, nodes)
+\method{siblings}{MixedGraph}(this, nodes, ...)
 }
 \arguments{
 \item{this}{the mixed graph object}

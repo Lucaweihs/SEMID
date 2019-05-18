@@ -5,9 +5,9 @@
 \alias{nodes.MixedGraph}
 \title{Get all nodes in the graph.}
 \usage{
-nodes(this)
+nodes(this, ...)
 
-\method{nodes}{MixedGraph}(this)
+\method{nodes}{MixedGraph}(this, ...)
 }
 \arguments{
 \item{this}{the mixed graph object}

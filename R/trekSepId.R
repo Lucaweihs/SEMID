@@ -83,7 +83,7 @@ trekSeparationIdentifyStep <- function(mixedGraph, unsolvedParents, solvedParent
                         toRemoveOnRight <- as.integer(rbind(c(j, solvedParents[[i]]),
                           i))
                         systemWithoutEdges <- mixedGraph$getTrekSystem(sources, c(targets,
-                          i), toRemoveOnRight)
+                          i), avoidRightEdges = toRemoveOnRight)
                         if (!systemWithoutEdges$systemExists) {
                           identifiedEdges <- c(identifiedEdges, i, j)
                           edgeIdentified <- T

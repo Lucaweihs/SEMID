@@ -15,13 +15,14 @@ test_that("Ancestral identification does not identify edges erroneously.", {
                 L <- rDirectedAdjMatrix(n, p)
                 O <- rUndirectedAdjMat(n, p)
                 g <- MixedGraph(L, O)
-                gid <- htcID(g)
+                gid <- htcID(g, tianDecompose = F)
                 aid <- ancestralID(g)
-                
+
                 expect_true(all(sapply(1:n, FUN = function(x) {
                   all(gid$solvedParents[[x]] %in% aid$solvedParents[[x]])
                 })))
-                
+
+                randomIdentificationTest(gid$identifier, L, O, gid$solvedParents)
                 randomIdentificationTest(aid$identifier, L, O, aid$solvedParents)
             }
         }
@@ -71,12 +72,12 @@ test_that("graphID.ancestralID function works as expected.", {
             }
         }
     }
-    
-    dG <- igraph::graph.edgelist(matrix(c(1, 2, 1, 3, 1, 6, 2, 3, 2, 4, 2, 5, 2, 
+
+    dG <- igraph::graph.edgelist(matrix(c(1, 2, 1, 3, 1, 6, 2, 3, 2, 4, 2, 5, 2,
         6, 3, 4, 4, 5), ncol = 2, byrow = T))
-    bG <- igraph::graph.edgelist(matrix(c(1, 6, 1, 4, 2, 3, 2, 5, 2, 6), ncol = 2, 
+    bG <- igraph::graph.edgelist(matrix(c(1, 6, 1, 4, 2, 3, 2, 5, 2, 6), ncol = 2,
         byrow = T), directed = F)
-    expect_equal(as.integer(sort(graphID.ancestralID(getAdjMat(dG), getAdjMat(bG)))), 
+    expect_equal(as.integer(sort(graphID.ancestralID(getAdjMat(dG), getAdjMat(bG)))),
         1:6)
 })
 

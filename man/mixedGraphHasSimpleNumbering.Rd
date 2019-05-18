@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{mixedGraphHasSimpleNumbering}
 \alias{mixedGraphHasSimpleNumbering}
-\title{Checks a MixedGraph has appropriate node numbering}
+\title{Checks that a MixedGraph has appropriate node numbering}
 \usage{
 mixedGraphHasSimpleNumbering(mixedGraph)
 }
