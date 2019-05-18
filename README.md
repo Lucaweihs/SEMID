@@ -77,7 +77,7 @@ identifiability of linear structural equation models. _Ann. Statist._
 
 There still do not exist any 'if and only if' graphical conditions for
 testing whether or not certain parameters in a mixed graph are
-generically identifiable. There do, howeover, exist some necessary and
+generically identifiable. There do, however, exist some necessary and
 some sufficient conditions which work for a large collection of
 graphs.
 
