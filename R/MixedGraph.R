@@ -493,7 +493,7 @@ setConstructorS3("MixedGraph", function(L = matrix(0, 1, 1), O = matrix(0,
     if (nrow(L) == 0) {
         vertexNums <- c()
         vertexNumsToInternal <- c()
-    } else if (vertexNums%%1 != 0 || any(vertexNums < 1) || length(unique(vertexNums)) !=
+    } else if (any(vertexNums%%1 != 0) || any(vertexNums < 1) || length(unique(vertexNums)) !=
         length(vertexNums) || length(vertexNums) != nrow(L)) {
         stop(paste("vertexNums must be all unique positive", "integers and must have length == nrow(L)"))
     } else {
