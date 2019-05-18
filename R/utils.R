@@ -563,7 +563,7 @@ createIdentifierBaseCase <- function(L, O) {
         Lambda <- matrix(NA, nrow(L), nrow(L))
         Lambda[L == 0] <- 0
         Omega <- matrix(NA, nrow(O), nrow(O))
-        Omega[(O == 0) && !(diag(nrow(O)))] <- 0
+        Omega[(O == 0) & !(diag(nrow(O)))] <- 0
         return(list(Lambda = Lambda, Omega = Omega))
     })
 }
