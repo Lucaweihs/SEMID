@@ -14,31 +14,31 @@ test_that("The Tian decomposition recovers covariance matrices correctly.", {
             for (i in 1:sims) {
                 L <- rDirectedAdjMatrix(n, p)
                 O <- rUndirectedAdjMat(n, p)
-                
+
                 LL <- L * matrix(rnorm(n^2), ncol = n)
                 OO <- (O + diag(n)) * matrix(rnorm(n^2), ncol = n)
                 OO <- OO + t(OO)
                 Sigma <- solve(t(diag(n) - LL)) %*% OO %*% solve(diag(n) - LL)
-                
+
                 g <- MixedGraph(L, O)
                 cComponents <- g$tianDecompose()
-                
+
                 for (comp in cComponents) {
                   internal <- comp$internal
                   incoming <- comp$incoming
                   topOrder <- comp$topOrder
-                  
+
                   LLnew <- LL[topOrder, topOrder, drop = F]
                   LLnew[, topOrder %in% incoming] <- 0
                   OOnew <- OO[topOrder, topOrder, drop = F]
                   OOnew[topOrder %in% incoming, topOrder %in% incoming] <- diag(length(incoming))
-                  SigmaNew <- solve(t(diag(length(topOrder)) - LLnew)) %*% OOnew %*% 
+                  SigmaNew <- solve(t(diag(length(topOrder)) - LLnew)) %*% OOnew %*%
                     solve(diag(length(topOrder)) - LLnew)
-                  
-                  expect_equal(SigmaNew, tianSigmaForComponent(Sigma, internal, incoming, 
-                    topOrder))
+
+                  recoveredSigma = tianSigmaForComponent(Sigma, internal, incoming, topOrder)
+                  expect_true(all((abs(SigmaNew - recoveredSigma) / (abs(SigmaNew) + 1e-6)) < 1e-3))
                 }
-                
+
             }
         }
     }
