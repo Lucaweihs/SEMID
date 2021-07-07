@@ -4,8 +4,13 @@
 \alias{trekSeparationIdentifyStep}
 \title{Perform one iteration of trek separation identification.}
 \usage{
-trekSeparationIdentifyStep(mixedGraph, unsolvedParents, solvedParents,
-  identifier, maxSubsetSize = 3)
+trekSeparationIdentifyStep(
+  mixedGraph,
+  unsolvedParents,
+  solvedParents,
+  identifier,
+  maxSubsetSize = 3
+)
 }
 \arguments{
 \item{mixedGraph}{a \code{\link{MixedGraph}} object representing

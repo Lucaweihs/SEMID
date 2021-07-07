@@ -7,8 +7,13 @@
 \usage{
 htrFrom(this, nodes, ...)
 
-\method{htrFrom}{MixedGraph}(this, nodes, avoidLeftNodes = integer(0),
-  avoidRightNodes = integer(0), ...)
+\method{htrFrom}{MixedGraph}(
+  this,
+  nodes,
+  avoidLeftNodes = integer(0),
+  avoidRightNodes = integer(0),
+  ...
+)
 }
 \arguments{
 \item{this}{the mixed graph object}

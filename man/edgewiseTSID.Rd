@@ -4,8 +4,12 @@
 \alias{edgewiseTSID}
 \title{Determines which edges in a mixed graph are edgewiseID+TS identifiable}
 \usage{
-edgewiseTSID(mixedGraph, tianDecompose = T, subsetSizeControl = 3,
-  maxSubsetSize = 3)
+edgewiseTSID(
+  mixedGraph,
+  tianDecompose = T,
+  subsetSizeControl = 3,
+  maxSubsetSize = 3
+)
 }
 \arguments{
 \item{mixedGraph}{a \code{\link{MixedGraph}} object representing the L-SEM.}

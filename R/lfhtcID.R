@@ -90,7 +90,6 @@ createYZSets <- function(allowedYZPerLatent) {
         for (YZPair in YZPairsRecurse) {
           YZPairsNew[[k]] = list(Y = c(y, YZPair$Y),
                               Z = c(z, YZPair$Z))
-
           k = k + 1
         }
       }
@@ -194,8 +193,9 @@ lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, identifier,
 
     childrenOfLatentParents <-
       lapply(latentParents, FUN = function(x) { graph$children(x) })
-    latentParentHasGeq4Children <- sapply(childrenOfLatentParents,
-                                     FUN = function(x) { length(x) >= 4 })
+    latentParentHasGeq4Children <- vapply(childrenOfLatentParents,
+                                     FUN = function(x) { length(x) >= 4 },
+                                     logical(1))
     latentsToControl <- latentParents[latentParentHasGeq4Children]
 
     for (k in seq(0, length = 1 + min(subsetSizeControl, length(latentsToControl)))) {
@@ -265,4 +265,127 @@ lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, identifier,
               unsolvedParents = unsolvedParents,
               solvedParents = solvedParents,
               identifier = identifier))
+}
+
+
+#' Create an latent identifier base case
+#'
+#' Identifiers are functions that take as input a covariance matrix Sigma
+#' corresponding to some latent digraph G and, from that covariance matrix,
+#' identify some subset of the coefficients in the latent digraph G. This function
+#' takes as input the matrix L defining G and creates an identifier
+#' that does not identify any of the coefficients of G. This is useful as a
+#' base case when building more complex identification functions.
+#'
+#' @export
+#'
+#' @param graph a \code{\link{LatentDigraph}} object representing
+#'         the latent factor graph. All latent nodes in this graph should be
+#'         source nodes (i.e. have no parents).
+#'
+#' @return a function that takes as input a covariance matrix compatible with
+#'         the latent digraph defined by L and returns a list with two
+#'         named components:
+#'         Lambda - a matrix equal to L but with NA values instead of 1s,
+#'         Omega - a matrix equal to O but with NA values for coefficients not equal to zero.
+#'         When building more complex identifiers these NAs will be replaced
+#'         by the value that can be identified from Sigma.
+createLFIdentifierBaseCase <- function(graph) {
+
+  L <- graph$L()
+  observedNodes <- graph$observedNodes()
+  latentNodes <- graph$latentNodes()
+  numObservedNodes <- length(observedNodes)
+  childrenOfLatentNodes <- lapply(latentNodes, graph$children)
+  indicesOmega <- sapply(childrenOfLatentNodes, combn, 2, simplify=FALSE)
+  indicesOmega <- t(do.call(cbind, indicesOmega))
+  indicesOmega <- indicesOmega[!duplicated(indicesOmega),]
+
+  return(function(Sigma) {
+    Lambda <- matrix(NA, numObservedNodes, numObservedNodes)
+    Lambda[L[observedNodes, observedNodes] == 0] <- 0
+    Omega <- matrix(0, numObservedNodes, numObservedNodes)
+    Omega[indicesOmega] <- NA
+    Omega[indicesOmega[,c(2,1)]] <- NA
+    diag(Omega) <- NA
+    return(list(Lambda = Lambda, Omega=Omega))
+  })
+}
+
+
+#' Checks that a LatentDigraph has appropriate node numbering
+#'
+#' Checks that the input latent digraph has nodes numbered from 1
+#' to latentDigraph$numObserved()+latentDigraph$numLatents(). The first latentDigraph$numObserved()
+#' nodes correspond to the observed nodes in the graph, all other nodes are considered unobserved.
+#' Throws an error if this is not true.
+#'
+#' @param graph a \code{\link{LatentDigraph}} object representing
+#'         the latent factor graph. All latent nodes in this graph should be
+#'         source nodes (i.e. have no parents).
+latentDigraphHasSimpleNumbering <- function(graph) {
+  observedNodes <- graph$observedNodes()
+  latentNodes <- graph$latentNodes()
+  if ((any(observedNodes != 1:graph$numObserved())) ||
+      (any(latentNodes != (graph$numObserved()+1):(graph$numObserved()+graph$numLatents())))) {
+    stop(paste("Currently only latent graphs whose vertices are numbered from 1",
+               "to graph$numObserved()+graph$numLatents() in order are supported."))
+  }
+}
+
+
+
+#' Determines which edges in a latent digraph are LF-HTC-identifiable.
+#'
+#' Uses the latent factor half-trek criterion to determine
+#' which edges in a latent digraph are generically identifiable.
+#'
+#' @export
+#'
+#' @param graph a \code{\link{LatentDigraph}} object representing
+#'         the latent factor graph. All latent nodes in this graph should be
+#'         source nodes (i.e. have no parents).
+#'
+#' @return returns a list with 5 components:
+#' \describe{
+#'   \item{\code{solvedParents}}{a list whose ith element contains a vector
+#'   containing the subsets of parents of node i for which the edge j->i could
+#'   be shown to be generically identifiable.}
+#'   \item{\code{unsolvedParents}}{as for \code{solvedParents} but for the
+#'   unsolved parents.}
+#'   \item{\code{identifier}}{a function that takes a (generic) covariance
+#'   matrix corresponding to the graph and identifies the edges parameters
+#'   from solvedParents and solvedSiblings. See \code{\link{htcIdentifyStep}}
+#'   for a more in-depth discussion of identifier functions.}
+#'   \item{\code{graph}}{a latent digraph object of the graph.}
+#'   \item{\code{call}}{the call made to this function.}
+#' }
+#'
+#' @references
+#' TO BE WRITTEN
+lfhtcID <- function(graph){
+
+  # Check the graph
+  latentDigraphHasSimpleNumbering(graph)
+
+  unsolvedParents <- lapply(graph$observedNodes(), graph$observedParents)
+  solvedParents <- rep(list(numeric(0)), length(graph$observedNodes()))
+  identifier <- createLFIdentifierBaseCase(graph)
+
+  changeFlag <- T
+  while (changeFlag) {
+    idResult <- lfhtcIdentifyStep(graph, unsolvedParents, solvedParents, identifier)
+    changeFlag <- (nrow(idResult$identifiedEdges) != 0)
+    unsolvedParents <- idResult$unsolvedParents
+    solvedParents <- idResult$solvedParents
+    identifier <- idResult$identifier
+  }
+
+  result <- list()
+  result$solvedParents <- solvedParents
+  result$unsolvedParents <- unsolvedParents
+  result$identifier <- identifier
+  result$graph <- graph
+  result$call <- match.call()
+  return(result)
 }

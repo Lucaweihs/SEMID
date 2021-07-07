@@ -4,8 +4,14 @@
 \alias{graphID.decompose}
 \title{Determine generic identifiability by Tian Decomposition and HTC}
 \usage{
-graphID.decompose(L, O, decomp.if.acyclic = TRUE, test.globalID = TRUE,
-  test.genericID = TRUE, test.nonID = TRUE)
+graphID.decompose(
+  L,
+  O,
+  decomp.if.acyclic = TRUE,
+  test.globalID = TRUE,
+  test.genericID = TRUE,
+  test.nonID = TRUE
+)
 }
 \arguments{
 \item{L}{Adjacency matrix for the directed part of the path

@@ -26,18 +26,23 @@ An object representing the LatentDigraph
 Creates an object representing a latent factor graph. The methods that are
 currently available to be used on the latent factor graph include
 \enumerate{
-\item ancestors
-\item descendants
-\item parents
-\item trFrom
-\item getTrekSystem
-\item inducedSubgraph
-\item L
-\item observedNodes
-\item latentNodes
 \item numObserved
 \item numLatents
 \item numNodes
+\item toIn
+\item toEx
+\item L
+\item observedNodes
+\item latentNodes
+\item parents
+\item children
+\item ancestors
+\item descendants
+\item trFrom
+\item getTrekSystem
+\item inducedSubgraph
+\item stronglyConnectedComponent
+\item plot
 }
 see the individual function documentation for more information.
 }

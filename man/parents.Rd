@@ -9,11 +9,9 @@
 \usage{
 parents(this, nodes, ...)
 
-\method{parents}{LatentDigraphFixedOrder}(this, nodes,
-  includeObserved = T, includeLatents = T, ...)
+\method{parents}{LatentDigraphFixedOrder}(this, nodes, includeObserved = T, includeLatents = T, ...)
 
-\method{parents}{LatentDigraph}(this, nodes, includeObserved = T,
-  includeLatents = T, ...)
+\method{parents}{LatentDigraph}(this, nodes, includeObserved = T, includeLatents = T, ...)
 
 \method{parents}{MixedGraph}(this, nodes, ...)
 }

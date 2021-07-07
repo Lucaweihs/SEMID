@@ -4,8 +4,14 @@
 \alias{createTrekSeparationIdentifier}
 \title{Create an trek separation identification function}
 \usage{
-createTrekSeparationIdentifier(idFunc, sources, targets, node, parent,
-  solvedParents)
+createTrekSeparationIdentifier(
+  idFunc,
+  sources,
+  targets,
+  node,
+  parent,
+  solvedParents
+)
 }
 \arguments{
 \item{idFunc}{identification of edge coefficients often requires that other

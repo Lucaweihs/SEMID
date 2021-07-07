@@ -4,8 +4,13 @@
 \alias{lfhtcIdentifyStep}
 \title{Perform one iteration of latent factor HTC identification.}
 \usage{
-lfhtcIdentifyStep(graph, unsolvedParents, solvedParents, identifier,
-  subsetSizeControl = Inf)
+lfhtcIdentifyStep(
+  graph,
+  unsolvedParents,
+  solvedParents,
+  identifier,
+  subsetSizeControl = Inf
+)
 }
 \arguments{
 \item{graph}{a \code{\link{LatentDigraph}} object representing

@@ -4,8 +4,13 @@
 \alias{edgewiseIdentifyStep}
 \title{Perform one iteration of edgewise identification.}
 \usage{
-edgewiseIdentifyStep(mixedGraph, unsolvedParents, solvedParents,
-  identifier, subsetSizeControl = Inf)
+edgewiseIdentifyStep(
+  mixedGraph,
+  unsolvedParents,
+  solvedParents,
+  identifier,
+  subsetSizeControl = Inf
+)
 }
 \arguments{
 \item{mixedGraph}{a \code{\link{MixedGraph}} object representing

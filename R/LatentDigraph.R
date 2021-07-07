@@ -55,14 +55,13 @@ validateVarArgsEmpty <- function(...) {
 #' @param numObserved a non-negative integer representing the number of observed
 #'        nodes in the graph.
 #'
-#' @inheritParams graphID
-#'
 #' @return An object representing the LatentDigraphFixedOrder
 setConstructorS3("LatentDigraphFixedOrder", function(L = matrix(0, 1, 1),
                                                      numObserved = nrow(L)) {
   validateMatrix(L)
   numObserved = as.integer(numObserved)
 
+  # Sanity check
   if (length(numObserved) != 1 || numObserved < 0 || numObserved > nrow(L)) {
     stop("numObserved must be a nonnegative integer of size no more than nrow(L).")
   }
@@ -538,25 +537,32 @@ setMethodS3("stronglyConnectedComponent", "LatentDigraphFixedOrder",
 }, appendVarArgs = F)
 
 
-### The LatentDigraph wrapper class
+#######################################
+### The LatentDigraph wrapper class ###
+#######################################
 
 #' Construct a LatentDigraph object
 #'
 #' Creates an object representing a latent factor graph. The methods that are
 #' currently available to be used on the latent factor graph include
 #' \enumerate{
-#' \item ancestors
-#' \item descendants
-#' \item parents
-#' \item trFrom
-#' \item getTrekSystem
-#' \item inducedSubgraph
-#' \item L
-#' \item observedNodes
-#' \item latentNodes
 #' \item numObserved
 #' \item numLatents
 #' \item numNodes
+#' \item toIn
+#' \item toEx
+#' \item L
+#' \item observedNodes
+#' \item latentNodes
+#' \item parents
+#' \item children
+#' \item ancestors
+#' \item descendants
+#' \item trFrom
+#' \item getTrekSystem
+#' \item inducedSubgraph
+#' \item stronglyConnectedComponent
+#' \item plot
 #' }
 #' see the individual function documentation for more information.
 #'
@@ -578,6 +584,7 @@ setMethodS3("stronglyConnectedComponent", "LatentDigraphFixedOrder",
 setConstructorS3("LatentDigraph", function(L = matrix(0, 1, 1),
                                      observedNodes = seq(1, length = nrow(L)),
                                      latentNodes = integer(0)) {
+  # Sanity check
   vertexNums = c(observedNodes, latentNodes)
   if (nrow(L) == 0) {
     vertexNums <- as.integer(NA)
@@ -597,6 +604,7 @@ setConstructorS3("LatentDigraph", function(L = matrix(0, 1, 1),
   }
 
   internalGraph <- LatentDigraphFixedOrder(L, length(observedNodes))
+  # in internalGraph, nodes 1:length(observedNodes) are always the observed nodes
 
   R.oo::extend(
     R.oo::Object(),
@@ -735,7 +743,6 @@ setMethodS3("latentNodes", "LatentDigraph", function(this, ...) {
   return(this$.latentNodes)
 }, appendVarArgs = F)
 
-#' @inheritParams parents.LatentDigraphFixedOrder
 #' @rdname   parents
 #' @name     parents.LatentDigraph
 #' @export
@@ -882,4 +889,24 @@ setMethodS3("stronglyConnectedComponent", "LatentDigraph", function(this, node, 
 #' @export
 setMethodS3("plot", "LatentDigraph", function(x, ...) {
   plotLatentDigraph(x$L(), x$observedNodes(), x$latentNodes())
+}, appendVarArgs = F)
+
+#' Get the observed parents on a collection of nodes
+#'
+#' @name observedParents
+#' @export observedParents
+#'
+#' @param this the graph object
+#' @param nodes the nodes on which to to get the observed parents
+observedParents <- function(this, nodes, ...) {
+  UseMethod("observedParents")
+}
+
+#' @rdname   observedParents
+#' @name     observedParents.LatentDigraph
+#' @export
+setMethodS3("observedParents", "LatentDigraph", function(this, node, ...) {
+  parents = this$parents(node)
+  observedParents <- unique(parents[! parents %in% this$latentNodes()])
+  return(observedParents)
 }, appendVarArgs = F)

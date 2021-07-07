@@ -4,8 +4,13 @@
 \alias{semID}
 \title{Identifiability of linear structural equation models.}
 \usage{
-semID(mixedGraph, testGlobalID = TRUE, testGenericNonID = TRUE,
-  genericIdStepFunctions = list(htcIdentifyStep), tianDecompose = TRUE)
+semID(
+  mixedGraph,
+  testGlobalID = TRUE,
+  testGenericNonID = TRUE,
+  genericIdStepFunctions = list(htcIdentifyStep),
+  tianDecompose = TRUE
+)
 }
 \arguments{
 \item{mixedGraph}{a \code{\link{MixedGraph}} object representing the L-SEM.}
