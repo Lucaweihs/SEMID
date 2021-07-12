@@ -75,6 +75,7 @@ validateLatentNodesAreSources <- function(graph) {
   }
 }
 
+# Helper function for getPossibleYZ()
 createYZSets <- function(allowedYZPerLatent) {
   if (length(allowedYZPerLatent) == 0) {
     return(list(list(Y = integer(0), Z = integer(0))))
@@ -98,6 +99,7 @@ createYZSets <- function(allowedYZPerLatent) {
   return(YZPairsNew[seq(1, length = k - 1)])
 }
 
+# Returns a list of all possible YZ-pairs with |Y| = |Z| <= |L|
 getPossibleYZ <- function(graph, L, allowedForY, allowedForZ) {
   if (length(L) == 0) {
     return(list(list(Y = integer(0), Z = integer(0))))
@@ -168,29 +170,35 @@ getPossibleYZ <- function(graph, L, allowedForY, allowedForZ) {
 #' TO BE WRITTEN
 lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, identifier,
                               subsetSizeControl = Inf) {
+  # Sanity check
   validateLatentNodesAreSources(graph)
+
+  # Variable to store all newly identified edges
   identifiedEdges <- numeric(0)
 
+  # Collect basic infos from graph
   observedNodes <- graph$observedNodes()
   latentNodes <- graph$latentNodes()
   numObserved <- length(observedNodes)
   numLatents <- length(latentNodes)
-
   edgeMat <- graph$L()
   edgesBetweenObserved <- which(edgeMat[seq(1, length = numObserved),
                                         seq(1, length = numObserved), drop = F] == 1,
                                 arr.ind = T)
   edgesBetweenObserved <- matrix(observedNodes[edgesBetweenObserved], ncol = 2)
-
   solvedNodes <- which(sapply(unsolvedParents, FUN = function(x) {
     length(x) == 0
   }))
 
+  # Loop over all unsolved nodes
   for (i in setdiff(observedNodes, solvedNodes)) {
+
+    # Collect basic info of unsolved node i
     allParents <- graph$parents(i)
     latentParents <- intersect(latentNodes, allParents)
     observedParents <- intersect(observedNodes, allParents)
 
+    # Only latent parents of i with >= 4 children may possibly be in L
     childrenOfLatentParents <-
       lapply(latentParents, FUN = function(x) { graph$children(x) })
     latentParentHasGeq4Children <- vapply(childrenOfLatentParents,
@@ -198,27 +206,52 @@ lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, identifier,
                                      logical(1))
     latentsToControl <- latentParents[latentParentHasGeq4Children]
 
+    # Loop over possible cardinalities of the L
     for (k in seq(0, length = 1 + min(subsetSizeControl, length(latentsToControl)))) {
+      # Loop over all subsets L in latentsToControl with cardinality k, i.e. |L| = k
       for (L in subsetsOfSize(latentsToControl, k)) {
-        Lcomp <- setdiff(latentParents, L)
+        Lcomp <- setdiff(latentParents, L)  # All latent parents of i not in L
 
+        # Find set maybeAllowdForY. These are all nodes that are
+        # - not i
+        # - no siblings of i avoiding L (all latent parents of Y that are at the same
+        #                                time latent parents of i have to be in L!)
+        # - solved if half-trek reachable from i avoiding L
         htrFromIAvoidingL <- intersect(observedNodes,
                                   union(graph$descendants(i),
-                                        graph$trFrom(Lcomp)))
+                                        graph$trFrom(Lcomp)))  # trFrom(l) finds all half-treks
+                                                               # starting with i<-l-> ...
         siblingsOfIAvoidingL <- graph$children(Lcomp)
         maybeAllowedForY <- setdiff(observedNodes,
                                c(i, siblingsOfIAvoidingL,
                                  setdiff(htrFromIAvoidingL, solvedNodes)))
+
+        # Each element in Z has to be solved and has to be no parent of i
+        # (Since in this case we would have sided intersection in the system of half-treks)
         allowedForZ <- setdiff(solvedNodes, allParents)
+
+        # All possible YZ-pairs with |Y| = |Z| <= |L|
+        # NOTE: The definition of Y is DIFFERENT than the one in the paper!!!
+        # If k = 0 (i.e. L is empty set), then we only have one YZ-pair: Y and Z both empty
         possibleYZs <- getPossibleYZ(graph, L,
                                     allowedForY = maybeAllowedForY,
                                     allowedForZ = allowedForZ)
+
+        # Loop over all pairs (Y,Z) with |Y| = |Z| = |L| = k
         for (YZ in possibleYZs) {
           Y = YZ$Y
           Z = YZ$Z
+          # Sanity check of Y and Z
           if (length(unique(Y)) == length(Y) &&
               length(unique(Z)) == length(Z) &&
               length(intersect(Y, Z)) == 0) {
+
+            # Find allowed set for Y. This is now possibly since Z (and L) is known.
+            # Consists of all nodes in maybeAllowedForY that are
+            # - not in (Z or i)
+            # - no siblings of (Z or i) avoiding L (all latent parents of Y that are at the same
+            #                                time latent parents of (Z or i) have to be in L!)
+            # - solved if half-trek reachable from (Z or i) avoiding L
             latentParentsOfZandI <- intersect(latentNodes, graph$parents(c(i,Z)))
             latentParentsOfZandINotInL <- setdiff(latentParentsOfZandI, L)
             htrFromZandIAvoidingL <- union(graph$descendants(c(i,Z)),
@@ -228,23 +261,32 @@ lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, identifier,
             allowed <- setdiff(allowed,
                                c(graph$children(latentParentsOfZandINotInL),
                                  Z, i))
+
+            # Sanity check: Maybe we have nodes in Y that are not allowed any more
             if (any(!(Y %in% allowed))) {
               next
             }
 
+            # Check if there is a half-trek system from allowed nodes to pa(i)
+            # - avoid (Y,L) on LHS
+            # - avoid (Z,L) on RHS
+            #   (These two conditions enforce no sided intersection of half-trek system!)
+            # - Avoid starting with "<-" vetween obsrved nodes.
+            #   This forces trek system to be half-trek system.
             trekSystemResults <- graph$getTrekSystem(
               allowed, observedParents,
               avoidLeftNodes = c(Y, L), avoidRightNodes = c(Z, L),
               avoidLeftEdges = edgesBetweenObserved)
 
+            # If half-trek system exists we know that all edges between pa(i) and i are identified
             if (trekSystemResults$systemExists) {
               identifiedEdges <- c(identifiedEdges, as.integer(rbind(observedParents, i)))
               activeFrom <- trekSystemResults$activeFrom
               identifier <- createLFHtcIdentifier(identifier, v = i,
-                                                  Y = c(activeFrom, Y),
+                                                  Y = c(activeFrom, Y),  # This recovers Y from paper
                                                   Z = Z,
                                                   parents = observedParents,
-                                                  reachableY = htrFromZandIAvoidingL)
+                                                  reachableY = htrFromZandIAvoidingL) # half-trek reachable elements of Y are known
               solvedParents[[i]] <- observedParents
               unsolvedParents[[i]] <- integer(0)
               solvedNodes <- c(i, solvedNodes)
