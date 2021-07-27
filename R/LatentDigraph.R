@@ -910,3 +910,43 @@ setMethodS3("observedParents", "LatentDigraph", function(this, node, ...) {
   observedParents <- unique(parents[! parents %in% this$latentNodes()])
   return(observedParents)
 }, appendVarArgs = F)
+
+
+
+
+#' Get the corresponding mixed graph
+#'
+#' @name getMixedGraph
+#' @export getMixedGraph
+#'
+#' @param this the graph object
+getMixedGraph <- function(this, ...) {
+  UseMethod("getMixedGraph")
+}
+
+#' @rdname   getMixedGraph
+#' @name     getMixedGraph.LatentDigraph
+#' @export
+setMethodS3("getMixedGraph", "LatentDigraph", function(this, ...) {
+
+  # Remove observed edges
+  latentL <- this$.L
+  latentL[this$.observedNodes, this$.observedNodes] <- 0
+
+  latentGraph <-  LatentDigraph(latentL, this$.observedNodes, this$.latentNodes)
+  reachableByLatentTrek = lapply(this$.observedNodes, latentGraph$trFrom, includeLatents = FALSE)
+
+  O = matrix(0, length(this$.observedNodes), length(this$.observedNodes))
+  for (i in 1:length(this$.observedNodes)){
+    for (j in 1:length(reachableByLatentTrek[[i]])){
+      O[this$.observedNodes[i],reachableByLatentTrek[[i]][j]] <- 1
+    }
+  }
+  diag(O) <- 0
+
+
+  return(MixedGraph(this$.L[this$.observedNodes, this$.observedNodes], O))
+}, appendVarArgs = F)
+
+
+
