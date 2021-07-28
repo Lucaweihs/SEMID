@@ -13,7 +13,7 @@ source nodes (i.e. have no parents).}
 }
 \description{
 Checks that the input latent digraph has nodes numbered from 1
-to latentDigraph$numNodes(). The first latentDigraph$numObserved()
+to latentDigraph$numObserved()+latentDigraph$numLatents(). The first latentDigraph$numObserved()
 nodes correspond to the observed nodes in the graph, all other nodes are considered unobserved.
 Throws an error if this is not true.
 }

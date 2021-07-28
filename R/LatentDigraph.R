@@ -563,6 +563,7 @@ setMethodS3("stronglyConnectedComponent", "LatentDigraphFixedOrder",
 #' \item inducedSubgraph
 #' \item stronglyConnectedComponent
 #' \item plot
+#' \item getMixedGraph
 #' }
 #' see the individual function documentation for more information.
 #'
