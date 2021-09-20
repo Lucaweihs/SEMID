@@ -168,7 +168,7 @@ getPossibleYZ <- function(graph, L, allowedForY, allowedForZ) {
 #'
 #' @references
 #' TO BE WRITTEN
-lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, identifier,
+lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, activeFrom, Zs, Ls, identifier,
                               subsetSizeControl = Inf) {
   # Sanity check
   validateLatentNodesAreSources(graph)
@@ -289,6 +289,9 @@ lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, identifier,
                                                   reachableY = htrFromZandIAvoidingL) # half-trek reachable elements of Y are known
               solvedParents[[i]] <- observedParents
               unsolvedParents[[i]] <- integer(0)
+              activeFrom[[i]] <- c(activeFrom, Y)
+              Zs[[i]] <- Z
+              Ls[[i]] <- L
               solvedNodes <- c(i, solvedNodes)
               break
             }
@@ -306,6 +309,9 @@ lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, identifier,
   return(list(identifiedEdges = matrix(identifiedEdges, byrow = T, ncol = 2),
               unsolvedParents = unsolvedParents,
               solvedParents = solvedParents,
+              activeFrom = activeFrom,
+              Zs = Zs,
+              Ls = Ls,
               identifier = identifier))
 }
 
@@ -412,14 +418,20 @@ lfhtcID <- function(graph){
 
   unsolvedParents <- lapply(graph$observedNodes(), graph$observedParents)
   solvedParents <- rep(list(numeric(0)), length(graph$observedNodes()))
+  activeFrom <- rep(list(numeric(0)), length(graph$observedNodes()))
+  Zs <- rep(list(numeric(0)), length(graph$observedNodes()))
+  Ls <- rep(list(numeric(0)), length(graph$observedNodes()))
   identifier <- createLFIdentifierBaseCase(graph)
 
   changeFlag <- T
   while (changeFlag) {
-    idResult <- lfhtcIdentifyStep(graph, unsolvedParents, solvedParents, identifier)
+    idResult <- lfhtcIdentifyStep(graph, unsolvedParents, solvedParents, activeFrom, Zs, Ls, identifier)
     changeFlag <- (nrow(idResult$identifiedEdges) != 0)
     unsolvedParents <- idResult$unsolvedParents
     solvedParents <- idResult$solvedParents
+    activeFrom <- idResult$activeFrom
+    Zs <- idResult$Zs
+    Ls <- idResult$Ls
     identifier <- idResult$identifier
   }
 
@@ -428,6 +440,9 @@ lfhtcID <- function(graph){
   result$unsolvedParents <- unsolvedParents
   result$identifier <- identifier
   result$graph <- graph
+  result$activeFrom <- activeFrom
+  result$Zs <- Zs
+  result$Ls <- Ls
   result$call <- match.call()
   return(result)
 }
