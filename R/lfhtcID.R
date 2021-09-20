@@ -425,7 +425,7 @@ lfhtcID <- function(graph){
 
   changeFlag <- T
   while (changeFlag) {
-    idResult <- lfhtcIdentifyStep(graph, unsolvedParents, solvedParents, activeFrom, Zs, Ls, identifier)
+    idResult <- lfhtcIdentifyStep(graph, unsolvedParents, solvedParents, activeFroms, Zs, Ls, identifier)
     changeFlag <- (nrow(idResult$identifiedEdges) != 0)
     unsolvedParents <- idResult$unsolvedParents
     solvedParents <- idResult$solvedParents
