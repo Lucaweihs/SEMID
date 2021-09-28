@@ -8,6 +8,9 @@ lfhtcIdentifyStep(
   graph,
   unsolvedParents,
   solvedParents,
+  activeFroms,
+  Zs,
+  Ls,
   identifier,
   subsetSizeControl = Inf
 )

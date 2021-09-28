@@ -436,6 +436,7 @@ lfhtcID <- function(graph){
   }
 
   result <- list()
+  class(result) <- "LfhtcIDResult"
   result$solvedParents <- solvedParents
   result$unsolvedParents <- unsolvedParents
   result$identifier <- identifier
@@ -444,5 +445,88 @@ lfhtcID <- function(graph){
   result$Zs <- Zs
   result$Ls <- Ls
   result$call <- match.call()
+  result$LatentDigraph <- graph
   return(result)
 }
+
+
+
+
+
+
+#' Prints a LfhtcIDResult object
+#'
+#' Prints a LfhtcIDResult object as returned by
+#' \code{\link{lfhtcID}}. Invisibly returns its argument via
+#' \code{\link{invisible}(x)} as most print functions do.
+#'
+#' @export
+#'
+#' @param x the LfhtcIDResult object
+#' @param ... optional parameters, currently unused.
+print.LfhtcIDResult <- function(x, ...) {
+  cat("Call: ")
+  print(x$call)
+
+  observedNodes <- x$LatentDigraph$observedNodes()
+  nObserved <- length(observedNodes)
+  latentNodes <- x$LatentDigraph$latentNodes()
+  nLatent <- length(latentNodes)
+  solvedParents <- x$solvedParents
+
+  cat(paste("\nLatent Digraph Info\n"))
+  cat(paste("# observed nodes:", nObserved, "\n"))
+  cat(paste("# latent nodes:", nLatent, "\n"))
+  cat(paste("# total nr. of edges between observed nodes:", sum(x$LatentDigraph$L()[observedNodes,]), "\n"))
+
+  cat(paste("\nGeneric Identifiability Summary\n"))
+  cat(paste("# nr. of edges between observed nodes shown gen. identifiable:", length(unlist(solvedParents)),
+            "\n"))
+
+  cat("# gen. identifiable edges: ")
+  edges <- character(min(length(unlist(solvedParents))/2, 11))
+  k <- 0
+  for (i in 1:nObserved) {
+    if (length(solvedParents[[i]]) != 0) {
+      for (j in solvedParents[[i]]) {
+        k <- k + 1
+        edges[k] <- paste(j, "->", i, sep = "")
+
+        if (k == 10) {
+          edges[11] <- "..."
+          break
+        }
+      }
+      if (k == 10) {
+        break
+      }
+    }
+  }
+  if (length(edges) == 0) {
+    cat("None\n")
+  } else {
+    cat(paste(paste(edges, collapse = ", "), "\n"))
+  }
+
+  invisible(x)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
