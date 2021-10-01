@@ -190,6 +190,13 @@ lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, activeFroms
     length(x) == 0
   }))
 
+  # Only latent nodes with >=  children may be possibly in L
+  childrenOfLatentNodes <- lapply(latentNodes, FUN = function(x) { graph$children(x) })
+  latentNodeHasGeq4Children <- vapply(childrenOfLatentNodes,
+                                        FUN = function(x) { length(x) >= 4 },
+                                        logical(1))
+  latentsToControl <- latentNodes[latentNodeHasGeq4Children]
+
   # Loop over all unsolved nodes
   for (i in setdiff(observedNodes, solvedNodes)) {
 
@@ -198,19 +205,19 @@ lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, activeFroms
     latentParents <- intersect(latentNodes, allParents)
     observedParents <- intersect(observedNodes, allParents)
 
-    # Only latent parents of i with >= 4 children may possibly be in L
-    childrenOfLatentParents <-
-      lapply(latentParents, FUN = function(x) { graph$children(x) })
-    latentParentHasGeq4Children <- vapply(childrenOfLatentParents,
-                                     FUN = function(x) { length(x) >= 4 },
-                                     logical(1))
-    latentsToControl <- latentParents[latentParentHasGeq4Children]
+    # # Only latent parents of i with >= 4 children may possibly be in L
+    # childrenOfLatentParents <-
+    #   lapply(latentParents, FUN = function(x) { graph$children(x) })
+    # latentParentHasGeq4Children <- vapply(childrenOfLatentParents,
+    #                                  FUN = function(x) { length(x) >= 4 },
+    #                                  logical(1))
+    # latentsToControl <- latentParents[latentParentHasGeq4Children]
 
     # Loop over possible cardinalities of the L
     for (k in seq(0, length = 1 + min(subsetSizeControl, length(latentsToControl)))) {
       # Loop over all subsets L in latentsToControl with cardinality k, i.e. |L| = k
       for (L in subsetsOfSize(latentsToControl, k)) {
-        Lcomp <- setdiff(latentParents, L)  # All latent parents of i not in L
+        Lcomp <- setdiff(latentParents, L)  # All latent nodes of i not in L
 
         # Find set maybeAllowdForY. These are all nodes that are
         # - not i
