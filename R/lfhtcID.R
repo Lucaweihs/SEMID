@@ -323,6 +323,121 @@ lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, activeFroms
 }
 
 
+
+
+lfhtcIdentifyStep2 <- function(graph, unsolvedParents, solvedParents, activeFroms, Zs, Ls, identifier,
+                              subsetSizeControl = Inf) {
+  # Sanity check
+  validateLatentNodesAreSources(graph)
+
+  # Variable to store all newly identified edges
+  identifiedEdges <- numeric(0)
+
+  # Collect basic infos from graph
+  observedNodes <- graph$observedNodes()
+  latentNodes <- graph$latentNodes()
+  numObserved <- length(observedNodes)
+  numLatents <- length(latentNodes)
+  edgeMat <- graph$L()
+  edgesBetweenObserved <- which(edgeMat[seq(1, length = numObserved),
+                                        seq(1, length = numObserved), drop = F] == 1,
+                                arr.ind = T)
+  edgesBetweenObserved <- matrix(observedNodes[edgesBetweenObserved], ncol = 2)
+  solvedNodes <- which(sapply(unsolvedParents, FUN = function(x) {
+    length(x) == 0
+  }))
+
+  # Only latent nodes with >=  children may be possibly in L
+  childrenOfLatentNodes <- lapply(latentNodes, FUN = function(x) { graph$children(x) })
+  latentNodeHasGeq4Children <- vapply(childrenOfLatentNodes,
+                                      FUN = function(x) { length(x) >= 4 },
+                                      logical(1))
+  latentsToControl <- latentNodes[latentNodeHasGeq4Children]
+
+  # Loop over all unsolved nodes
+  for (i in setdiff(observedNodes, solvedNodes)) {
+
+    # Collect basic info of unsolved node i
+    allParents <- graph$parents(i)
+    latentParents <- intersect(latentNodes, allParents)
+    observedParents <- intersect(observedNodes, allParents)
+
+    # Loop over possible cardinalities of the L
+    for (k in seq(0, length = 1 + min(subsetSizeControl, length(latentsToControl)))) {
+
+      # Loop over all subsets L in latentsToControl with cardinality k, i.e. |L| = k
+      for (L in subsetsOfSize(latentsToControl, k)) {
+
+        # Allowed nodes for Z
+        childrenOfL = graph$children(L)
+        allowedForZ <- setdiff(intersect(solvedNodes,childrenOfL), c(i, observedParents))
+
+        for (Z in subsetsOfSize(allowedForZ, k)) {
+
+          # Allowed set for Y. This is now possibly since Z and L is known.
+          # Consists of all nodes in maybeAllowedForY that are
+          # - not in (Z or i)
+          # - no siblings of (Z or i) avoiding L (all latent parents of Y that are at the same
+          #                                time latent parents of (Z or i) have to be in L!)
+          # - solved if half-trek reachable from (Z or i) avoiding L
+          latentParentsOfZandI <- intersect(latentNodes, graph$parents(c(i,Z)))
+          latentParentsOfZandINotInL <- setdiff(latentParentsOfZandI, L)
+          htrFromZandIAvoidingL <- union(graph$descendants(c(i,Z)),
+                                         graph$trFrom(latentParentsOfZandINotInL))
+          allowed <- setdiff(observedNodes,
+                             setdiff(htrFromZandIAvoidingL, solvedNodes))
+          allowed <- setdiff(allowed,
+                             c(graph$children(latentParentsOfZandINotInL),
+                               Z, i))
+
+          # Check if there is a half-trek system from allowed nodes to the observed parents pa(i) and Z
+          # Avoid starting with edge between two observed nodes.
+          # Avoid ending a half-trek in Z with an observed edge.
+          # This forces trek system to be half-trek system of correct form.
+          avoidRightEdges <- matrix(edgesBetweenObserved[is.element(edgesBetweenObserved[,2], Z),], ncol=2)
+          trekSystemResults <- graph$getTrekSystem(
+            allowed, c(observedParents, Z),
+            avoidLeftEdges = edgesBetweenObserved, avoidRightEdges = avoidRightEdges)
+
+          # If half-trek system exists we know that all edges between pa(i) and i are identified
+          if (trekSystemResults$systemExists) {
+            identifiedEdges <- c(identifiedEdges, as.integer(rbind(observedParents, i)))
+            Y <- trekSystemResults$activeFrom
+            identifier <- createLFHtcIdentifier(identifier, v = i,
+                                                Y = Y,
+                                                Z = Z,
+                                                parents = observedParents,
+                                                reachableY = htrFromZandIAvoidingL) # half-trek reachable elements of Y are known
+            solvedParents[[i]] <- observedParents
+            unsolvedParents[[i]] <- integer(0)
+            activeFroms[[i]] <- Y
+            Zs[[i]] <- Z
+            Ls[[i]] <- L
+            solvedNodes <- c(i, solvedNodes)
+            break
+          }
+        }
+      }
+      if (i %in% solvedNodes) {
+        break
+      }
+    }
+    if (i %in% solvedNodes) {
+      break
+    }
+  }
+  return(list(identifiedEdges = matrix(identifiedEdges, byrow = T, ncol = 2),
+              unsolvedParents = unsolvedParents,
+              solvedParents = solvedParents,
+              activeFroms = activeFroms,
+              Zs = Zs,
+              Ls = Ls,
+              identifier = identifier))
+}
+
+
+
+
 #' Create an latent identifier base case
 #'
 #' Identifiers are functions that take as input a covariance matrix Sigma
@@ -418,7 +533,7 @@ latentDigraphHasSimpleNumbering <- function(graph) {
 #'
 #' @references
 #' TO BE WRITTEN
-lfhtcID <- function(graph){
+lfhtcID <- function(graph, version=1){
 
   # Check the graph
   latentDigraphHasSimpleNumbering(graph)
@@ -432,7 +547,12 @@ lfhtcID <- function(graph){
 
   changeFlag <- T
   while (changeFlag) {
-    idResult <- lfhtcIdentifyStep(graph, unsolvedParents, solvedParents, activeFroms, Zs, Ls, identifier)
+    if (version==1){
+      idResult <- lfhtcIdentifyStep(graph, unsolvedParents, solvedParents, activeFroms, Zs, Ls, identifier)
+    }
+    else {
+      idResult <- lfhtcIdentifyStep2(graph, unsolvedParents, solvedParents, activeFroms, Zs, Ls, identifier)
+    }
     changeFlag <- (nrow(idResult$identifiedEdges) != 0)
     unsolvedParents <- idResult$unsolvedParents
     solvedParents <- idResult$solvedParents
