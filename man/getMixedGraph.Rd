@@ -11,6 +11,8 @@ getMixedGraph(this, ...)
 }
 \arguments{
 \item{this}{the graph object}
+
+\item{...}{ignored}
 }
 \description{
 Only works for graphs where the latent nodes are source nodes

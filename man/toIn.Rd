@@ -16,6 +16,8 @@ toIn(this, nodes, ...)
 \item{this}{the graph object}
 
 \item{nodes}{the nodes to transform}
+
+\item{...}{ignored}
 }
 \description{
 Transforms a vector of given node indices into their internal numbering

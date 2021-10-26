@@ -21,6 +21,10 @@ htrFrom(this, nodes, ...)
 \item{nodes}{the nodes from which to get all half-trek reachable nodes.}
 
 \item{...}{ignored.}
+
+\item{avoidLeftNodes}{a collection of nodes to avoid on the left}
+
+\item{avoidRightNodes}{a collection of nodes to avoid on the right}
 }
 \value{
 a vector of all nodes half-trek reachable from node.

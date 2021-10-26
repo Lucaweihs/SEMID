@@ -57,6 +57,8 @@ hand side of any trek in the trek system.}
 \item{avoidRightEdges}{a collection of edges between observed noes
 in the graph that should not be used on any right
 hand side of any trek in the trek system.}
+
+\item{...}{ignored}
 }
 \description{
 Determines if a trek system exists in the mixed graph.

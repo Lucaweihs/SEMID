@@ -11,14 +11,15 @@
 #'        function that produces all such identifications. The newly created
 #'        identifier function will return these identifications along with its
 #'        own.
-#' @param sources the sources of the half-trek system.
-#' @param targets the targets of the half-trek system (these should be the
-#'        parents of node).
-#' @param node the node for which all incoming edges are to be identified
+#' @param v the node for which all incoming edges are to be identified
 #'        (the tails of which are targets).
-#' @param htrSources the nodes in sources which are half-trek reachable from
-#'        node. All incoming edges to these sources should be identified by
-#'        idFunc for the newly created identification function to work.
+#' @param Y the sources of the latent-factor half-trek system.
+#' @param Z the nodes that a reached from Y via an latent-factor half-trek of the form
+#'        \code{y <- h -> z} where \code{h} is an element of L.
+#' @param parents the parents of node v.
+#' @param reachableY the nodes in Y which are latent-factor half-trek reachable
+#'        from Z or v  by avoiding the nodes in L. All incoming edges to these
+#'        nodes should be identified by idFunc the newly created identification function to work.
 #'
 #' @return an identification function
 #'

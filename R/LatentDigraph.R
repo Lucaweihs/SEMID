@@ -121,6 +121,7 @@ setMethodS3("numNodes", "LatentDigraphFixedOrder", function(this, ...) {
 #' @export numObserved
 #'
 #' @param this the graph object
+#' @param ... ignored
 #'
 numObserved <- function(this, ...) {
   UseMethod("numObserved")
@@ -140,6 +141,7 @@ setMethodS3("numObserved", "LatentDigraphFixedOrder", function(this, ...) {
 #' @export numLatents
 #'
 #' @param this the graph object
+#' @param ... ignored
 #'
 numLatents <- function(this, ...) {
   UseMethod("numLatents")
@@ -305,6 +307,7 @@ setMethodS3("descendants", "LatentDigraphFixedOrder", function(this, nodes,
 #' @export createTrGraph
 #'
 #' @param this the graph object
+#' @param ... ignored
 createTrGraph <- function(this, ...) {
   UseMethod("createTrGraph")
 }
@@ -390,6 +393,7 @@ setMethodS3("trFrom", "LatentDigraphFixedOrder", function(this, nodes,
 #' @export createTrekFlowGraph
 #'
 #' @param this the graph object
+#' @param ... ignored
 createTrekFlowGraph <- function(this, ...) {
   UseMethod("createTrekFlowGraph")
 }
@@ -426,6 +430,7 @@ setMethodS3("createTrekFlowGraph", "LatentDigraphFixedOrder", function(this, ...
 #' @param avoidRightEdges a collection of edges between observed noes
 #'                          in the graph that should not be used on any right
 #'                          hand side of any trek in the trek system.
+#' @param ... ignored
 getTrekSystem <-
   function(this, fromNodes, toNodes,
            avoidLeftNodes = integer(0),
@@ -591,7 +596,7 @@ setConstructorS3("LatentDigraph", function(L = matrix(0, 1, 1),
   if (nrow(L) == 0) {
     vertexNums <- as.integer(NA)
     vertexNumsToInternal <- as.integer(NA)
-  } else if (vertexNums %% 1 != 0 || any(vertexNums < 1) ||
+  } else if (any(vertexNums %% 1 != 0) || any(vertexNums < 1) ||
              length(unique(vertexNums)) != length(vertexNums) ||
              length(vertexNums) != nrow(L)) {
     stop(
@@ -651,6 +656,7 @@ setMethodS3("numNodes", "LatentDigraph", function(this, ...) {
 #'
 #' @param this the graph object
 #' @param nodes the nodes to transform
+#' @param ... ignored
 toIn <- function(this, nodes, ...) {
   UseMethod("toIn")
 }
@@ -680,6 +686,7 @@ setMethodS3("toIn", "LatentDigraph", function(this, nodes, ...) {
 #'
 #' @param this the graph object
 #' @param nodes the nodes to transform
+#' @param ... ignored
 toEx <- function(this, nodes, ...) {
   UseMethod("toEx")
 }
@@ -715,6 +722,7 @@ setMethodS3("L", "LatentDigraph", function(this, ...) {
 #' @export observedNodes
 #'
 #' @param this the graph object
+#' @param ... ignored
 observedNodes <- function(this, ...) {
   UseMethod("observedNodes")
 }
@@ -733,6 +741,7 @@ setMethodS3("observedNodes", "LatentDigraph", function(this, ...) {
 #' @export latentNodes
 #'
 #' @param this the graph object
+#' @param ... ignored
 latentNodes <- function(this, ...) {
   UseMethod("latentNodes")
 }
@@ -900,6 +909,7 @@ setMethodS3("plot", "LatentDigraph", function(x, ...) {
 #'
 #' @param this the graph object
 #' @param nodes the nodes on which to get the observed parents
+#' @param ... ignored
 observedParents <- function(this, nodes, ...) {
   UseMethod("observedParents")
 }
@@ -907,8 +917,8 @@ observedParents <- function(this, nodes, ...) {
 #' @rdname   observedParents
 #' @name     observedParents.LatentDigraph
 #' @export
-setMethodS3("observedParents", "LatentDigraph", function(this, node, ...) {
-  parents = this$parents(node)
+setMethodS3("observedParents", "LatentDigraph", function(this, nodes, ...) {
+  parents = this$parents(nodes)
   observedParents <- unique(parents[! parents %in% this$latentNodes()])
   return(observedParents)
 }, appendVarArgs = F)
@@ -924,6 +934,7 @@ setMethodS3("observedParents", "LatentDigraph", function(this, node, ...) {
 #' @export getMixedGraph
 #'
 #' @param this the graph object
+#' @param ... ignored
 getMixedGraph <- function(this, ...) {
   UseMethod("getMixedGraph")
 }

@@ -7,12 +7,14 @@
 \usage{
 observedParents(this, nodes, ...)
 
-\method{observedParents}{LatentDigraph}(this, node, ...)
+\method{observedParents}{LatentDigraph}(this, nodes, ...)
 }
 \arguments{
 \item{this}{the graph object}
 
 \item{nodes}{the nodes on which to get the observed parents}
+
+\item{...}{ignored}
 }
 \description{
 Get the observed parents on a collection of nodes

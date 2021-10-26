@@ -24,8 +24,7 @@
 #' see the individual function documentation for more information.
 #'
 #' @name MixedGraph
-#' @usage MixedGraph(L = matrix(0,1,1), O = matrix(0,1,1),
-#'                   vertexNums = seq(1, length = nrow(L))
+#'
 #' @export MixedGraph
 #'
 #' @param L see \code{\link{graphID}} for the appropriate form of L.
@@ -178,7 +177,7 @@ setMethodS3("parents", "MixedGraph", function(this, nodes, ...) {
 }, appendVarArgs = F)
 
 #' @rdname   children
-#' @name     parents.MixedGraph
+#' @name     children.MixedGraph
 #' @param ... ignored.
 #' @export
 setMethodS3("children", "MixedGraph", function(this, nodes, ...) {
@@ -207,6 +206,8 @@ setMethodS3("descendants", "MixedGraph", function(this, nodes, ...) {
 #' @export htrFrom
 #' @param this the mixed graph object
 #' @param nodes the nodes from which to get all half-trek reachable nodes.
+#' @param avoidLeftNodes a collection of nodes to avoid on the left
+#' @param avoidRightNodes a collection of nodes to avoid on the right
 #' @param ... ignored.
 #' @return a vector of all nodes half-trek reachable from node.
 htrFrom <- function(this, nodes, ...) {

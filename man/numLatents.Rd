@@ -14,6 +14,8 @@ numLatents(this, ...)
 }
 \arguments{
 \item{this}{the graph object}
+
+\item{...}{ignored}
 }
 \description{
 Number of latent nodes in the graph.

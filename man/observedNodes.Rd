@@ -11,6 +11,8 @@ observedNodes(this, ...)
 }
 \arguments{
 \item{this}{the graph object}
+
+\item{...}{ignored}
 }
 \description{
 Get all observed nodes in the graph.
