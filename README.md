@@ -307,7 +307,7 @@ TO BE WRITTEN propose a sufficient criterion to check generic identifiability in
 > # Plot the latent digraph
 > plot(g)
 ```
-The algorithm in TO BE WRITTEN that checks generic identifiability via the latent-factor half.trek criterion is implemented in `lfhtcID`.
+The algorithm in TO BE WRITTEN checks generic identifiability via the latent-factor half-trek criterion. It is applicable to all graphs where the latent nodes are source nodes. The algorithm is implemented in `lfhtcID`.
 ```
 > lfhtcID(g)
 Call: lfhtcID(graph = g)
