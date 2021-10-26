@@ -13,5 +13,5 @@ getMixedGraph(this, ...)
 \item{this}{the graph object}
 }
 \description{
-Get the corresponding mixed graph
+Only works for graphs where the latent nodes are source nodes
 }

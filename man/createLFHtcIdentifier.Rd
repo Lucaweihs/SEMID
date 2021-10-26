@@ -2,7 +2,7 @@
 % Please edit documentation in R/lfhtcID.R
 \name{createLFHtcIdentifier}
 \alias{createLFHtcIdentifier}
-\title{Create an latent factor half-trek critierion identification function.}
+\title{Create a latent factor half-trek critierion identification function.}
 \usage{
 createLFHtcIdentifier(idFunc, v, Y, Z, parents, reachableY)
 }

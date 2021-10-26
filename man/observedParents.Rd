@@ -12,7 +12,7 @@ observedParents(this, nodes, ...)
 \arguments{
 \item{this}{the graph object}
 
-\item{nodes}{the nodes on which to to get the observed parents}
+\item{nodes}{the nodes on which to get the observed parents}
 }
 \description{
 Get the observed parents on a collection of nodes

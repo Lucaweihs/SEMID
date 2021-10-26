@@ -1,8 +1,10 @@
-#' Create an latent factor half-trek critierion identification function.
+#' Create a latent factor half-trek critierion identification function.
 #'
 #' A helper function for \code{\link{lfhtcIdentifyStep}}, creates an identifier
 #' function based on its given parameters. This created identifier function will
 #' identify the directed edges from 'targets' to 'node.'
+#'
+#' @export
 #'
 #' @param idFunc identification of edge coefficients often requires that other
 #'        edge coefficients already be identified. This argument should be a
@@ -62,9 +64,12 @@ createLFHtcIdentifier <- function(idFunc, v, Y, Z, parents, reachableY) {
   })
 }
 
+
 #' A helper function to validate that latent nodes in a LatentDigraph are sources.
 #'
-#' Produces an error not all latent nodes are sources.
+#' Produces an error if not all latent nodes are sources.
+#'
+#' @export
 #'
 #' @param graph the LatentDigraph
 validateLatentNodesAreSources <- function(graph) {
@@ -75,43 +80,7 @@ validateLatentNodesAreSources <- function(graph) {
   }
 }
 
-# Helper function for getPossibleYZ()
-createYZSets <- function(allowedYZPerLatent) {
-  if (length(allowedYZPerLatent) == 0) {
-    return(list(list(Y = integer(0), Z = integer(0))))
-  }
-  Y <- allowedYZPerLatent[[1]]$Y
-  Z <- allowedYZPerLatent[[1]]$Z
-  YZPairsRecurse <- createYZSets(allowedYZPerLatent[-1])
-  YZPairsNew = vector("list", length(Y) * length(Z) * length(YZPairsRecurse))
-  k = 1
-  for (y in Y) {
-    for (z in Z) {
-      if (y != z) {
-        for (YZPair in YZPairsRecurse) {
-          YZPairsNew[[k]] = list(Y = c(y, YZPair$Y),
-                              Z = c(z, YZPair$Z))
-          k = k + 1
-        }
-      }
-    }
-  }
-  return(YZPairsNew[seq(1, length = k - 1)])
-}
 
-# Returns a list of all possible YZ-pairs with |Y| = |Z| <= |L|
-getPossibleYZ <- function(graph, L, allowedForY, allowedForZ) {
-  if (length(L) == 0) {
-    return(list(list(Y = integer(0), Z = integer(0))))
-  }
-  allowedYZPerLatent = vector("list", length = length(L))
-  for (i in 1:length(L)) {
-    children = graph$children(L[i])
-    allowedYZPerLatent[[i]] = list(Y = intersect(allowedForY, children),
-                                   Z = intersect(allowedForZ, children))
-  }
-  return(createYZSets(allowedYZPerLatent))
-}
 
 #' Perform one iteration of latent factor HTC identification.
 #'
@@ -133,21 +102,12 @@ getPossibleYZ <- function(graph, L, allowedForY, allowedForZ) {
 #'        \code{identifier} should be a function taking a single argument Sigma
 #'        (any generically generated covariance matrix corresponding
 #'        to the latent factor graph) and returns a list with two named arguments
-#' \describe{
-#'   \item{Lambda}{denote the number of nodes in \code{graph} as n. Then
-#'                 Lambda is an nxn matrix whose i,jth entry
-#' \enumerate{
-#'   \item equals 0 if i is not a parent of j,
-#'   \item equals NA if i is a parent of j but \code{identifier} cannot
-#'         identify it generically,
-#'   \item equals the (generically) unique value corresponding to the weight
-#'         along the edge i->j that was used to produce Sigma.
-#' }}
-#'   \item{Omega}{just as Lambda but for the error covariance matrix for the
-#'                latent factor graph.}
-#' }
-#'        such that if j is in \code{solvedParents[[i]]} we must have that
-#'        Lambda[j,i] is not NA.
+#' @param activeFroms list. If node i is solved then the ith index is a vector
+#'        containing the nodes Y otherwise it is empty.
+#' @param Zs list. If node i is solved then the ith index is a vector
+#'        containing the nodes Z otherwise it is empty.
+#' @param Ls list. If node i is solved then the ith index is a vector
+#'        containing the nodes Z otherwise it is empty.
 #' @param subsetSizeControl the largest subset of latent nodes to consider.
 #'
 #' @return a list with four components:
@@ -162,6 +122,12 @@ getPossibleYZ <- function(graph, L, allowedForY, allowedForZ) {
 #'   any newly identified edges}
 #'   \item{\code{identifier}}{as the input argument but updated with
 #'   any newly identified edges}
+#'   \item{\code{activeFroms}}{as the input argument but updated with
+#'   any newly solved node}
+#'   \item{\code{Zs}}{as the input argument but updated with
+#'   any newly solved node}
+#'   \item{\code{Ls}}{as the input argument but updated with
+#'   any newly solved node}
 #' }
 #'
 #' @export
@@ -180,164 +146,6 @@ lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, activeFroms
   observedNodes <- graph$observedNodes()
   latentNodes <- graph$latentNodes()
   numObserved <- length(observedNodes)
-  numLatents <- length(latentNodes)
-  edgeMat <- graph$L()
-  edgesBetweenObserved <- which(edgeMat[seq(1, length = numObserved),
-                                        seq(1, length = numObserved), drop = F] == 1,
-                                arr.ind = T)
-  edgesBetweenObserved <- matrix(observedNodes[edgesBetweenObserved], ncol = 2)
-  solvedNodes <- which(sapply(unsolvedParents, FUN = function(x) {
-    length(x) == 0
-  }))
-
-  # Only latent nodes with >=  children may be possibly in L
-  childrenOfLatentNodes <- lapply(latentNodes, FUN = function(x) { graph$children(x) })
-  latentNodeHasGeq4Children <- vapply(childrenOfLatentNodes,
-                                        FUN = function(x) { length(x) >= 4 },
-                                        logical(1))
-  latentsToControl <- latentNodes[latentNodeHasGeq4Children]
-
-  # Loop over all unsolved nodes
-  for (i in setdiff(observedNodes, solvedNodes)) {
-
-    # Collect basic info of unsolved node i
-    allParents <- graph$parents(i)
-    latentParents <- intersect(latentNodes, allParents)
-    observedParents <- intersect(observedNodes, allParents)
-
-    # # Only latent parents of i with >= 4 children may possibly be in L
-    # childrenOfLatentParents <-
-    #   lapply(latentParents, FUN = function(x) { graph$children(x) })
-    # latentParentHasGeq4Children <- vapply(childrenOfLatentParents,
-    #                                  FUN = function(x) { length(x) >= 4 },
-    #                                  logical(1))
-    # latentsToControl <- latentParents[latentParentHasGeq4Children]
-
-    # Loop over possible cardinalities of the L
-    for (k in seq(0, length = 1 + min(subsetSizeControl, length(latentsToControl)))) {
-      # Loop over all subsets L in latentsToControl with cardinality k, i.e. |L| = k
-      for (L in subsetsOfSize(latentsToControl, k)) {
-        Lcomp <- setdiff(latentParents, L)  # All latent nodes of i not in L
-
-        # Find set maybeAllowdForY. These are all nodes that are
-        # - not i
-        # - no siblings of i avoiding L (all latent parents of Y that are at the same
-        #                                time latent parents of i have to be in L!)
-        # - solved if half-trek reachable from i avoiding L
-        htrFromIAvoidingL <- intersect(observedNodes,
-                                  union(graph$descendants(i),
-                                        graph$trFrom(Lcomp)))  # trFrom(l) finds all half-treks
-                                                               # starting with i<-l-> ...
-        siblingsOfIAvoidingL <- graph$children(Lcomp)
-        maybeAllowedForY <- setdiff(observedNodes,
-                               c(i, siblingsOfIAvoidingL,
-                                 setdiff(htrFromIAvoidingL, solvedNodes)))
-
-        # Each element in Z has to be solved and has to be no parent of i
-        # (Since in this case we would have sided intersection in the system of half-treks)
-        allowedForZ <- setdiff(solvedNodes, allParents)
-
-        # All possible YZ-pairs with |Y| = |Z| <= |L|
-        # NOTE: The definition of Y is DIFFERENT than the one in the paper!!!
-        # If k = 0 (i.e. L is empty set), then we only have one YZ-pair: Y and Z both empty
-        possibleYZs <- getPossibleYZ(graph, L,
-                                    allowedForY = maybeAllowedForY,
-                                    allowedForZ = allowedForZ)
-
-        # Loop over all pairs (Y,Z) with |Y| = |Z| = |L| = k
-        for (YZ in possibleYZs) {
-          Y = YZ$Y
-          Z = YZ$Z
-          # Sanity check of Y and Z
-          if (length(unique(Y)) == length(Y) &&
-              length(unique(Z)) == length(Z) &&
-              length(intersect(Y, Z)) == 0) {
-
-            # Find allowed set for Y. This is now possibly since Z (and L) is known.
-            # Consists of all nodes in maybeAllowedForY that are
-            # - not in (Z or i)
-            # - no siblings of (Z or i) avoiding L (all latent parents of Y that are at the same
-            #                                time latent parents of (Z or i) have to be in L!)
-            # - solved if half-trek reachable from (Z or i) avoiding L
-            latentParentsOfZandI <- intersect(latentNodes, graph$parents(c(i,Z)))
-            latentParentsOfZandINotInL <- setdiff(latentParentsOfZandI, L)
-            htrFromZandIAvoidingL <- union(graph$descendants(c(i,Z)),
-                                           graph$trFrom(latentParentsOfZandINotInL))
-            allowed <- setdiff(maybeAllowedForY,
-                               setdiff(htrFromZandIAvoidingL, solvedNodes))
-            allowed <- setdiff(allowed,
-                               c(graph$children(latentParentsOfZandINotInL),
-                                 Z, i))
-
-            # Sanity check: Maybe we have nodes in Y that are not allowed any more
-            if (any(!(Y %in% allowed))) {
-              next
-            }
-
-            # Check if there is a half-trek system from allowed nodes to pa(i)
-            # - avoid (Y,L) on LHS
-            # - avoid (Z,L) on RHS
-            #   (These two conditions enforce no sided intersection of half-trek system!)
-            # - Avoid starting with "<-" vetween obsrved nodes.
-            #   This forces trek system to be half-trek system.
-            trekSystemResults <- graph$getTrekSystem(
-              allowed, observedParents,
-              avoidLeftNodes = c(Y, L), avoidRightNodes = c(Z, L),
-              avoidLeftEdges = edgesBetweenObserved)
-
-            # If half-trek system exists we know that all edges between pa(i) and i are identified
-            if (trekSystemResults$systemExists) {
-              identifiedEdges <- c(identifiedEdges, as.integer(rbind(observedParents, i)))
-              activeFrom <- trekSystemResults$activeFrom
-              identifier <- createLFHtcIdentifier(identifier, v = i,
-                                                  Y = c(activeFrom, Y),  # This recovers Y from paper
-                                                  Z = Z,
-                                                  parents = observedParents,
-                                                  reachableY = htrFromZandIAvoidingL) # half-trek reachable elements of Y are known
-              solvedParents[[i]] <- observedParents
-              unsolvedParents[[i]] <- integer(0)
-              activeFroms[[i]] <- c(activeFrom, Y)
-              Zs[[i]] <- Z
-              Ls[[i]] <- L
-              solvedNodes <- c(i, solvedNodes)
-              break
-            }
-          }
-        }
-        if (i %in% solvedNodes) {
-          break
-        }
-      }
-      if (i %in% solvedNodes) {
-        break
-      }
-    }
-  }
-  return(list(identifiedEdges = matrix(identifiedEdges, byrow = T, ncol = 2),
-              unsolvedParents = unsolvedParents,
-              solvedParents = solvedParents,
-              activeFroms = activeFroms,
-              Zs = Zs,
-              Ls = Ls,
-              identifier = identifier))
-}
-
-
-
-
-lfhtcIdentifyStep2 <- function(graph, unsolvedParents, solvedParents, activeFroms, Zs, Ls, identifier,
-                              subsetSizeControl = Inf) {
-  # Sanity check
-  validateLatentNodesAreSources(graph)
-
-  # Variable to store all newly identified edges
-  identifiedEdges <- numeric(0)
-
-  # Collect basic infos from graph
-  observedNodes <- graph$observedNodes()
-  latentNodes <- graph$latentNodes()
-  numObserved <- length(observedNodes)
-  numLatents <- length(latentNodes)
   edgeMat <- graph$L()
   edgesBetweenObserved <- which(edgeMat[seq(1, length = numObserved),
                                         seq(1, length = numObserved), drop = F] == 1,
@@ -436,8 +244,6 @@ lfhtcIdentifyStep2 <- function(graph, unsolvedParents, solvedParents, activeFrom
 }
 
 
-
-
 #' Create an latent identifier base case
 #'
 #' Identifiers are functions that take as input a covariance matrix Sigma
@@ -456,8 +262,12 @@ lfhtcIdentifyStep2 <- function(graph, unsolvedParents, solvedParents, activeFrom
 #' @return a function that takes as input a covariance matrix compatible with
 #'         the latent digraph defined by L and returns a list with two
 #'         named components:
-#'         Lambda - a matrix equal to L but with NA values instead of 1s,
-#'         Omega - a matrix equal to O but with NA values for coefficients not equal to zero.
+#'         \describe{
+#'         \item{\code{Lambda}}{a matrix equal to the observed part of L but with NA values
+#'         instead of 1s}
+#'         \item{\code{Omega}}{a matrix equal to O but with NA values for coefficients
+#'         not equal to zero.}
+#'         }
 #'         When building more complex identifiers these NAs will be replaced
 #'         by the value that can be identified from Sigma.
 createLFIdentifierBaseCase <- function(graph) {
@@ -490,6 +300,8 @@ createLFIdentifierBaseCase <- function(graph) {
 #' nodes correspond to the observed nodes in the graph, all other nodes are considered unobserved.
 #' Throws an error if this is not true.
 #'
+#' @export
+#'
 #' @param graph a \code{\link{LatentDigraph}} object representing
 #'         the latent factor graph. All latent nodes in this graph should be
 #'         source nodes (i.e. have no parents).
@@ -502,7 +314,6 @@ latentDigraphHasSimpleNumbering <- function(graph) {
                "to graph$numObserved()+graph$numLatents() in order are supported."))
   }
 }
-
 
 
 #' Determines which edges in a latent digraph are LF-HTC-identifiable.
@@ -529,11 +340,17 @@ latentDigraphHasSimpleNumbering <- function(graph) {
 #'   for a more in-depth discussion of identifier functions.}
 #'   \item{\code{graph}}{a latent digraph object of the graph.}
 #'   \item{\code{call}}{the call made to this function.}
+#'   \item{\code{activeFroms}}{list. If node i is solved then the ith index
+#'   is a vector containing the nodes Y otherwise it is empty.}
+#'   \item{\code{Zs}}{list. If node i is solved then the ith index is a
+#'   vector containing the nodes Z otherwise it is empty.}
+#'   \item{\code{Ls}}{list. If node i is solved then the ith index is a
+#'   vector containing the nodes L otherwise it is empty.}
 #' }
 #'
 #' @references
 #' TO BE WRITTEN
-lfhtcID <- function(graph, version=1){
+lfhtcID <- function(graph){
 
   # Check the graph
   latentDigraphHasSimpleNumbering(graph)
@@ -547,12 +364,7 @@ lfhtcID <- function(graph, version=1){
 
   changeFlag <- T
   while (changeFlag) {
-    if (version==1){
-      idResult <- lfhtcIdentifyStep(graph, unsolvedParents, solvedParents, activeFroms, Zs, Ls, identifier)
-    }
-    else {
-      idResult <- lfhtcIdentifyStep2(graph, unsolvedParents, solvedParents, activeFroms, Zs, Ls, identifier)
-    }
+    idResult <- lfhtcIdentifyStep(graph, unsolvedParents, solvedParents, activeFroms, Zs, Ls, identifier)
     changeFlag <- (nrow(idResult$identifiedEdges) != 0)
     unsolvedParents <- idResult$unsolvedParents
     solvedParents <- idResult$solvedParents
@@ -572,12 +384,8 @@ lfhtcID <- function(graph, version=1){
   result$Zs <- Zs
   result$Ls <- Ls
   result$call <- match.call()
-  result$LatentDigraph <- graph
   return(result)
 }
-
-
-
 
 
 
@@ -595,16 +403,16 @@ print.LfhtcIDResult <- function(x, ...) {
   cat("Call: ")
   print(x$call)
 
-  observedNodes <- x$LatentDigraph$observedNodes()
+  observedNodes <- x$graph$observedNodes()
   nObserved <- length(observedNodes)
-  latentNodes <- x$LatentDigraph$latentNodes()
+  latentNodes <- x$graph$latentNodes()
   nLatent <- length(latentNodes)
   solvedParents <- x$solvedParents
 
   cat(paste("\nLatent Digraph Info\n"))
   cat(paste("# observed nodes:", nObserved, "\n"))
   cat(paste("# latent nodes:", nLatent, "\n"))
-  cat(paste("# total nr. of edges between observed nodes:", sum(x$LatentDigraph$L()[observedNodes,]), "\n"))
+  cat(paste("# total nr. of edges between observed nodes:", sum(x$graph$L()[observedNodes,]), "\n"))
 
   cat(paste("\nGeneric Identifiability Summary\n"))
   cat(paste("# nr. of edges between observed nodes shown gen. identifiable:", length(unlist(solvedParents)),
@@ -637,23 +445,3 @@ print.LfhtcIDResult <- function(x, ...) {
 
   invisible(x)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

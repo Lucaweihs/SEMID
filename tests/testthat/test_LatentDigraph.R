@@ -25,6 +25,10 @@ test_that("Empty graph works properly", {
   expect_error(g$trFrom(1, 1))
   expect_error(g$getTrekSystem(1, 1))
   expect_error(g$inducedSubgraph(1))
+
+  expect_equal(g$observedParents(c()), integer(0))
+  expect_equal(g$getMixedGraph()$L(), matrix(0, 0, 0))
+  expect_equal(g$getMixedGraph()$O(), matrix(0, 0, 0))
 })
 
 test_that("Single node graph works properly", {
@@ -63,6 +67,11 @@ test_that("Single node graph works properly", {
   expect_equal(g$getTrekSystem(1, 1), list(systemExists = TRUE, activeFrom = 1))
 
   expect_equal(g$inducedSubgraph(1)$L(), L)
+
+  expect_equal(g$observedParents(c()), integer(0))
+  expect_equal(g$observedParents(1), integer(0))
+  expect_equal(g$getMixedGraph()$L(), matrix(0, 1, 1))
+  expect_equal(g$getMixedGraph()$O(), matrix(0, 1, 1))
 })
 
 test_that("Two nodes, no latents, graph works properly", {
@@ -108,6 +117,12 @@ test_that("Two nodes, no latents, graph works properly", {
 
   expect_equal(g$inducedSubgraph(c(1,2))$L(), L)
   expect_equal(g$inducedSubgraph(c(1))$L(), matrix(0,1,1))
+
+  expect_equal(g$observedParents(c()), integer(0))
+  expect_equal(g$observedParents(1), integer(0))
+  expect_equal(g$observedParents(2), c(1))
+  expect_equal(g$getMixedGraph()$L(), L)
+  expect_equal(g$getMixedGraph()$O(), matrix(c(0, 0, 0, 0), nrow=2))
 })
 
 test_that("Two node (different labels), one latent, graph works properly", {
@@ -165,6 +180,13 @@ test_that("Two node (different labels), one latent, graph works properly", {
   expect_equal(g$inducedSubgraph(c(12))$L(), matrix(0,1,1))
   expect_equal(g$inducedSubgraph(c(12))$latentNodes(), integer(0))
   expect_equal(g$inducedSubgraph(c(44,3))$L(), matrix(c(0,0,1,0), ncol = 2, byrow = T))
+
+
+  expect_equal(g$observedParents(c()), integer(0))
+  expect_equal(g$observedParents(44), integer(0))
+  expect_equal(g$observedParents(12), c(44))
+  expect_equal(g$getMixedGraph()$L(), matrix(c(0,1,0,0), ncol = 2, byrow = T))
+  expect_equal(g$getMixedGraph()$O(), matrix(c(0,1,1,0), ncol = 2, byrow = T))
 })
 
 
@@ -258,4 +280,47 @@ test_that("More complicated graph, 5 observed, 2 latents, works properly", {
                         1,1,0,0,0,0), ncol = 6, byrow = T))
   expect_equal(a$latentNodes(), c(11,12))
   expect_equal(a$observedNodes(), c(2,10,4,6))
+
+  expect_equal(g$observedParents(c()), integer(0))
+  expect_equal(g$observedParents(8), integer(0))
+  expect_equal(g$observedParents(11), integer(0))
+  expect_equal(g$observedParents(4), c(2,6))
+  expect_equal(g$observedParents(12), c(8))
+  expect_equal(g$observedParents(c(4,6)), c(2,4,6))
+  expect_error(g$getMixedGraph())
 })
+
+
+test_that("getMixedGraph is working properly on larger graph where all latent nodes are source nodes", {
+  observedNodes = c(2, 4, 6, 8, 10)
+  latentNodes = c(11, 12)
+  L = matrix(
+    c(0,1,0,0,0,0,0,
+      0,0,1,0,0,0,0,
+      0,1,0,0,0,0,0,
+      0,0,0,0,1,0,0,
+      0,0,0,0,0,0,0,
+      0,1,1,0,1,0,0,
+      1,0,0,0,1,0,0), ncol = 7, byrow = T)
+
+  g = LatentDigraph(L, observedNodes = observedNodes, latentNodes = latentNodes)
+
+  expectedL = matrix(
+    c(0,1,0,0,0,
+      0,0,1,0,0,
+      0,1,0,0,0,
+      0,0,0,0,1,
+      0,0,0,0,0), ncol = 5, byrow = T)
+
+  expectedO = matrix(
+    c(0,0,0,0,1,
+      0,0,1,0,1,
+      0,1,0,0,1,
+      0,0,0,0,0,
+      1,1,1,0,0), ncol = 5, byrow = T)
+
+  expect_equal(g$getMixedGraph()$L(), expectedL)
+  expect_equal(g$getMixedGraph()$O(), expectedO)
+
+})
+

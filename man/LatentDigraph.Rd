@@ -43,6 +43,7 @@ currently available to be used on the latent factor graph include
 \item inducedSubgraph
 \item stronglyConnectedComponent
 \item plot
+\item observedParents
 \item getMixedGraph
 }
 see the individual function documentation for more information.

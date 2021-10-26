@@ -15,8 +15,12 @@ source nodes (i.e. have no parents).}
 a function that takes as input a covariance matrix compatible with
         the latent digraph defined by L and returns a list with two
         named components:
-        Lambda - a matrix equal to L but with NA values instead of 1s,
-        Omega - a matrix equal to O but with NA values for coefficients not equal to zero.
+        \describe{
+        \item{\code{Lambda}}{a matrix equal to the observed part of L but with NA values
+        instead of 1s}
+        \item{\code{Omega}}{a matrix equal to O but with NA values for coefficients
+        not equal to zero.}
+        }
         When building more complex identifiers these NAs will be replaced
         by the value that can be identified from Sigma.
 }

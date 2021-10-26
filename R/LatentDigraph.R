@@ -563,6 +563,7 @@ setMethodS3("stronglyConnectedComponent", "LatentDigraphFixedOrder",
 #' \item inducedSubgraph
 #' \item stronglyConnectedComponent
 #' \item plot
+#' \item observedParents
 #' \item getMixedGraph
 #' }
 #' see the individual function documentation for more information.
@@ -898,7 +899,7 @@ setMethodS3("plot", "LatentDigraph", function(x, ...) {
 #' @export observedParents
 #'
 #' @param this the graph object
-#' @param nodes the nodes on which to to get the observed parents
+#' @param nodes the nodes on which to get the observed parents
 observedParents <- function(this, nodes, ...) {
   UseMethod("observedParents")
 }
@@ -917,6 +918,8 @@ setMethodS3("observedParents", "LatentDigraph", function(this, node, ...) {
 
 #' Get the corresponding mixed graph
 #'
+#' Only works for graphs where the latent nodes are source nodes
+#'
 #' @name getMixedGraph
 #' @export getMixedGraph
 #'
@@ -930,23 +933,36 @@ getMixedGraph <- function(this, ...) {
 #' @export
 setMethodS3("getMixedGraph", "LatentDigraph", function(this, ...) {
 
+  if (length(this$parents(this$latentNodes())) != 0){
+    stop("Can only procuse mixed graphs for LatentDigraphs where all latent nodes are source nodes.")
+  }
+
   # Remove observed edges
   latentL <- this$.L
-  latentL[this$.observedNodes, this$.observedNodes] <- 0
 
-  latentGraph <-  LatentDigraph(latentL, this$.observedNodes, this$.latentNodes)
-  reachableByLatentTrek = lapply(this$.observedNodes, latentGraph$trFrom, includeLatents = FALSE)
+  observedNodes <- this$toIn(this$.observedNodes)
+  latentNodes <- this$toIn(this$.latentNodes)
 
-  O = matrix(0, length(this$.observedNodes), length(this$.observedNodes))
-  for (i in 1:length(this$.observedNodes)){
-    for (j in 1:length(reachableByLatentTrek[[i]])){
-      O[this$.observedNodes[i],reachableByLatentTrek[[i]][j]] <- 1
+  latentL[observedNodes, observedNodes] <- 0
+
+  latentGraph <-  LatentDigraph(latentL, observedNodes, latentNodes)
+  reachableByLatentTrek = lapply(observedNodes, latentGraph$trFrom, includeLatents = FALSE)
+
+  O = matrix(0, length(observedNodes), length(observedNodes))
+  if (length(observedNodes) >= 1){
+    for (i in 1:length(observedNodes)){
+      if (length(reachableByLatentTrek[[i]]) >= 1){
+        for (j in 1:length(reachableByLatentTrek[[i]])){
+          O[observedNodes[i],reachableByLatentTrek[[i]][j]] <- 1
+        }
+      }
     }
   }
+
   diag(O) <- 0
 
 
-  return(MixedGraph(this$.L[this$.observedNodes, this$.observedNodes], O))
+  return(MixedGraph(as.matrix(this$.L[observedNodes, observedNodes]), O, vertexNums=this$.observedNodes))
 }, appendVarArgs = F)
 
 

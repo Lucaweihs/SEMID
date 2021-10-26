@@ -48,8 +48,11 @@ setConstructorS3("MixedGraph", function(L = matrix(0, 1, 1),
   for (i in seq(1, length = nrow(siblings))) {
     LwithLatents[numObserved + i, siblings[i,]] = 1
   }
-
-  latentNodes = seq(max(vertexNums) + 1, length = numLatents)
+  if (length(vertexNums)==0){
+    latentNodes = integer(0)
+  } else {
+    latentNodes = seq(max(vertexNums) + 1, length = numLatents)
+  }
   R.oo::extend(R.oo::Object(),
                "MixedGraph",
                .internalGraph = LatentDigraph(LwithLatents,

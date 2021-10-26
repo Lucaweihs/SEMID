@@ -25,6 +25,12 @@ returns a list with 5 components:
   for a more in-depth discussion of identifier functions.}
   \item{\code{graph}}{a latent digraph object of the graph.}
   \item{\code{call}}{the call made to this function.}
+  \item{\code{activeFroms}}{list. If node i is solved then the ith index
+  is a vector containing the nodes Y otherwise it is empty.}
+  \item{\code{Zs}}{list. If node i is solved then the ith index is a
+  vector containing the nodes Z otherwise it is empty.}
+  \item{\code{Ls}}{list. If node i is solved then the ith index is a
+  vector containing the nodes L otherwise it is empty.}
 }
 }
 \description{
