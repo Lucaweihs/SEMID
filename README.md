@@ -302,9 +302,9 @@ TO BE WRITTEN propose a sufficient criterion to check generic identifiability in
 > latentNodes = c(6)
 >
 > # Create the latent digraph object corresponding to L
->
 > g = LatentDigraph(L, observedNodes, latentNodes)
-> # Plot the latent digraph
+>
+> # Plot latent digraph
 > plot(g)
 ```
 The algorithm in TO BE WRITTEN checks generic identifiability via the latent-factor half-trek criterion. It is applicable to all graphs where the latent nodes are source nodes. The algorithm is implemented in `lfhtcID`.
