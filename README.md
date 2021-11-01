@@ -302,9 +302,9 @@ The latent-factor half-trek criterion (LF-HTC) is a sufficient criterion to chec
 > latentNodes = c(6)
 >
 > # Create the latent digraph object corresponding to L
->
 > g = LatentDigraph(L, observedNodes, latentNodes)
-> # Plot the latent digraph
+>
+> # Plot latent digraph
 > plot(g)
 ```
 The LF-HTC is applicable to all graphs where the latent nodes are source nodes. An algorithm that checks LF-HTC-identifiability is implemented in `lfhtcID`.
