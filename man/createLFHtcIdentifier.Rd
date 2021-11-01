@@ -35,6 +35,3 @@ A helper function for \code{\link{lfhtcIdentifyStep}}, creates an identifier
 function based on its given parameters. This created identifier function will
 identify the directed edges from 'targets' to 'node.'
 }
-\references{
-TO BE WRITTEN
-}

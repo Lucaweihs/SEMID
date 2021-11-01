@@ -69,8 +69,5 @@ a list with four components:
 \description{
 A function that does one step through all the nodes in a latent factor graph
 and tries to identify new edge coefficients using the existence of
-half-trek systems as described in TO BE WRITTEN.
-}
-\references{
-TO BE WRITTEN
+latent-factor half-trek systems.
 }

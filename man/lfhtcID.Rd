@@ -37,6 +37,3 @@ returns a list with 5 components:
 Uses the latent factor half-trek criterion to determine
 which edges in a latent digraph are generically identifiable.
 }
-\references{
-TO BE WRITTEN
-}

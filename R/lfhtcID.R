@@ -22,9 +22,6 @@
 #'        nodes should be identified by idFunc the newly created identification function to work.
 #'
 #' @return an identification function
-#'
-#' @references
-#' TO BE WRITTEN
 createLFHtcIdentifier <- function(idFunc, v, Y, Z, parents, reachableY) {
   # Necessary redundant assignments
   idFunc <- idFunc
@@ -87,7 +84,7 @@ validateLatentNodesAreSources <- function(graph) {
 #'
 #' A function that does one step through all the nodes in a latent factor graph
 #' and tries to identify new edge coefficients using the existence of
-#' half-trek systems as described in TO BE WRITTEN.
+#' latent-factor half-trek systems.
 #'
 #' @param graph a \code{\link{LatentDigraph}} object representing
 #'         the latent factor graph. All latent nodes in this graph should be
@@ -132,9 +129,6 @@ validateLatentNodesAreSources <- function(graph) {
 #' }
 #'
 #' @export
-#'
-#' @references
-#' TO BE WRITTEN
 lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, activeFroms, Zs, Ls, identifier,
                               subsetSizeControl = Inf) {
   # Sanity check
@@ -348,9 +342,6 @@ latentDigraphHasSimpleNumbering <- function(graph) {
 #'   \item{\code{Ls}}{list. If node i is solved then the ith index is a
 #'   vector containing the nodes L otherwise it is empty.}
 #' }
-#'
-#' @references
-#' TO BE WRITTEN
 lfhtcID <- function(graph){
 
   # Check the graph
