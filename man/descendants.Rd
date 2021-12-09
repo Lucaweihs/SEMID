@@ -9,11 +9,9 @@
 \usage{
 descendants(this, nodes, ...)
 
-\method{descendants}{LatentDigraphFixedOrder}(this, nodes,
-  includeObserved = T, includeLatents = T, ...)
+\method{descendants}{LatentDigraphFixedOrder}(this, nodes, includeObserved = T, includeLatents = T, ...)
 
-\method{descendants}{LatentDigraph}(this, nodes, includeObserved = T,
-  includeLatents = T, ...)
+\method{descendants}{LatentDigraph}(this, nodes, includeObserved = T, includeLatents = T, ...)
 
 \method{descendants}{MixedGraph}(this, nodes, ...)
 }

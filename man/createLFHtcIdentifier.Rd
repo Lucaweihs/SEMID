@@ -2,7 +2,7 @@
 % Please edit documentation in R/lfhtcID.R
 \name{createLFHtcIdentifier}
 \alias{createLFHtcIdentifier}
-\title{Create an latent factor half-trek critierion identification function.}
+\title{Create a latent factor half-trek critierion identification function.}
 \usage{
 createLFHtcIdentifier(idFunc, v, Y, Z, parents, reachableY)
 }
@@ -13,17 +13,19 @@ function that produces all such identifications. The newly created
 identifier function will return these identifications along with its
 own.}
 
-\item{sources}{the sources of the half-trek system.}
-
-\item{targets}{the targets of the half-trek system (these should be the
-parents of node).}
-
-\item{node}{the node for which all incoming edges are to be identified
+\item{v}{the node for which all incoming edges are to be identified
 (the tails of which are targets).}
 
-\item{htrSources}{the nodes in sources which are half-trek reachable from
-node. All incoming edges to these sources should be identified by
-idFunc for the newly created identification function to work.}
+\item{Y}{the sources of the latent-factor half-trek system.}
+
+\item{Z}{the nodes that a reached from Y via an latent-factor half-trek of the form
+\code{y <- h -> z} where \code{h} is an element of L.}
+
+\item{parents}{the parents of node v.}
+
+\item{reachableY}{the nodes in Y which are latent-factor half-trek reachable
+from Z or v  by avoiding the nodes in L. All incoming edges to these
+nodes should be identified by idFunc the newly created identification function to work.}
 }
 \value{
 an identification function
@@ -32,7 +34,4 @@ an identification function
 A helper function for \code{\link{lfhtcIdentifyStep}}, creates an identifier
 function based on its given parameters. This created identifier function will
 identify the directed edges from 'targets' to 'node.'
-}
-\references{
-TO BE WRITTEN
 }

@@ -47,6 +47,7 @@ plotMixedGraph <- function(L, O, main = "", vertexLabels = 1:nrow(L)) {
 #' @inheritParams LatentDigraph
 #' @param main the plot title.
 #' @inherit LatentDigraph
+#' @importFrom grDevices rgb
 plotLatentDigraph <- function(L, observedNodes, latentNodes, main = "") {
   if (nrow(L) == 0) {
     stop("Can only plot graphs with >= 1 vertex")

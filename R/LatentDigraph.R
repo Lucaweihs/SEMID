@@ -55,14 +55,13 @@ validateVarArgsEmpty <- function(...) {
 #' @param numObserved a non-negative integer representing the number of observed
 #'        nodes in the graph.
 #'
-#' @inheritParams graphID
-#'
 #' @return An object representing the LatentDigraphFixedOrder
 setConstructorS3("LatentDigraphFixedOrder", function(L = matrix(0, 1, 1),
                                                      numObserved = nrow(L)) {
   validateMatrix(L)
   numObserved = as.integer(numObserved)
 
+  # Sanity check
   if (length(numObserved) != 1 || numObserved < 0 || numObserved > nrow(L)) {
     stop("numObserved must be a nonnegative integer of size no more than nrow(L).")
   }
@@ -122,6 +121,7 @@ setMethodS3("numNodes", "LatentDigraphFixedOrder", function(this, ...) {
 #' @export numObserved
 #'
 #' @param this the graph object
+#' @param ... ignored
 #'
 numObserved <- function(this, ...) {
   UseMethod("numObserved")
@@ -141,6 +141,7 @@ setMethodS3("numObserved", "LatentDigraphFixedOrder", function(this, ...) {
 #' @export numLatents
 #'
 #' @param this the graph object
+#' @param ... ignored
 #'
 numLatents <- function(this, ...) {
   UseMethod("numLatents")
@@ -306,6 +307,7 @@ setMethodS3("descendants", "LatentDigraphFixedOrder", function(this, nodes,
 #' @export createTrGraph
 #'
 #' @param this the graph object
+#' @param ... ignored
 createTrGraph <- function(this, ...) {
   UseMethod("createTrGraph")
 }
@@ -391,6 +393,7 @@ setMethodS3("trFrom", "LatentDigraphFixedOrder", function(this, nodes,
 #' @export createTrekFlowGraph
 #'
 #' @param this the graph object
+#' @param ... ignored
 createTrekFlowGraph <- function(this, ...) {
   UseMethod("createTrekFlowGraph")
 }
@@ -427,6 +430,7 @@ setMethodS3("createTrekFlowGraph", "LatentDigraphFixedOrder", function(this, ...
 #' @param avoidRightEdges a collection of edges between observed noes
 #'                          in the graph that should not be used on any right
 #'                          hand side of any trek in the trek system.
+#' @param ... ignored
 getTrekSystem <-
   function(this, fromNodes, toNodes,
            avoidLeftNodes = integer(0),
@@ -538,25 +542,34 @@ setMethodS3("stronglyConnectedComponent", "LatentDigraphFixedOrder",
 }, appendVarArgs = F)
 
 
-### The LatentDigraph wrapper class
+#######################################
+### The LatentDigraph wrapper class ###
+#######################################
 
 #' Construct a LatentDigraph object
 #'
 #' Creates an object representing a latent factor graph. The methods that are
 #' currently available to be used on the latent factor graph include
 #' \enumerate{
-#' \item ancestors
-#' \item descendants
-#' \item parents
-#' \item trFrom
-#' \item getTrekSystem
-#' \item inducedSubgraph
-#' \item L
-#' \item observedNodes
-#' \item latentNodes
 #' \item numObserved
 #' \item numLatents
 #' \item numNodes
+#' \item toIn
+#' \item toEx
+#' \item L
+#' \item observedNodes
+#' \item latentNodes
+#' \item parents
+#' \item children
+#' \item ancestors
+#' \item descendants
+#' \item trFrom
+#' \item getTrekSystem
+#' \item inducedSubgraph
+#' \item stronglyConnectedComponent
+#' \item plot
+#' \item observedParents
+#' \item getMixedGraph
 #' }
 #' see the individual function documentation for more information.
 #'
@@ -578,11 +591,12 @@ setMethodS3("stronglyConnectedComponent", "LatentDigraphFixedOrder",
 setConstructorS3("LatentDigraph", function(L = matrix(0, 1, 1),
                                      observedNodes = seq(1, length = nrow(L)),
                                      latentNodes = integer(0)) {
+  # Sanity check
   vertexNums = c(observedNodes, latentNodes)
   if (nrow(L) == 0) {
     vertexNums <- as.integer(NA)
     vertexNumsToInternal <- as.integer(NA)
-  } else if (vertexNums %% 1 != 0 || any(vertexNums < 1) ||
+  } else if (any(vertexNums %% 1 != 0) || any(vertexNums < 1) ||
              length(unique(vertexNums)) != length(vertexNums) ||
              length(vertexNums) != nrow(L)) {
     stop(
@@ -597,6 +611,7 @@ setConstructorS3("LatentDigraph", function(L = matrix(0, 1, 1),
   }
 
   internalGraph <- LatentDigraphFixedOrder(L, length(observedNodes))
+  # in internalGraph, nodes 1:length(observedNodes) are always the observed nodes
 
   R.oo::extend(
     R.oo::Object(),
@@ -641,6 +656,7 @@ setMethodS3("numNodes", "LatentDigraph", function(this, ...) {
 #'
 #' @param this the graph object
 #' @param nodes the nodes to transform
+#' @param ... ignored
 toIn <- function(this, nodes, ...) {
   UseMethod("toIn")
 }
@@ -670,6 +686,7 @@ setMethodS3("toIn", "LatentDigraph", function(this, nodes, ...) {
 #'
 #' @param this the graph object
 #' @param nodes the nodes to transform
+#' @param ... ignored
 toEx <- function(this, nodes, ...) {
   UseMethod("toEx")
 }
@@ -705,6 +722,7 @@ setMethodS3("L", "LatentDigraph", function(this, ...) {
 #' @export observedNodes
 #'
 #' @param this the graph object
+#' @param ... ignored
 observedNodes <- function(this, ...) {
   UseMethod("observedNodes")
 }
@@ -723,6 +741,7 @@ setMethodS3("observedNodes", "LatentDigraph", function(this, ...) {
 #' @export latentNodes
 #'
 #' @param this the graph object
+#' @param ... ignored
 latentNodes <- function(this, ...) {
   UseMethod("latentNodes")
 }
@@ -735,7 +754,6 @@ setMethodS3("latentNodes", "LatentDigraph", function(this, ...) {
   return(this$.latentNodes)
 }, appendVarArgs = F)
 
-#' @inheritParams parents.LatentDigraphFixedOrder
 #' @rdname   parents
 #' @name     parents.LatentDigraph
 #' @export
@@ -882,4 +900,78 @@ setMethodS3("stronglyConnectedComponent", "LatentDigraph", function(this, node, 
 #' @export
 setMethodS3("plot", "LatentDigraph", function(x, ...) {
   plotLatentDigraph(x$L(), x$observedNodes(), x$latentNodes())
+}, appendVarArgs = F)
+
+#' Get the observed parents on a collection of nodes
+#'
+#' @name observedParents
+#' @export observedParents
+#'
+#' @param this the graph object
+#' @param nodes the nodes on which to get the observed parents
+#' @param ... ignored
+observedParents <- function(this, nodes, ...) {
+  UseMethod("observedParents")
+}
+
+#' @rdname   observedParents
+#' @name     observedParents.LatentDigraph
+#' @export
+setMethodS3("observedParents", "LatentDigraph", function(this, nodes, ...) {
+  parents = this$parents(nodes)
+  observedParents <- unique(parents[! parents %in% this$latentNodes()])
+  return(observedParents)
+}, appendVarArgs = F)
+
+
+
+
+#' Get the corresponding mixed graph
+#'
+#' Only works for graphs where the latent nodes are source nodes
+#'
+#' @name getMixedGraph
+#' @export getMixedGraph
+#'
+#' @param this the graph object
+#' @param ... ignored
+getMixedGraph <- function(this, ...) {
+  UseMethod("getMixedGraph")
+}
+
+#' @rdname   getMixedGraph
+#' @name     getMixedGraph.LatentDigraph
+#' @export
+setMethodS3("getMixedGraph", "LatentDigraph", function(this, ...) {
+
+  if (length(this$parents(this$latentNodes())) != 0){
+    stop("In LatentDigraph: mixed graphs are only available when latent nodes have no parents.")
+  }
+
+  # Remove observed edges
+  latentL <- this$.L
+
+  observedNodes <- this$toIn(this$.observedNodes)
+  latentNodes <- this$toIn(this$.latentNodes)
+
+  latentL[observedNodes, observedNodes] <- 0
+
+  latentGraph <-  LatentDigraph(latentL, observedNodes, latentNodes)
+  reachableByLatentTrek = lapply(observedNodes, latentGraph$trFrom, includeLatents = FALSE)
+
+  O = matrix(0, length(observedNodes), length(observedNodes))
+  if (length(observedNodes) >= 1){
+    for (i in 1:length(observedNodes)){
+      if (length(reachableByLatentTrek[[i]]) >= 1){
+        for (j in 1:length(reachableByLatentTrek[[i]])){
+          O[observedNodes[i],reachableByLatentTrek[[i]][j]] <- 1
+        }
+      }
+    }
+  }
+
+  diag(O) <- 0
+
+
+  return(MixedGraph(as.matrix(this$.L[observedNodes, observedNodes]), O, vertexNums=this$.observedNodes))
 }, appendVarArgs = F)

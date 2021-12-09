@@ -16,6 +16,8 @@ toEx(this, nodes, ...)
 \item{this}{the graph object}
 
 \item{nodes}{the nodes to transform}
+
+\item{...}{ignored}
 }
 \description{
 Transforms a vector of node indices in the internal rep. into external numbering

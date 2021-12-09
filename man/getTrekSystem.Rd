@@ -6,17 +6,38 @@
 \alias{getTrekSystem.LatentDigraph}
 \title{Determines if a trek system exists in the mixed graph.}
 \usage{
-getTrekSystem(this, fromNodes, toNodes, avoidLeftNodes = integer(0),
-  avoidRightNodes = integer(0), avoidLeftEdges = integer(0),
-  avoidRightEdges = integer(0), ...)
+getTrekSystem(
+  this,
+  fromNodes,
+  toNodes,
+  avoidLeftNodes = integer(0),
+  avoidRightNodes = integer(0),
+  avoidLeftEdges = integer(0),
+  avoidRightEdges = integer(0),
+  ...
+)
 
-\method{getTrekSystem}{LatentDigraphFixedOrder}(this, fromNodes, toNodes,
-  avoidLeftNodes = integer(0), avoidRightNodes = integer(0),
-  avoidLeftEdges = integer(0), avoidRightEdges = integer(0), ...)
+\method{getTrekSystem}{LatentDigraphFixedOrder}(
+  this,
+  fromNodes,
+  toNodes,
+  avoidLeftNodes = integer(0),
+  avoidRightNodes = integer(0),
+  avoidLeftEdges = integer(0),
+  avoidRightEdges = integer(0),
+  ...
+)
 
-\method{getTrekSystem}{LatentDigraph}(this, fromNodes, toNodes,
-  avoidLeftNodes = integer(0), avoidRightNodes = integer(0),
-  avoidLeftEdges = integer(0), avoidRightEdges = integer(0), ...)
+\method{getTrekSystem}{LatentDigraph}(
+  this,
+  fromNodes,
+  toNodes,
+  avoidLeftNodes = integer(0),
+  avoidRightNodes = integer(0),
+  avoidLeftEdges = integer(0),
+  avoidRightEdges = integer(0),
+  ...
+)
 }
 \arguments{
 \item{this}{the graph object}
@@ -36,6 +57,8 @@ hand side of any trek in the trek system.}
 \item{avoidRightEdges}{a collection of edges between observed noes
 in the graph that should not be used on any right
 hand side of any trek in the trek system.}
+
+\item{...}{ignored}
 }
 \description{
 Determines if a trek system exists in the mixed graph.

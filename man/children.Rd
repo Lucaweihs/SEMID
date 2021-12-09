@@ -4,17 +4,14 @@
 \alias{children}
 \alias{children.LatentDigraphFixedOrder}
 \alias{children.LatentDigraph}
-\alias{parents.MixedGraph}
 \alias{children.MixedGraph}
 \title{All children of a collection of observed nodes.}
 \usage{
 children(this, nodes, ...)
 
-\method{children}{LatentDigraphFixedOrder}(this, nodes,
-  includeObserved = T, includeLatents = T, ...)
+\method{children}{LatentDigraphFixedOrder}(this, nodes, includeObserved = T, includeLatents = T, ...)
 
-\method{children}{LatentDigraph}(this, nodes, includeObserved = T,
-  includeLatents = T, ...)
+\method{children}{LatentDigraph}(this, nodes, includeObserved = T, includeLatents = T, ...)
 
 \method{children}{MixedGraph}(this, nodes, ...)
 }

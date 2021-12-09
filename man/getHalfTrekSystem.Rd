@@ -8,13 +8,26 @@
 \usage{
 getHalfTrekSystem(this, fromNodes, toNodes, ...)
 
-\method{getHalfTrekSystem}{MixedGraph}(this, fromNodes, toNodes,
-  avoidLeftNodes = integer(0), avoidRightNodes = integer(0),
-  avoidRightEdges = integer(0), ...)
+\method{getHalfTrekSystem}{MixedGraph}(
+  this,
+  fromNodes,
+  toNodes,
+  avoidLeftNodes = integer(0),
+  avoidRightNodes = integer(0),
+  avoidRightEdges = integer(0),
+  ...
+)
 
-\method{getTrekSystem}{MixedGraph}(this, fromNodes, toNodes,
-  avoidLeftNodes = integer(0), avoidRightNodes = integer(0),
-  avoidLeftEdges = integer(0), avoidRightEdges = integer(0), ...)
+\method{getTrekSystem}{MixedGraph}(
+  this,
+  fromNodes,
+  toNodes,
+  avoidLeftNodes = integer(0),
+  avoidRightNodes = integer(0),
+  avoidLeftEdges = integer(0),
+  avoidRightEdges = integer(0),
+  ...
+)
 }
 \arguments{
 \item{this}{the mixed graph object}
@@ -39,10 +52,6 @@ hand side of any trek in the trek system.}
 \item{avoidLeftEdges}{a collection of edges between observed nodes
 in the graph that should not be used on any right
 hand side of any trek in the trek system.}
-
-\item{...}{ignored.}
-
-\item{...}{ignored.}
 }
 \value{
 a list with two named components, \code{systemExists} (TRUE if a

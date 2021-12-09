@@ -11,6 +11,8 @@ latentNodes(this, ...)
 }
 \arguments{
 \item{this}{the graph object}
+
+\item{...}{ignored}
 }
 \description{
 Get all latent nodes in the graph.

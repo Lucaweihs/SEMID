@@ -4,8 +4,16 @@
 \alias{lfhtcIdentifyStep}
 \title{Perform one iteration of latent factor HTC identification.}
 \usage{
-lfhtcIdentifyStep(graph, unsolvedParents, solvedParents, identifier,
-  subsetSizeControl = Inf)
+lfhtcIdentifyStep(
+  graph,
+  unsolvedParents,
+  solvedParents,
+  activeFroms,
+  Zs,
+  Ls,
+  identifier,
+  subsetSizeControl = Inf
+)
 }
 \arguments{
 \item{graph}{a \code{\link{LatentDigraph}} object representing
@@ -20,26 +28,20 @@ generically identifiable.}
 ith index is a vector of all parents j of i for which the edge i->j
 is known to be generically identifiable (perhaps by other algorithms).}
 
+\item{activeFroms}{list. If node i is solved then the ith index is a vector
+containing the nodes Y otherwise it is empty.}
+
+\item{Zs}{list. If node i is solved then the ith index is a vector
+containing the nodes Z otherwise it is empty.}
+
+\item{Ls}{list. If node i is solved then the ith index is a vector
+containing the nodes Z otherwise it is empty.}
+
 \item{identifier}{an identification function that must produce the
-       identifications corresponding to those in solved parents. That is
-       \code{identifier} should be a function taking a single argument Sigma
-       (any generically generated covariance matrix corresponding
-       to the latent factor graph) and returns a list with two named arguments
-\describe{
-  \item{Lambda}{denote the number of nodes in \code{graph} as n. Then
-                Lambda is an nxn matrix whose i,jth entry
-\enumerate{
-  \item equals 0 if i is not a parent of j,
-  \item equals NA if i is a parent of j but \code{identifier} cannot
-        identify it generically,
-  \item equals the (generically) unique value corresponding to the weight
-        along the edge i->j that was used to produce Sigma.
-}}
-  \item{Omega}{just as Lambda but for the error covariance matrix for the
-               latent factor graph.}
-}
-       such that if j is in \code{solvedParents[[i]]} we must have that
-       Lambda[j,i] is not NA.}
+identifications corresponding to those in solved parents. That is
+\code{identifier} should be a function taking a single argument Sigma
+(any generically generated covariance matrix corresponding
+to the latent factor graph) and returns a list with two named arguments}
 
 \item{subsetSizeControl}{the largest subset of latent nodes to consider.}
 }
@@ -56,13 +58,16 @@ a list with four components:
   any newly identified edges}
   \item{\code{identifier}}{as the input argument but updated with
   any newly identified edges}
+  \item{\code{activeFroms}}{as the input argument but updated with
+  any newly solved node}
+  \item{\code{Zs}}{as the input argument but updated with
+  any newly solved node}
+  \item{\code{Ls}}{as the input argument but updated with
+  any newly solved node}
 }
 }
 \description{
 A function that does one step through all the nodes in a latent factor graph
 and tries to identify new edge coefficients using the existence of
-half-trek systems as described in TO BE WRITTEN.
-}
-\references{
-TO BE WRITTEN
+latent-factor half-trek systems.
 }

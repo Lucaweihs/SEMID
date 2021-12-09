@@ -4,8 +4,14 @@
 \alias{createEdgewiseIdentifier}
 \title{Create an edgewise identification function}
 \usage{
-createEdgewiseIdentifier(idFunc, sources, targets, node, solvedNodeParents,
-  sourceParentsToRemove)
+createEdgewiseIdentifier(
+  idFunc,
+  sources,
+  targets,
+  node,
+  solvedNodeParents,
+  sourceParentsToRemove
+)
 }
 \arguments{
 \item{idFunc}{identification of edge coefficients often requires that other

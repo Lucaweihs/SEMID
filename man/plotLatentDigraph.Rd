@@ -7,7 +7,10 @@
 plotLatentDigraph(L, observedNodes, latentNodes, main = "")
 }
 \arguments{
-\item{L}{see \code{\link{graphID}} for the appropriate form of L.}
+\item{L}{Adjacency matrix for the directed part of the path
+diagram/mixed graph; an edge pointing from i to j is encoded as L[i,j]=1 and
+the lack of an edge between i and j is encoded as L[i,j]=0. There should be
+no directed self loops, i.e. no i such that L[i,i]=1.}
 
 \item{observedNodes}{a vector of positive integers representing
 the vertex numbers of the observed nodes. These will correspond,

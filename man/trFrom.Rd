@@ -9,16 +9,33 @@
 \usage{
 trFrom(this, nodes, ...)
 
-\method{trFrom}{LatentDigraphFixedOrder}(this, nodes,
-  avoidLeftNodes = integer(0), avoidRightNodes = integer(0),
-  includeObserved = T, includeLatents = T, ...)
+\method{trFrom}{LatentDigraphFixedOrder}(
+  this,
+  nodes,
+  avoidLeftNodes = integer(0),
+  avoidRightNodes = integer(0),
+  includeObserved = T,
+  includeLatents = T,
+  ...
+)
 
-\method{trFrom}{LatentDigraph}(this, nodes, avoidLeftNodes = integer(0),
-  avoidRightNodes = integer(0), includeObserved = T,
-  includeLatents = T, ...)
+\method{trFrom}{LatentDigraph}(
+  this,
+  nodes,
+  avoidLeftNodes = integer(0),
+  avoidRightNodes = integer(0),
+  includeObserved = T,
+  includeLatents = T,
+  ...
+)
 
-\method{trFrom}{MixedGraph}(this, nodes, avoidLeftNodes = integer(0),
-  avoidRightNodes = integer(0), ...)
+\method{trFrom}{MixedGraph}(
+  this,
+  nodes,
+  avoidLeftNodes = integer(0),
+  avoidRightNodes = integer(0),
+  ...
+)
 }
 \arguments{
 \item{this}{the graph object}

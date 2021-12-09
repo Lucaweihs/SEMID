@@ -45,7 +45,6 @@ mixedGraphHasSimpleNumbering <- function(mixedGraph) {
 #'                      make the algorithm faster and more powerful. Note that
 #'                      this is a version of the Tian decomposition that works
 #'                      also with cyclic graphs.
-#' @inheritParams generalGenericID
 #'
 #' @return returns an object of \link{class} '\code{SEMIDResult},' this
 #'         object is just a list with 6 components:

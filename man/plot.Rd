@@ -10,10 +10,6 @@
 \method{plot}{MixedGraph}(x, ...)
 }
 \arguments{
-\item{x}{the LatentDigraph object}
-
-\item{...}{additional plotting arguments. Currently ignored.}
-
 \item{x}{the mixed graph object}
 
 \item{...}{additional plotting arguments. Currently ignored.}

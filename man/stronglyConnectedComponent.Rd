@@ -9,8 +9,7 @@
 \usage{
 stronglyConnectedComponent(this, node, ...)
 
-\method{stronglyConnectedComponent}{LatentDigraphFixedOrder}(this, node,
-  ...)
+\method{stronglyConnectedComponent}{LatentDigraphFixedOrder}(this, node, ...)
 
 \method{stronglyConnectedComponent}{LatentDigraph}(this, node, ...)
 

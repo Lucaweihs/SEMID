@@ -14,6 +14,8 @@ numObserved(this, ...)
 }
 \arguments{
 \item{this}{the graph object}
+
+\item{...}{ignored}
 }
 \description{
 Number of observed nodes in the graph.

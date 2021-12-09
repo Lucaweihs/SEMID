@@ -10,5 +10,5 @@ validateLatentNodesAreSources(graph)
 \item{graph}{the LatentDigraph}
 }
 \description{
-Produces an error not all latent nodes are sources.
+Produces an error if not all latent nodes are sources.
 }

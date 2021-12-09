@@ -11,6 +11,8 @@ createTrGraph(this, ...)
 }
 \arguments{
 \item{this}{the graph object}
+
+\item{...}{ignored}
 }
 \description{
 Helper function to create a graph encoding trek reachable relationships.
