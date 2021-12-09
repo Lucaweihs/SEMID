@@ -945,7 +945,7 @@ getMixedGraph <- function(this, ...) {
 setMethodS3("getMixedGraph", "LatentDigraph", function(this, ...) {
 
   if (length(this$parents(this$latentNodes())) != 0){
-    stop("Can only procuse mixed graphs for LatentDigraphs where all latent nodes are source nodes.")
+    stop("In LatentDigraph: mixed graphs are only available when latent nodes have no parents.")
   }
 
   # Remove observed edges
@@ -975,6 +975,3 @@ setMethodS3("getMixedGraph", "LatentDigraph", function(this, ...) {
 
   return(MixedGraph(as.matrix(this$.L[observedNodes, observedNodes]), O, vertexNums=this$.observedNodes))
 }, appendVarArgs = F)
-
-
-

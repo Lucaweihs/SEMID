@@ -1,4 +1,4 @@
-#' Create a latent factor half-trek critierion identification function.
+#' Create a latent-factor half-trek critierion identification function.
 #'
 #' A helper function for \code{\link{lfhtcIdentifyStep}}, creates an identifier
 #' function based on its given parameters. This created identifier function will
@@ -80,14 +80,14 @@ validateLatentNodesAreSources <- function(graph) {
 
 
 
-#' Perform one iteration of latent factor HTC identification.
+#' Perform one iteration of latent-factor HTC identification.
 #'
-#' A function that does one step through all the nodes in a latent factor graph
+#' A function that does one step through all the nodes in a latent-factor graph
 #' and tries to identify new edge coefficients using the existence of
 #' latent-factor half-trek systems.
 #'
 #' @param graph a \code{\link{LatentDigraph}} object representing
-#'         the latent factor graph. All latent nodes in this graph should be
+#'         the latent-factor graph. All latent nodes in this graph should be
 #'         source nodes (i.e. have no parents).
 #' @param unsolvedParents a list whose ith index is a vector of all the parents
 #'        j of i in the graph which for which the edge j->i is not yet known to be
@@ -99,7 +99,7 @@ validateLatentNodesAreSources <- function(graph) {
 #'        identifications corresponding to those in solved parents. That is
 #'        \code{identifier} should be a function taking a single argument Sigma
 #'        (any generically generated covariance matrix corresponding
-#'        to the latent factor graph) and returns a list with two named arguments
+#'        to the latent-factor graph) and returns a list with two named arguments
 #' @param activeFroms list. If node i is solved then the ith index is a vector
 #'        containing the nodes Y otherwise it is empty.
 #' @param Zs list. If node i is solved then the ith index is a vector
@@ -251,7 +251,7 @@ lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, activeFroms
 #' @export
 #'
 #' @param graph a \code{\link{LatentDigraph}} object representing
-#'         the latent factor graph. All latent nodes in this graph should be
+#'         the latent-factor graph. All latent nodes in this graph should be
 #'         source nodes (i.e. have no parents).
 #'
 #' @return a function that takes as input a covariance matrix compatible with
@@ -298,7 +298,7 @@ createLFIdentifierBaseCase <- function(graph) {
 #' @export
 #'
 #' @param graph a \code{\link{LatentDigraph}} object representing
-#'         the latent factor graph. All latent nodes in this graph should be
+#'         the latent-factor graph. All latent nodes in this graph should be
 #'         source nodes (i.e. have no parents).
 latentDigraphHasSimpleNumbering <- function(graph) {
   observedNodes <- graph$observedNodes()
@@ -313,13 +313,13 @@ latentDigraphHasSimpleNumbering <- function(graph) {
 
 #' Determines which edges in a latent digraph are LF-HTC-identifiable.
 #'
-#' Uses the latent factor half-trek criterion to determine
+#' Uses the latent-factor half-trek criterion to determine
 #' which edges in a latent digraph are generically identifiable.
 #'
 #' @export
 #'
 #' @param graph a \code{\link{LatentDigraph}} object representing
-#'         the latent factor graph. All latent nodes in this graph should be
+#'         the latent-factor graph. All latent nodes in this graph should be
 #'         source nodes (i.e. have no parents).
 #'
 #' @return returns a list with 5 components:
