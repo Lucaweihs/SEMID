@@ -4,8 +4,13 @@
 \alias{graphID.main}
 \title{Helper function to handle a graph component.}
 \usage{
-graphID.main(L, O, test.globalID = TRUE, test.genericID = TRUE,
-  test.nonID = TRUE)
+graphID.main(
+  L,
+  O,
+  test.globalID = TRUE,
+  test.genericID = TRUE,
+  test.nonID = TRUE
+)
 }
 \arguments{
 \item{L}{Adjacency matrix for the directed part of the path

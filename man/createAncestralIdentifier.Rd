@@ -4,8 +4,15 @@
 \alias{createAncestralIdentifier}
 \title{Create an ancestral identification function.}
 \usage{
-createAncestralIdentifier(idFunc, sources, targets, node, htrSources,
-  ancestralSubset, cComponent)
+createAncestralIdentifier(
+  idFunc,
+  sources,
+  targets,
+  node,
+  htrSources,
+  ancestralSubset,
+  cComponent
+)
 }
 \arguments{
 \item{idFunc}{identification of edge coefficients often requires that other

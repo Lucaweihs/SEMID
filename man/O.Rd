@@ -5,12 +5,14 @@
 \alias{O.MixedGraph}
 \title{Get adjacency matrix for bidirected part.}
 \usage{
-O(this)
+O(this, ...)
 
-\method{O}{MixedGraph}(this)
+\method{O}{MixedGraph}(this, ...)
 }
 \arguments{
 \item{this}{the mixed graph object}
+
+\item{...}{ignored.}
 }
 \description{
 Get adjacency matrix for bidirected part.
