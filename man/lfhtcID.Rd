@@ -8,7 +8,7 @@ lfhtcID(graph)
 }
 \arguments{
 \item{graph}{a \code{\link{LatentDigraph}} object representing
-the latent factor graph. All latent nodes in this graph should be
+the latent-factor graph. All latent nodes in this graph should be
 source nodes (i.e. have no parents).}
 }
 \value{
@@ -34,6 +34,11 @@ returns a list with 5 components:
 }
 }
 \description{
-Uses the latent factor half-trek criterion to determine
+Uses the latent-factor half-trek criterion to determine
 which edges in a latent digraph are generically identifiable.
+}
+\references{
+Barber, R. F., Drton, M., Sturma, N., and Weihs L. (2022).
+Half-Trek Criterion for Identifiability of Latent Variable Models.
+\emph{arXiv preprint} arXiv:2201.04457
 }

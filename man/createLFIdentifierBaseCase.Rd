@@ -8,7 +8,7 @@ createLFIdentifierBaseCase(graph)
 }
 \arguments{
 \item{graph}{a \code{\link{LatentDigraph}} object representing
-the latent factor graph. All latent nodes in this graph should be
+the latent-factor graph. All latent nodes in this graph should be
 source nodes (i.e. have no parents).}
 }
 \value{

@@ -2,7 +2,7 @@
 % Please edit documentation in R/lfhtcID.R
 \name{createLFHtcIdentifier}
 \alias{createLFHtcIdentifier}
-\title{Create a latent factor half-trek critierion identification function.}
+\title{Create a latent-factor half-trek critierion identification function.}
 \usage{
 createLFHtcIdentifier(idFunc, v, Y, Z, parents, reachableY)
 }
@@ -34,4 +34,9 @@ an identification function
 A helper function for \code{\link{lfhtcIdentifyStep}}, creates an identifier
 function based on its given parameters. This created identifier function will
 identify the directed edges from 'targets' to 'node.'
+}
+\references{
+Barber, R. F., Drton, M., Sturma, N., and Weihs L. (2022).
+Half-Trek Criterion for Identifiability of Latent Variable Models.
+\emph{arXiv preprint} arXiv:2201.04457
 }

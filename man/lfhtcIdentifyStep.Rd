@@ -2,7 +2,7 @@
 % Please edit documentation in R/lfhtcID.R
 \name{lfhtcIdentifyStep}
 \alias{lfhtcIdentifyStep}
-\title{Perform one iteration of latent factor HTC identification.}
+\title{Perform one iteration of latent-factor HTC identification.}
 \usage{
 lfhtcIdentifyStep(
   graph,
@@ -17,7 +17,7 @@ lfhtcIdentifyStep(
 }
 \arguments{
 \item{graph}{a \code{\link{LatentDigraph}} object representing
-the latent factor graph. All latent nodes in this graph should be
+the latent-factor graph. All latent nodes in this graph should be
 source nodes (i.e. have no parents).}
 
 \item{unsolvedParents}{a list whose ith index is a vector of all the parents
@@ -41,7 +41,7 @@ containing the nodes Z otherwise it is empty.}
 identifications corresponding to those in solved parents. That is
 \code{identifier} should be a function taking a single argument Sigma
 (any generically generated covariance matrix corresponding
-to the latent factor graph) and returns a list with two named arguments}
+to the latent-factor graph) and returns a list with two named arguments}
 
 \item{subsetSizeControl}{the largest subset of latent nodes to consider.}
 }
@@ -67,7 +67,12 @@ a list with four components:
 }
 }
 \description{
-A function that does one step through all the nodes in a latent factor graph
+A function that does one step through all the nodes in a latent-factor graph
 and tries to identify new edge coefficients using the existence of
 latent-factor half-trek systems.
+}
+\references{
+Barber, R. F., Drton, M., Sturma, N., and Weihs L. (2022).
+Half-Trek Criterion for Identifiability of Latent Variable Models.
+\emph{arXiv preprint} arXiv:2201.04457
 }

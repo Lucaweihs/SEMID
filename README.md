@@ -288,7 +288,7 @@ None
 
 
 ## Identifiability of latent factor graphs
-The latent-factor half-trek criterion (LF-HTC) is a sufficient criterion to check generic identifiability in directed graphical models with explicit latent variables. We created a LatentDigraph class to represent such graphs.
+The latent-factor half-trek criterion (LF-HTC) by Barber, Drton, Sturma and Weihs (2022) is a sufficient criterion to check generic identifiability in directed graphical models with explicitly modeled latent variables. We created a LatentDigraph class to represent such graphs.
 ```
 > # Latent digraphs are specified by their directed adjacency matrix L
 > library(SEMID)
@@ -307,7 +307,13 @@ The latent-factor half-trek criterion (LF-HTC) is a sufficient criterion to chec
 > # Plot latent digraph
 > plot(g)
 ```
-The LF-HTC is applicable to all graphs where the latent nodes are source nodes. An algorithm that checks LF-HTC-identifiability is implemented in `lfhtcID`.
+The function `lfhtcID` implements the algorithm to check LF-HTC-identifiability as presented in
+
+Barber, R. F., Drton, M., Sturma, N., and Weihs L. (2022).
+Half-Trek Criterion for Identifiability of Latent Variable Models.
+*arXiv preprint* arXiv:2201.04457.
+ 
+The LF-HTC is applicable to all graphs where the latent nodes are source nodes.
 ```
 > lfhtcID(g)
 Call: lfhtcID(graph = g)

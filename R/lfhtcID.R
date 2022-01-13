@@ -22,6 +22,11 @@
 #'        nodes should be identified by idFunc the newly created identification function to work.
 #'
 #' @return an identification function
+#'
+#' @references
+#' Barber, R. F., Drton, M., Sturma, N., and Weihs L. (2022).
+#' Half-Trek Criterion for Identifiability of Latent Variable Models.
+#' \emph{arXiv preprint} arXiv:2201.04457
 createLFHtcIdentifier <- function(idFunc, v, Y, Z, parents, reachableY) {
   # Necessary redundant assignments
   idFunc <- idFunc
@@ -129,6 +134,11 @@ validateLatentNodesAreSources <- function(graph) {
 #' }
 #'
 #' @export
+#'
+#' @references
+#' Barber, R. F., Drton, M., Sturma, N., and Weihs L. (2022).
+#' Half-Trek Criterion for Identifiability of Latent Variable Models.
+#' \emph{arXiv preprint} arXiv:2201.04457
 lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, activeFroms, Zs, Ls, identifier,
                               subsetSizeControl = Inf) {
   # Sanity check
@@ -342,6 +352,11 @@ latentDigraphHasSimpleNumbering <- function(graph) {
 #'   \item{\code{Ls}}{list. If node i is solved then the ith index is a
 #'   vector containing the nodes L otherwise it is empty.}
 #' }
+#'
+#' @references
+#' Barber, R. F., Drton, M., Sturma, N., and Weihs L. (2022).
+#' Half-Trek Criterion for Identifiability of Latent Variable Models.
+#' \emph{arXiv preprint} arXiv:2201.04457
 lfhtcID <- function(graph){
 
   # Check the graph
