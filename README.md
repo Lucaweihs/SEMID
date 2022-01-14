@@ -4,7 +4,7 @@
 
 This package offers a number of different functions for determining
 global and generic identifiability of path diagrams / mixed
-graphs. The following sections highlight the primary ways in which the
+graphs and latent digraphs. The following sections highlight the primary ways in which the
 package can be used. Much of the package's functionality can be accessed
 through the wrapper function `semID`.
 
@@ -266,7 +266,7 @@ Generically identifiable dir. edges:
 Generically identifiable bi. edges:
 None
 >
-> # We can do better (fewer unsolvd parents) if we don't restrict the edgewise 
+> # We can do better (fewer unsolved parents) if we don't restrict the edgewise 
 > # identifier algorithm as much
 > generalGenericID(graph, list(htcIdentifyStep, edgewiseIdentifyStep),
 +                  tianDecompose = F)
@@ -284,4 +284,46 @@ Generically identifiable dir. edges:
 
 Generically identifiable bi. edges:
 None
+```
+
+
+## Identifiability of latent factor graphs
+The latent-factor half-trek criterion (LF-HTC) by Barber, Drton, Sturma and Weihs (2022) is a sufficient criterion to check generic identifiability in directed graphical models with explicitly modeled latent variables. We created a LatentDigraph class to represent such graphs.
+```
+> # Latent digraphs are specified by their directed adjacency matrix L
+> library(SEMID)
+> L = matrix(c(0, 1, 0, 0, 0, 0,
++              0, 0, 1, 0, 0, 0,
++              0, 0, 0, 0, 0, 0,
++              0, 0, 0, 0, 1, 0,
++              0, 0, 0, 0, 0, 0,
++              1, 1, 1, 1, 1, 0), 6, 6, byrow=TRUE)
+> observedNodes = seq(1,5)
+> latentNodes = c(6)
+>
+> # Create the latent digraph object corresponding to L
+> g = LatentDigraph(L, observedNodes, latentNodes)
+>
+> # Plot latent digraph
+> plot(g)
+```
+The function `lfhtcID` implements the algorithm to check LF-HTC-identifiability as presented in
+
+Barber, R. F., Drton, M., Sturma, N., and Weihs L. (2022).
+Half-Trek Criterion for Identifiability of Latent Variable Models.
+*arXiv preprint* arXiv:2201.04457.
+ 
+The LF-HTC is applicable to all graphs where the latent nodes are source nodes.
+```
+> lfhtcID(g)
+Call: lfhtcID(graph = g)
+
+Latent Digraph Info
+# observed nodes: 5 
+# latent nodes: 1 
+# total nr. of edges between observed nodes: 3 
+
+Generic Identifiability Summary
+# nr. of edges between observed nodes shown gen. identifiable: 3 
+# gen. identifiable edges: 1->2, 2->3, 4->5
 ```

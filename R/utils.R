@@ -1,4 +1,4 @@
-#' Checks a MixedGraph has appropriate node numbering
+#' Checks that a MixedGraph has appropriate node numbering
 #'
 #' Checks that the input mixed graph has vertices are numbered from 1
 #' to mixedGraph$numNodes(). Throws an error if they are not.
@@ -45,7 +45,6 @@ mixedGraphHasSimpleNumbering <- function(mixedGraph) {
 #'                      make the algorithm faster and more powerful. Note that
 #'                      this is a version of the Tian decomposition that works
 #'                      also with cyclic graphs.
-#' @inheritParams generalGenericID
 #'
 #' @return returns an object of \link{class} '\code{SEMIDResult},' this
 #'         object is just a list with 6 components:
@@ -160,6 +159,29 @@ print.SEMIDResult <- function(x, ...) {
     }
 
     invisible(x)
+}
+
+#' A helper function to validate an input matrix.
+#'
+#' This helper function validates that an input matrix, L, is of the
+#' the appropriate form to be interpreted by the other functions. In particular
+#' it should be square matrix of 1's and 0's with all 0's along its
+#' diagonal. If any of the above conditions is not met, this function will
+#' throw an error.
+#'
+#' @param L See above description.
+#'
+#' @return No return value
+validateMatrix <- function(L) {
+  if (!is.matrix(L)) {
+    stop("Input is not a matrix.")
+  } else if (nrow(L) != ncol(L)) {
+    stop("Input matrix must be square.")
+  } else if (!all(L %in% c(0, 1))) {
+    stop("Input matrix must be 0,1 valued.")
+  } else if (any(diag(L) != 0)) {
+    stop("Input matrix must have all 0's along its diagonal.")
+  }
 }
 
 #' A helper function to validate input matrices.

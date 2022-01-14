@@ -2,15 +2,32 @@
 % Please edit documentation in R/MixedGraph.R
 \name{getHalfTrekSystem}
 \alias{getHalfTrekSystem}
-\alias{getHalfTrekSystem.MixedGraphFixedOrder}
 \alias{getHalfTrekSystem.MixedGraph}
+\alias{getTrekSystem.MixedGraph}
 \title{Determines if a half-trek system exists in the mixed graph.}
 \usage{
-getHalfTrekSystem(this, fromNodes, toNodes)
+getHalfTrekSystem(this, fromNodes, toNodes, ...)
 
-\method{getHalfTrekSystem}{MixedGraphFixedOrder}(this, fromNodes, toNodes)
+\method{getHalfTrekSystem}{MixedGraph}(
+  this,
+  fromNodes,
+  toNodes,
+  avoidLeftNodes = integer(0),
+  avoidRightNodes = integer(0),
+  avoidRightEdges = integer(0),
+  ...
+)
 
-\method{getHalfTrekSystem}{MixedGraph}(this, fromNodes, toNodes)
+\method{getTrekSystem}{MixedGraph}(
+  this,
+  fromNodes,
+  toNodes,
+  avoidLeftNodes = integer(0),
+  avoidRightNodes = integer(0),
+  avoidLeftEdges = integer(0),
+  avoidRightEdges = integer(0),
+  ...
+)
 }
 \arguments{
 \item{this}{the mixed graph object}
@@ -21,6 +38,20 @@ any half-trek system from any subset of fromNodes of size
 length(toNodes) to toNodes.}
 
 \item{toNodes}{the nodes where the half-trek system should end.}
+
+\item{...}{ignored.}
+
+\item{avoidLeftNodes}{a collection of nodes to avoid on the left}
+
+\item{avoidRightNodes}{a collection of nodes to avoid on the right}
+
+\item{avoidRightEdges}{a collection of edges between observed noes
+in the graph that should not be used on any right
+hand side of any trek in the trek system.}
+
+\item{avoidLeftEdges}{a collection of edges between observed nodes
+in the graph that should not be used on any right
+hand side of any trek in the trek system.}
 }
 \value{
 a list with two named components, \code{systemExists} (TRUE if a

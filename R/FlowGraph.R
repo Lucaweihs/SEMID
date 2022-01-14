@@ -120,7 +120,7 @@ setMethodS3("updateVertexCapacities", "FlowGraph", function(this, vertices,
 #'
 #' @param this the flow graph object
 #' @param edges the vertices to update (as a 2xr matrix with ith row
-#'        corresponding to the edge edges[i,1]->edges[i,2].
+#'        corresponding to the edge edges[1,i]->edges[2,i].
 #' @param newCaps the new capacities for the edges
 updateEdgeCapacities <- function(this, edges, newCaps) {
     UseMethod("updateEdgeCapacities")

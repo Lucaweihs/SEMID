@@ -4,8 +4,11 @@
 \alias{MixedGraph}
 \title{Construct MixedGraph object}
 \usage{
-MixedGraph(L = matrix(0,1,1), O = matrix(0,1,1),
-                  vertexNums = 1:nrow(L))
+MixedGraph(
+  L = matrix(0, 1, 1),
+  O = matrix(0, 1, 1),
+  vertexNums = seq(1, length = nrow(L))
+)
 }
 \arguments{
 \item{L}{see \code{\link{graphID}} for the appropriate form of L.}

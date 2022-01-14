@@ -1,19 +1,34 @@
 ## Test environments
-* local OS X install, R 3.5.3
-* ubuntu 14.04 (on travis-ci), R 3.6.0
-* Using devtools::check_win_devel()
-* Using devtools::check_rhub()
+Checks were performed on the following platforms using rhub::check_for_cran():
+- R-hub windows-x86_64-devel (r-devel)
+- R-hub ubuntu-gcc-release (r-release)
+- R-hub fedora-clang-devel (r-devel)
 
 ## R CMD check results
-There were no ERRORs, WARNINGs, or NOTEs.
+On windows-x86_64-devel (r-devel), ubuntu-gcc-release (r-release), fedora-clang-devel (r-devel) \
+* checking CRAN incoming feasibility ... NOTE \
+Maintainer: 'Nils Sturma <nils.sturma@tum.de>'
 
-* Previously I have received notes regarding possibly mispelled words in DESCRIPTION, namely:
-  Draisma (15:55)
-  Drton (14:58, 15:68)
-  Foygel (14:65, 15:47)
-  Sullivant (15:5)
-  
-  None of these words are mispelled. They are all names.
+New maintainer: \
+Nils Sturma <nils.sturma@tum.de> \
+Old maintainer(s): \
+Luca Weihs <lucaw@uw.edu> \
+
+Found the following (possibly) invalid DOIs: \
+DOI: 10.1214/10-AOS859 \
+    From: DESCRIPTION \
+    Status: Internal Server Error \
+    Message: 500 \
+DOI: 10.1214/12-AOS1012 \
+    From: DESCRIPTION \
+    Status: Internal Server Error \
+    Message: 500 \
+
+0 errors √ | 0 warnings √ | 1 note x \
+
+- The maintainer is being changed on purpose.
+- None of these DOIs are invalid. They are both correct.
+
 
 ## Downstream dependencies
 There are currently no downstream dependencies for this package.
