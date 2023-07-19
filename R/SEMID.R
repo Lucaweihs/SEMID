@@ -1,10 +1,10 @@
 #' SEMID package documentation.
 #'
 #' SEMID provides a number of methods for testing the global/generic
-#' identifiability of mixed graphs.
+#' identifiability of mixed graphs and latent-factor graphs.
 #'
-#' The only function you're likely to need from \pkg{SEMID} is
-#' \code{\link{semID}}. A complete description of all package features, along
+#' The only functions you're likely to need from \pkg{SEMID} are
+#' \code{\link{semID}} and \code{\link{lfhtcID}}. A complete description of all package features, along
 #' with examples, can be found at \url{https://github.com/Lucaweihs/SEMID}.
 #'
 #' @import igraph
@@ -100,4 +100,29 @@
 #' # identifier algorithm as much
 #' generalGenericID(graph, list(htcIdentifyStep, edgewiseIdentifyStep),
 #'                   tianDecompose = FALSE)
+#'
+#' ###
+#' # Checking the generic identifiability of parameters in a latent-factor graph.
+#' ###
+#'
+#' # Latent digraphs are specified by their directed adjacency matrix L
+#' library(SEMID)
+#' L = matrix(c(0, 1, 0, 0, 0, 0,
+#'              0, 0, 1, 0, 0, 0,
+#'              0, 0, 0, 0, 0, 0,
+#'              0, 0, 0, 0, 1, 0,
+#'              0, 0, 0, 0, 0, 0,
+#'              1, 1, 1, 1, 1, 0), 6, 6, byrow=TRUE)
+#' observedNodes = seq(1,5)
+#' latentNodes = c(6)
+#'
+#' # Create the latent digraph object corresponding to L
+#' g = LatentDigraph(L, observedNodes, latentNodes)
+#'
+#' # Plot latent digraph
+#' plot(g)
+#'
+#' # We can identify all nodes by the latent-factor half-trek criterion
+#' lfhtcID(g)
+#'
 NULL

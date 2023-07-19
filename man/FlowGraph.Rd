@@ -19,7 +19,7 @@ be a matrix of the same dimensions as L with (i,j)th entry the
 capacity of the i->j edge.}
 }
 \value{
-An object representing the FlowGraph
+An object representing the FlowGraph.
 }
 \description{
 Creates an object representing a flow graph.

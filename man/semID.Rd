@@ -16,7 +16,7 @@ semID(
 \item{mixedGraph}{a \code{\link{MixedGraph}} object representing the L-SEM.}
 
 \item{testGlobalID}{TRUE or FALSE if the graph should be tested for global
-identifiability. This uses the \code{\link{graphID.globalID}}
+identifiability. This uses the \code{\link{globalID}}
 function.}
 
 \item{testGenericNonID}{TRUE of FALSE if the graph should be tested for

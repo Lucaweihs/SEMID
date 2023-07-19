@@ -16,14 +16,14 @@ own.}
 \item{sources}{the sources of the half-trek system.}
 
 \item{targets}{the targets of the half-trek system (these should be the
-parents of node).}
+parents of \code{node}).}
 
 \item{node}{the node for which all incoming edges are to be identified
 (the tails of which are targets).}
 
 \item{htrSources}{the nodes in sources which are half-trek reachable from
-node. All incoming edges to these sources should be identified by
-idFunc for the newly created identification function to work.}
+\code{node}. All incoming edges to these sources should be identified by
+\code{idFunc} for the newly created identification function to work.}
 }
 \value{
 an identification function

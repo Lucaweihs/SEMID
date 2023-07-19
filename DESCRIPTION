@@ -1,8 +1,8 @@
 Package: SEMID
 Type: Package
 Title: Identifiability of Linear Structural Equation Models
-Version: 0.4.0
-Date: 2022-01-13
+Version: 0.4.1
+Date: 2023-07-19
 Authors@R: c(person("Rina", "Foygel Barber", role=c("aut"), 
                    email="rina@uchicago.edu"), 
             person("Mathias", "Drton", role=c("aut"), 
@@ -30,4 +30,4 @@ Suggests:
     testthat
 NeedsCompilation: no
 Repository: CRAN
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3

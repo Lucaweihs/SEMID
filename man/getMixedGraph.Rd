@@ -10,7 +10,7 @@ getMixedGraph(this, ...)
 \method{getMixedGraph}{LatentDigraph}(this, ...)
 }
 \arguments{
-\item{this}{the graph object}
+\item{this}{the LatentDigraph object}
 
 \item{...}{ignored}
 }

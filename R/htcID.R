@@ -11,12 +11,12 @@
 #'        own.
 #' @param sources the sources of the half-trek system.
 #' @param targets the targets of the half-trek system (these should be the
-#'        parents of node).
+#'        parents of \code{node}).
 #' @param node the node for which all incoming edges are to be identified
 #'        (the tails of which are targets).
 #' @param htrSources the nodes in sources which are half-trek reachable from
-#'        node. All incoming edges to these sources should be identified by
-#'        idFunc for the newly created identification function to work.
+#'        \code{node}. All incoming edges to these sources should be identified by
+#'        \code{idFunc} for the newly created identification function to work.
 #'
 #' @return an identification function
 #'
@@ -35,20 +35,20 @@ createHtcIdentifier <- function(idFunc, sources, targets, node, htrSources) {
         m <- nrow(Sigma)
         identifiedParams <- idFunc(Sigma)
         Lambda <- identifiedParams$Lambda
-        
+
         SigmaMinus <- Sigma
         for (source in htrSources) {
-            SigmaMinus[source, ] <- Sigma[source, ] - t(Lambda[, source, drop = F]) %*% 
+            SigmaMinus[source, ] <- Sigma[source, ] - t(Lambda[, source, drop = F]) %*%
                 Sigma
         }
-        
+
         if (abs(det(SigmaMinus[sources, targets, drop = F])) < 10^-10) {
             stop("In identification, found near-singular system. Is the input matrix generic?")
         }
-        
-        Lambda[targets, node] <- solve(SigmaMinus[sources, targets, drop = F], SigmaMinus[sources, 
+
+        Lambda[targets, node] <- solve(SigmaMinus[sources, targets, drop = F], SigmaMinus[sources,
             node, drop = F])
-        
+
         if (!any(is.na(Lambda))) {
             Omega <- t(diag(m) - Lambda) %*% Sigma %*% (diag(m) - Lambda)
             return(list(Lambda = Lambda, Omega = Omega))
@@ -127,18 +127,18 @@ htcIdentifyStep <- function(mixedGraph, unsolvedParents, solvedParents, identifi
             next
         }
         halfTrekSystemResult <- mixedGraph$getHalfTrekSystem(allowedNodes, nodeParents)
-        
+
         if (halfTrekSystemResult$systemExists) {
             identifiedEdges <- c(identifiedEdges, as.integer(rbind(nodeParents, i)))
             activeFrom <- halfTrekSystemResult$activeFrom
-            identifier <- createHtcIdentifier(identifier, activeFrom, nodeParents, 
+            identifier <- createHtcIdentifier(identifier, activeFrom, nodeParents,
                 i, intersect(activeFrom, htrFromNode))
             solvedParents[[i]] <- nodeParents
             unsolvedParents[[i]] <- integer(0)
             solvedNodes <- c(i, solvedNodes)
         }
     }
-    return(list(identifiedEdges = matrix(identifiedEdges, byrow = T, ncol = 2), unsolvedParents = unsolvedParents, 
+    return(list(identifiedEdges = matrix(identifiedEdges, byrow = T, ncol = 2), unsolvedParents = unsolvedParents,
         solvedParents = solvedParents, identifier = identifier))
 }
 
@@ -190,10 +190,10 @@ graphID.htcID <- function(L, O) {
     m <- nrow(L)
     validateMatrices(L, O)
     O <- 1 * ((O + t(O)) != 0)
-    
+
     # 1 & 2 = source & target 2 + {1,...,m} = L(i) for i=1,...,m 2+m + {1,...,m} =
     # R(i)-in for i=1,...,m 2+2*m + {1,...,m} = R(i)-out for i=1,...,m
-    
+
     Cap.matrix.init <- matrix(0, 2 + 3 * m, 2 + 3 * m)
     for (i in 1:m) {
         # edge from L(i) to R(i)-in, and to R(j)-in for all siblings j of i
@@ -203,35 +203,35 @@ graphID.htcID <- function(L, O) {
         # edge from R(i)-out to R(j)-in for all directed edges i->j
         Cap.matrix.init[2 + 2 * m + i, 2 + m + which(L[i, ] == 1)] <- 1
     }
-    
+
     # when testing if a set A satisfies the HTC with respect to a node i, need to add
     # (1) edge from source to L(j) for all j in A and (2) edge from R(j)-out to
     # target for all parents j of i
-    
+
     Dependence.matrix <- O + diag(m)
     for (i in 1:m) {
         Dependence.matrix <- (Dependence.matrix + Dependence.matrix %*% L > 0)
     }
-    
+
     Solved.nodes <- rep(0, m)
     Solved.nodes[which(colSums(L) == 0)] <- 1  # nodes with no parents
     change <- 1
     count <- 1
-    
+
     while (change == 1) {
         change <- 0
-        
+
         for (i in which(Solved.nodes == 0)) {
-            A <- setdiff(c(which(Solved.nodes > 0), which(Dependence.matrix[i, ] == 
+            A <- setdiff(c(which(Solved.nodes > 0), which(Dependence.matrix[i, ] ==
                 0)), c(i, which(O[i, ] == 1)))
-            
+
             Cap.matrix <- Cap.matrix.init
-            
+
             Cap.matrix[1, 2 + A] <- 1
             Cap.matrix[2 + 2 * m + which(L[, i] == 1), 2] <- 1
-            
+
             flow <- graph.maxflow(graph.adjacency(Cap.matrix), source = 1, target = 2)$value
-            
+
             if (flow == sum(L[, i])) {
                 change <- 1
                 count <- count + 1
@@ -239,7 +239,7 @@ graphID.htcID <- function(L, O) {
             }
         }
     }
-    
+
     if (all(Solved.nodes == 0)) {
         Solved.nodes <- NULL
     } else {
@@ -272,12 +272,12 @@ graphID.nonHtcID <- function(L, O) {
         return(F)
     }
     O <- 1 * ((O + t(O)) != 0)
-    
+
     # 1 & 2 = source & target 2 + {1,...,N} = L{i_n,j_n} for the n-th nonsibling
     # pair, n=1,...,N (2+N) + 2*m^2 = 2 copies of R_i(j) -- in copy & out copy where
     # (2+N) + (i-1)*m + j = R_i(j) in copy & (2+N+m^2) + (i-1)*m + j = R_i(j) out
     # copy
-    
+
     nonsibs <- NULL
     N <- 0
     for (i in 1:(m - 1)) {
@@ -288,17 +288,17 @@ graphID.nonHtcID <- function(L, O) {
             }
         }
     }
-    
+
     Cap.matrix <- matrix(0, 2 * m^2 + N + 2, 2 * m^2 + N + 2)
     if (N != 0) {
         Cap.matrix[1, 2 + (1:N)] <- 1  # edges from source to L{i,j} for each
         # nonsibling pair {i,j} = nonsibs[n,1:2] edge from L{i,j} to R_i(j), and to
         # R_i(k)-in for all siblings k of node j
         for (n in 1:N) {
-            Cap.matrix[2 + n, 2 + N + (nonsibs[n, 1] - 1) * m + c(nonsibs[n, 2], 
+            Cap.matrix[2 + n, 2 + N + (nonsibs[n, 1] - 1) * m + c(nonsibs[n, 2],
                 which(O[nonsibs[n, 2], ] == 1))] <- 1
             # edge from L{i,j} to R_j(i), and to R_j(i)-in for all siblings k of node i
-            Cap.matrix[2 + n, 2 + N + (nonsibs[n, 2] - 1) * m + c(nonsibs[n, 1], 
+            Cap.matrix[2 + n, 2 + N + (nonsibs[n, 2] - 1) * m + c(nonsibs[n, 1],
                 which(O[nonsibs[n, 1], ] == 1))] <- 1
         }
     }
@@ -309,11 +309,11 @@ graphID.nonHtcID <- function(L, O) {
             # edge from R_i(j)-in to R_i(j)-out
             Cap.matrix[2 + N + (i - 1) * m + j, 2 + N + m^2 + (i - 1) * m + j] <- 1
             # edge from R_i(j)-out to R_i(k)-in where j->k is a directed edge
-            Cap.matrix[2 + N + m^2 + (i - 1) * m + j, 2 + N + (i - 1) * m + which(L[j, 
+            Cap.matrix[2 + N + m^2 + (i - 1) * m + j, 2 + N + (i - 1) * m + which(L[j,
                 ] == 1)] <- 1
         }
     }
-    
+
     HTC.nonID <- graph.maxflow(igraph::graph.adjacency(Cap.matrix), source = 1, target = 2)$value
     return(HTC.nonID < sum(L))
 }
