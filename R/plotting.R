@@ -14,9 +14,7 @@ plotMixedGraph <- function(L, O, main = "", vertexLabels = 1:nrow(L)) {
     }
     R.utils::withSeed({
         dirGraph <- igraph::graph.adjacency(L)
-        igraph::V(dirGraph)$name <- vertexLabels
         biGraph <- igraph::graph.adjacency(O, mode = "undirected")
-        igraph::V(biGraph)$name <- vertexLabels
 
         layout <- igraph::layout_in_circle(dirGraph)
 
@@ -24,6 +22,7 @@ plotMixedGraph <- function(L, O, main = "", vertexLabels = 1:nrow(L)) {
         dirCurveMat <- (L * t(L)) != 0
         curvedOrNot <- dirCurveMat[dirEdgeList]
 
+        igraph::V(dirGraph)$name <- vertexLabels
         plot(dirGraph, edge.color = "blue", layout = layout, edge.curved = curvedOrNot,
             vertex.size = 30, vertex.color = "lightgrey", main = main)
 
@@ -31,6 +30,7 @@ plotMixedGraph <- function(L, O, main = "", vertexLabels = 1:nrow(L)) {
         biCurveMat <- ((L + t(L)) != 0) * O * (1 - dirCurveMat)
         curvedOrNot <- biCurveMat[biEdgeList] != 0
 
+        igraph::V(biGraph)$name <- vertexLabels
         plot(biGraph, add = T, edge.color = "red", layout = layout, edge.curved = curvedOrNot,
             edge.arrow.mode = 3, vertex.size = 30, vertex.color = "lightgrey")
     }, 123)

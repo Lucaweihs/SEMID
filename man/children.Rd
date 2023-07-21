@@ -5,7 +5,7 @@
 \alias{children.LatentDigraphFixedOrder}
 \alias{children.LatentDigraph}
 \alias{children.MixedGraph}
-\title{All children of a collection of observed nodes.}
+\title{All children of a collection of nodes.}
 \usage{
 children(this, nodes, ...)
 

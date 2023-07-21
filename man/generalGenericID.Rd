@@ -47,12 +47,12 @@ A function that encapsulates the general structure of our algorithms for
 testing generic identifiability. Allows for various identification algorithms
 to be used in concert, in particular it will use the identifier functions
 in the list \code{idStepFunctions} sequentially until it can find no more
-identifications. The step functions that are currently available for use are
-in \code{idStepFunctions}
+identifications. The step functions that are currently available for use
+in \code{idStepFunctions} are
 \enumerate{
-  \item htcIdentifyStep
-  \item ancestralIdentifyStep
-  \item edgewiseIdentifyStep
-  \item trekSeparationIdentifyStep
+  \item htcIdentifyStep,
+  \item ancestralIdentifyStep,
+  \item edgewiseIdentifyStep,
+  \item trekSeparationIdentifyStep.
 }
 }

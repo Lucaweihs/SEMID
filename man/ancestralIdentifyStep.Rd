@@ -40,13 +40,25 @@ is known to be generically identifiable (perhaps by other algorithms).}
        Lambda[j,i] is not NA.}
 }
 \value{
-a list
+a list with four components:
+\describe{
+  \item{\code{identifiedEdges}}{a matrix rx2 matrix where r is the number
+  of edges that where identified by this function call and
+  \code{identifiedEdges[i,1] -> identifiedEdges[i,2]} was the ith edge
+  identified}
+  \item{\code{unsolvedParents}}{as the input argument but updated with
+  any newly identified edges}
+  \item{\code{solvedParents}}{as the input argument but updated with
+  any newly identified edges}
+  \item{\code{identifier}}{as the input argument but updated with
+  any newly identified edges}
+}
 }
 \description{
 A function that does one step through all the nodes in a mixed graph
 and tries to determine if directed edge coefficients are generically
 identifiable by leveraging decomposition by ancestral subsets. See
-algorithm 1 of Drton and Weihs (2015); this version of the algorithm
+Algorithm 1 of Drton and Weihs (2015); this version of the algorithm
 is somewhat different from Drton and Weihs (2015) in that it also works
 on cyclic graphs.
 }

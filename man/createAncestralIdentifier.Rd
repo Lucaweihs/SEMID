@@ -24,26 +24,26 @@ own.}
 \item{sources}{the sources of the half-trek system.}
 
 \item{targets}{the targets of the half-trek system (these should be the
-parents of node).}
+parents of \code{node}).}
 
 \item{node}{the node for which all incoming edges are to be identified
 (the tails of which are targets).}
 
 \item{htrSources}{the nodes in sources which are half-trek reachable from
-node. All incoming edges to these sources should be identified by
-idFunc for the newly created identification function to work.}
+\code{node}. All incoming edges to these sources should be identified by
+\code{idFunc} for the newly created identification function to work.}
 
-\item{ancestralSubset}{an ancestral subset of the graph containing node.}
+\item{ancestralSubset}{an ancestral subset of the graph containing \code{node}.}
 
-\item{cComponent}{a list corresponding to the c-component containing node
-in the subgraph induced by ancestralSubset. See
-\code{\link{tianDecompose}} for how such c-component lists are formed.}
+\item{cComponent}{a list corresponding to the connected component containing \code{node}
+in the subgraph induced by \code{ancestralSubset}. See
+\code{\link{tianDecompose}} for how such connected component lists are formed.}
 }
 \value{
 an identification function
 }
 \description{
-A helper function for ancestralIdentifyStep, creates an identifier function
+A helper function for \code{\link{ancestralIdentifyStep}}, creates an identifier function
 based on its given parameters. This created identifier function will
 identify the directed edges from 'targets' to 'node.'
 }

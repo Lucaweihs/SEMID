@@ -23,7 +23,7 @@ The vector of nodes that could be determined to be generically
 identifiable.
 }
 \description{
-If directed part of input graph is cyclic then will check for generic
+If the directed part of input graph is cyclic then will check for generic
 identifiability using the half-trek criterion. Otherwise will use the a
 slightly stronger version of the half-trek criterion using ancestor
 decompositions.

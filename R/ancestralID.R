@@ -1,14 +1,14 @@
 #' Create an ancestral identification function.
 #'
-#' A helper function for ancestralIdentifyStep, creates an identifier function
+#' A helper function for \code{\link{ancestralIdentifyStep}}, creates an identifier function
 #' based on its given parameters. This created identifier function will
 #' identify the directed edges from 'targets' to 'node.'
 #'
 #' @inheritParams createHtcIdentifier
-#' @param ancestralSubset an ancestral subset of the graph containing node.
-#' @param cComponent a list corresponding to the c-component containing node
-#'        in the subgraph induced by ancestralSubset. See
-#'        \code{\link{tianDecompose}} for how such c-component lists are formed.
+#' @param ancestralSubset an ancestral subset of the graph containing \code{node}.
+#' @param cComponent a list corresponding to the connected component containing \code{node}
+#'        in the subgraph induced by \code{ancestralSubset}. See
+#'        \code{\link{tianDecompose}} for how such connected component lists are formed.
 #'
 #' @return an identification function
 createAncestralIdentifier <- function(idFunc, sources, targets, node, htrSources,
@@ -83,13 +83,25 @@ createAncestralIdentifier <- function(idFunc, sources, targets, node, htrSources
 #' A function that does one step through all the nodes in a mixed graph
 #' and tries to determine if directed edge coefficients are generically
 #' identifiable by leveraging decomposition by ancestral subsets. See
-#' algorithm 1 of Drton and Weihs (2015); this version of the algorithm
+#' Algorithm 1 of Drton and Weihs (2015); this version of the algorithm
 #' is somewhat different from Drton and Weihs (2015) in that it also works
 #' on cyclic graphs.
 #'
 #' @inheritParams htcIdentifyStep
 #'
-#' @return a list
+#' @return a list with four components:
+#' \describe{
+#'   \item{\code{identifiedEdges}}{a matrix rx2 matrix where r is the number
+#'   of edges that where identified by this function call and
+#'   \code{identifiedEdges[i,1] -> identifiedEdges[i,2]} was the ith edge
+#'   identified}
+#'   \item{\code{unsolvedParents}}{as the input argument but updated with
+#'   any newly identified edges}
+#'   \item{\code{solvedParents}}{as the input argument but updated with
+#'   any newly identified edges}
+#'   \item{\code{identifier}}{as the input argument but updated with
+#'   any newly identified edges}
+#' }
 #'
 #' @export
 #'
@@ -210,7 +222,7 @@ getAncestors <- function(g, nodes) {
     if (vcount(g) == 0 || length(nodes) == 0) {
         return(numeric(0))
     }
-    as.integer(sort(graph.bfs(g, nodes, neimode = "in", unreachable = F)$order, na.last = NA))
+    as.integer(sort(graph.bfs(g, nodes, mode = "in", unreachable = F)$order, na.last = NA))
     # sort(unique(unlist(neighborhood(g, vcount(g), nodes=nodes, mode='in'))))
 }
 
@@ -260,7 +272,7 @@ getDescendants <- function(g, nodes) {
     if (vcount(g) == 0 || length(nodes) == 0) {
         return(numeric(0))
     }
-    as.integer(sort(graph.bfs(g, nodes, neimode = "out", unreachable = F)$order,
+    as.integer(sort(graph.bfs(g, nodes, mode = "out", unreachable = F)$order,
         na.last = NA))
     # sort(unique(unlist(neighborhood(g, vcount(g), nodes=nodes, mode='out'))))
 }
@@ -323,12 +335,12 @@ getMixedCompForNode <- function(dG, bG, subNodes, node) {
 
     bidirectedComp <- as.integer(sort(graph.bfs(bG, root = node,
                                                 restricted = restricted,
-                                                neimode = "total",
+                                                mode = "total",
                                                 unreachable = F)$order))
 
     bidirectedComp =
       as.integer(sort(graph.bfs(bG, root = node, restricted = restricted,
-                                neimode = "total", unreachable = F)$order))
+                                mode = "total", unreachable = F)$order))
 
 
     incomingNodes <- intersect(setdiff(getParents(dG, bidirectedComp), bidirectedComp),

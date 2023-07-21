@@ -26,7 +26,7 @@ mixedGraphHasSimpleNumbering <- function(mixedGraph) {
 #'
 #' @param mixedGraph a \code{\link{MixedGraph}} object representing the L-SEM.
 #' @param testGlobalID TRUE or FALSE if the graph should be tested for global
-#'        identifiability. This uses the \code{\link{graphID.globalID}}
+#'        identifiability. This uses the \code{\link{globalID}}
 #'        function.
 #' @param testGenericNonID TRUE of FALSE if the graph should be tested for
 #'        generic non-identifiability, that is, if for every generic choice
@@ -87,7 +87,7 @@ semID <- function(mixedGraph, testGlobalID = TRUE, testGenericNonID = TRUE, gene
     tianDecompose = TRUE) {
     isGlobalID <- NA
     if (testGlobalID) {
-        isGlobalID <- graphID.globalID(mixedGraph$L(), mixedGraph$O())
+        isGlobalID <- globalID(mixedGraph)
     }
 
     isGenericNonID <- NA
@@ -331,13 +331,13 @@ tianIdentifier <- function(idFuncs, cComponents) {
 #' testing generic identifiability. Allows for various identification algorithms
 #' to be used in concert, in particular it will use the identifier functions
 #' in the list \code{idStepFunctions} sequentially until it can find no more
-#' identifications. The step functions that are currently available for use are
-#' in \code{idStepFunctions}
+#' identifications. The step functions that are currently available for use
+#' in \code{idStepFunctions} are
 #' \enumerate{
-#'   \item htcIdentifyStep
-#'   \item ancestralIdentifyStep
-#'   \item edgewiseIdentifyStep
-#'   \item trekSeparationIdentifyStep
+#'   \item htcIdentifyStep,
+#'   \item ancestralIdentifyStep,
+#'   \item edgewiseIdentifyStep,
+#'   \item trekSeparationIdentifyStep.
 #' }
 #'
 #' @export
@@ -560,21 +560,22 @@ subsetsOfSize <- function(x, k) {
 #' Create an identifier base case
 #'
 #' Identifiers are functions that take as input a covariance matrix Sigma
-#' corresponding to some mixed graph G and, from that covariance matrix,
-#' identify some subset of the coefficients in the mixed graph G. This function
-#' takes as input the matrices, L and O, defining G and creates an identifier
-#' that does not identify any of the coefficients of G. This is useful as a
+#' corresponding to some mixed graph \code{G} and, from that covariance matrix,
+#' identify some subset of the coefficients in the mixed graph \code{G}. This function
+#' takes as input the matrices, \code{L} and \code{O}, defining \code{G} and creates an identifier
+#' that does not identify any of the coefficients of \code{G}. This is useful as a
 #' base case when building more complex identification functions.
 #'
 #' @inheritParams graphID
 #'
 #' @return a function that takes as input a covariance matrix compatible with
-#'         the mixed graph defined by L/O and returns a list with two
-#'         named components:
-#'         Lambda - a matrix equal to L but with NA values instead of 1s,
-#'         Omega - a matrix equal to O but with NA values instead of 1s.
-#'         When building more complex identifiers these NAs will be replaced
-#'         by the value that can be identified from Sigma.
+#' the mixed graph defined by \code{L}/\code{O} and returns a list with two
+#' named components:
+#' \describe{
+#'   \item{\code{Lambda}}{a matrix equal to \code{L} but with \code{NA} values instead of \code{1}s}
+#'   \item{\code{Omega}}{a matrix equal to \code{O} but with \code{NA} values instead of \code{1}s}
+#' }
+#' When building more complex identifiers these NAs will be replaced by the value that can be identified from Sigma.
 createIdentifierBaseCase <- function(L, O) {
     # Redundant assignment puts L into the environment of the, below returned,
     # function

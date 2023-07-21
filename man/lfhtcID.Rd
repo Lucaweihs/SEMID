@@ -12,7 +12,7 @@ the latent-factor graph. All latent nodes in this graph should be
 source nodes (i.e. have no parents).}
 }
 \value{
-returns a list with 5 components:
+returns a list with 8 components:
 \describe{
   \item{\code{solvedParents}}{a list whose ith element contains a vector
   containing the subsets of parents of node i for which the edge j->i could
@@ -40,5 +40,5 @@ which edges in a latent digraph are generically identifiable.
 \references{
 Barber, R. F., Drton, M., Sturma, N., and Weihs L. (2022).
 Half-Trek Criterion for Identifiability of Latent Variable Models.
-\emph{arXiv preprint} arXiv:2201.04457
+Ann. Statist. 50(6):3174--3196. <doi:10.1214/22-AOS2221>.
 }

@@ -23,7 +23,7 @@ own.}
 \item{sources}{the sources of the half-trek system.}
 
 \item{targets}{the targets of the half-trek system (these should be the
-parents of node).}
+parents of \code{node}).}
 
 \item{node}{the node for which all incoming edges are to be identified
 (the tails of which are targets).}

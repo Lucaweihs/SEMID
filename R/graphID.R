@@ -83,7 +83,7 @@
 #' ## Examples from Foygel, Draisma & Drton (2012)
 #' demo(SEMID)
 #' }
-graphID <- function(L, O, output.type = "matrix", file.name = NULL, decomp.if.acyclic = TRUE, 
+graphID <- function(L, O, output.type = "matrix", file.name = NULL, decomp.if.acyclic = TRUE,
     test.globalID = TRUE, test.genericID = TRUE, test.nonID = TRUE) {
     .Deprecated("semID", package = "SEMID")
     if (!is.matrix(L) || !is.matrix(O)) {
@@ -104,13 +104,13 @@ graphID <- function(L, O, output.type = "matrix", file.name = NULL, decomp.if.ac
                 O <- O + t(O)
                 O <- (O != 0)
                 diag(O) <- 0
-                Graph.output <- graphID.decompose(L, O, decomp.if.acyclic, test.globalID, 
+                Graph.output <- graphID.decompose(L, O, decomp.if.acyclic, test.globalID,
                   test.genericID, test.nonID)
                 if (all(c(test.globalID, test.genericID, test.nonID))) {
-                  graphID.output.alltests(Graph.output$Components, Graph.output$Decomp, 
+                  graphID.output.alltests(Graph.output$Components, Graph.output$Decomp,
                     output.type, file.name)
                 } else {
-                  graphID.output.notalltests(Graph.output$Components, Graph.output$Decomp, 
+                  graphID.output.notalltests(Graph.output$Components, Graph.output$Decomp,
                     output.type, file.name, test.globalID, test.genericID, test.nonID)
                 }
             }
@@ -150,33 +150,33 @@ graphID.output.alltests <- function(Graph.components, Decomp, output.type, file.
                   }
                 }
             }
-            
+
             if (length(Graph.components[[comp]]$HTC.ID.nodes) == 0) {
                 Graph.components[[comp]]$HTC.ID.nodes <- "none"
             }
-            
-            Comp.row <- c(comp, paste(Graph.components[[comp]]$Nodes, collapse = ","), 
+
+            Comp.row <- c(comp, paste(Graph.components[[comp]]$Nodes, collapse = ","),
                 paste(Graph.components[[comp]]$HTC.ID.nodes, collapse = ","), Comp.status)
             Graph.output.matrix <- rbind(Graph.output.matrix, Comp.row)
         }
-        
-        Graph.output.matrix <- rbind(c("Component", "Nodes", "HTC-ID'able nodes", 
+
+        Graph.output.matrix <- rbind(c("Component", "Nodes", "HTC-ID'able nodes",
             "Identifiability"), Graph.output.matrix)
         colnames(Graph.output.matrix) <- rep("", 4)
         rownames(Graph.output.matrix) <- rep("", length(Graph.components) + 1)
-        
+
         if (!Decomp) {
             Graph.output.matrix <- Graph.output.matrix[, -(1:2)]
         }
-        
+
         Max.string <- max(nchar(Graph.output.matrix))
         for (i in 1:dim(Graph.output.matrix)[1]) {
             for (j in 1:dim(Graph.output.matrix)[2]) {
-                Graph.output.matrix[i, j] <- paste(c(Graph.output.matrix[i, j], rep(" ", 
+                Graph.output.matrix[i, j] <- paste(c(Graph.output.matrix[i, j], rep(" ",
                   5 + Max.string - nchar(Graph.output.matrix[i, j]))), collapse = "")
             }
         }
-        
+
         if (output.type == "file") {
             write.table(Graph.output.matrix, file = file.name, quote = FALSE)
         } else {
@@ -186,7 +186,7 @@ graphID.output.alltests <- function(Graph.components, Decomp, output.type, file.
 }
 
 ## Format output when not all tests have been run.
-graphID.output.notalltests <- function(Graph.components, Decomp, output.type, file.name, 
+graphID.output.notalltests <- function(Graph.components, Decomp, output.type, file.name,
     test.globalID, test.genericID, test.nonID) {
     if (output.type == "list") {
         return(Graph.components)
@@ -220,7 +220,7 @@ graphID.output.notalltests <- function(Graph.components, Decomp, output.type, fi
             } else {
                 Comp.status.NonID <- "not tested"
             }
-            
+
             if (length(Graph.components[[comp]]$HTC.ID.nodes) == 0) {
                 if (test.genericID) {
                   Graph.components[[comp]]$HTC.ID.nodes <- "none"
@@ -228,32 +228,32 @@ graphID.output.notalltests <- function(Graph.components, Decomp, output.type, fi
                   Graph.components[[comp]]$HTC.ID.nodes <- "not tested"
                 }
             }
-            
-            Comp.row <- c(comp, paste(Graph.components[[comp]]$Nodes, collapse = ","), 
-                paste(Graph.components[[comp]]$HTC.ID.nodes, collapse = ","), Comp.status.GlobalID, 
+
+            Comp.row <- c(comp, paste(Graph.components[[comp]]$Nodes, collapse = ","),
+                paste(Graph.components[[comp]]$HTC.ID.nodes, collapse = ","), Comp.status.GlobalID,
                 Comp.status.GenericID, Comp.status.NonID)
             Graph.output.matrix <- rbind(Graph.output.matrix, Comp.row)
         }
-        
-        Graph.output.matrix <- rbind(c("Component", "Nodes", "HTC-ID'able nodes", 
-            "Globally ID'able?", "Generically ID'able?", "Generically non-ID'able?"), 
+
+        Graph.output.matrix <- rbind(c("Component", "Nodes", "HTC-ID'able nodes",
+            "Globally ID'able?", "Generically ID'able?", "Generically non-ID'able?"),
             Graph.output.matrix)
         colnames(Graph.output.matrix) <- rep("", 6)
         rownames(Graph.output.matrix) <- rep("", length(Graph.components) + 1)
-        
+
         if (!Decomp) {
             Graph.output.matrix <- Graph.output.matrix[, -(1:2)]
         }
-        
+
         Max.string <- max(nchar(Graph.output.matrix))
         for (i in 1:dim(Graph.output.matrix)[1]) {
             for (j in 1:dim(Graph.output.matrix)[2]) {
-                Graph.output.matrix[i, j] <- paste(c(Graph.output.matrix[i, j], rep(" ", 
+                Graph.output.matrix[i, j] <- paste(c(Graph.output.matrix[i, j], rep(" ",
                   3 + Max.string - nchar(Graph.output.matrix[i, j]))), collapse = "")
             }
         }
-        
-        
+
+
         if (output.type == "file") {
             write.table(Graph.output.matrix, file = file.name, quote = FALSE)
         } else {
@@ -278,7 +278,7 @@ graphID.output.notalltests <- function(Graph.components, Decomp, output.type, fi
 #'       identifiability on the component (see the parameter descriptions).
 #'
 #'  2. Decomp - true if a decomposition occured, false if not.
-graphID.decompose <- function(L, O, decomp.if.acyclic = TRUE, test.globalID = TRUE, 
+graphID.decompose <- function(L, O, decomp.if.acyclic = TRUE, test.globalID = TRUE,
     test.genericID = TRUE, test.nonID = TRUE) {
     m <- nrow(L)
     L <- (L != 0)
@@ -286,14 +286,14 @@ graphID.decompose <- function(L, O, decomp.if.acyclic = TRUE, test.globalID = TR
     O <- O + t(O)
     O <- (O != 0)
     diag(O) <- 0
-    
+
     Decomp <- FALSE
     if (decomp.if.acyclic) {
         test.acyclic <- TRUE
         nodes.acyclic <- 1:m
         while (test.acyclic && !Decomp) {
             if (any(colSums(L[nodes.acyclic, nodes.acyclic, drop = FALSE]) == 0)) {
-                nodes.acyclic <- nodes.acyclic[-which(colSums(L[nodes.acyclic, nodes.acyclic, 
+                nodes.acyclic <- nodes.acyclic[-which(colSums(L[nodes.acyclic, nodes.acyclic,
                   drop = FALSE]) == 0)]
                 if (length(nodes.acyclic) == 0) {
                   Decomp <- TRUE
@@ -303,7 +303,7 @@ graphID.decompose <- function(L, O, decomp.if.acyclic = TRUE, test.globalID = TR
             }
         }
     }
-    
+
     if (Decomp) {
         Bidir.comp <- diag(m) + O
         for (i in 1:(m - 1)) {
@@ -323,10 +323,10 @@ graphID.decompose <- function(L, O, decomp.if.acyclic = TRUE, test.globalID = TR
         Components[[1]] <- 1:m
         num.comp <- 1
     }
-    
+
     for (comp in 1:num.comp) {
         Component <- Components[[comp]]
-        Component.parents <- sort(setdiff(which(rowSums(L[, Component, drop = FALSE]) > 
+        Component.parents <- sort(setdiff(which(rowSums(L[, Component, drop = FALSE]) >
             0), Component))
         if (length(Components[[comp]]) == 1) {
             Components[[comp]] <- list()
@@ -345,13 +345,13 @@ graphID.decompose <- function(L, O, decomp.if.acyclic = TRUE, test.globalID = TR
         } else {
             m1 <- length(Component)
             m2 <- length(Component.parents)
-            L.Component <- cbind(L[c(Component, Component.parents), Component], matrix(0, 
+            L.Component <- cbind(L[c(Component, Component.parents), Component], matrix(0,
                 m1 + m2, m2))
-            O.Component <- cbind(rbind(O[Component, Component], matrix(0, m2, m1)), 
+            O.Component <- cbind(rbind(O[Component, Component], matrix(0, m2, m1)),
                 matrix(0, m1 + m2, m2))
-            Components[[comp]] <- c(list(Nodes = Component), graphID.main(L.Component, 
+            Components[[comp]] <- c(list(Nodes = Component), graphID.main(L.Component,
                 O.Component, test.globalID, test.genericID, test.nonID))
-            Components[[comp]]$HTC.ID.nodes <- Component[intersect(Components[[comp]]$HTC.ID.nodes, 
+            Components[[comp]]$HTC.ID.nodes <- Component[intersect(Components[[comp]]$HTC.ID.nodes,
                 1:length(Component))]
         }
     }
@@ -376,19 +376,19 @@ graphID.main <- function(L, O, test.globalID = TRUE, test.genericID = TRUE, test
     O <- O + t(O)
     O <- (O != 0)
     diag(O) <- 0
-    
+
     ILinv <- diag(m)
     for (i in 1:m) {
         ILinv <- 0 + (diag(m) + ILinv %*% L > 0)
     }
-    
+
     Output <- list()
-    
+
     Output$acyclic <- (max(ILinv + t(ILinv) - diag(m)) == 1)
-    
+
     if (test.genericID) {
         Output$HTC.ID.nodes <- graphID.htcID(L, O)
-        
+
         if (length(Output$HTC.ID.nodes) < m) {
             Output$GenericID <- FALSE
             if (Output$acyclic && test.globalID) {
@@ -400,7 +400,7 @@ graphID.main <- function(L, O, test.globalID = TRUE, test.genericID = TRUE, test
         } else {
             Output$GenericID <- TRUE
             if (Output$acyclic && test.globalID) {
-                Output$GlobalID <- graphID.globalID(L, O)
+                Output$GlobalID <- globalID(MixedGraph(L,O))
             }
             if (test.nonID) {
                 Output$NonID <- FALSE
@@ -411,67 +411,21 @@ graphID.main <- function(L, O, test.globalID = TRUE, test.genericID = TRUE, test
             Output$NonID <- graphID.nonHtcID(L, O)
             if (!Output$NonID) {
                 if (Output$acyclic && test.globalID) {
-                  Output$GlobalID <- graphID.globalID(L, O)
+                  Output$GlobalID <- globalID(MixedGraph(L,O))
                 }
             }
         } else {
             if (Output$acyclic && test.globalID) {
-                Output$GlobalID <- graphID.globalID(L, O)
+                Output$GlobalID <- globalID(MixedGraph(L,O))
             }
         }
     }
     return(Output)
 }
 
-#' Check for global identifiability of a mixed graph.
-#'
-#' Checks for the global identifiability of a mixed graph using techniques
-#' presented in Drton, Foygel, Sullivant (2011).
-#'
-#' @export
-#'
-#' @inheritParams graphID
-#'
-#' @return TRUE if the graph was globally identifiable, FALSE otherwise.
-#'
-#' @references
-#' Drton, Mathias; Foygel, Rina; Sullivant, Seth. Global identifiability of
-#' linear structural equation models. \emph{Ann. Statist.}  39 (2011), no. 2,
-#' 865--886.
-graphID.globalID <- function(L, O) {
-    m <- nrow(L)
-    validateMatrices(L, O)
-    O <- 1 * ((O + t(O)) != 0)
-    
-    if (any(L + O == 2) || !igraph::is.dag(igraph::graph.adjacency(L))) {
-        return(F)
-    }
-    
-    for (i in 1:m) {
-        dirGraph <- igraph::graph.adjacency(L)
-        biGraph <- igraph::graph.adjacency(O, mode = "undirected")
-        ancestors <- as.integer(igraph::neighborhood(dirGraph, m, nodes = i, mode = "in")[[1]])
-        biComponent <- as.integer(igraph::neighborhood(biGraph, m, nodes = i)[[1]])
-        validVertices <- intersect(ancestors, biComponent)
-        
-        newL <- 0 * L
-        newL[validVertices, validVertices] <- L[validVertices, validVertices]
-        newDirGraph <- igraph::graph.adjacency(newL)
-        
-        for (j in setdiff(validVertices, i)) {
-            if (igraph::graph.maxflow(newDirGraph, source = j, target = i)$value != 
-                0) {
-                return(FALSE)
-            }
-        }
-    }
-    
-    return(TRUE)
-}
-
 #' Determine generic identifiability of a mixed graph.
 #'
-#' If directed part of input graph is cyclic then will check for generic
+#' If the directed part of input graph is cyclic then will check for generic
 #' identifiability using the half-trek criterion. Otherwise will use the a
 #' slightly stronger version of the half-trek criterion using ancestor
 #' decompositions.

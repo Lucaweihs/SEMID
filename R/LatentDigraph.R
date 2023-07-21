@@ -191,7 +191,7 @@ setMethodS3("parents", "LatentDigraphFixedOrder", function(this, nodes,
   return(which(rowSums(this$.L[includedNodes, nodes, drop = F]) != 0))
 }, appendVarArgs = F)
 
-#' All children of a collection of observed nodes.
+#' All children of a collection of nodes.
 #'
 #' Returns all children of the collection (does not necessarily include the
 #' input nodes themselves unless they are parents of one another).
@@ -375,7 +375,7 @@ setMethodS3("trFrom", "LatentDigraphFixedOrder", function(this, nodes,
       igraph::bfs(
         this$.trGraph,
         root = nodes,
-        neimode = "out",
+        mode = "out",
         unreachable = F,
         restricted = allowed
       )$order
@@ -933,7 +933,7 @@ setMethodS3("observedParents", "LatentDigraph", function(this, nodes, ...) {
 #' @name getMixedGraph
 #' @export getMixedGraph
 #'
-#' @param this the graph object
+#' @param this the LatentDigraph object
 #' @param ... ignored
 getMixedGraph <- function(this, ...) {
   UseMethod("getMixedGraph")

@@ -14,7 +14,7 @@
 #' @param v the node for which all incoming edges are to be identified
 #'        (the tails of which are targets).
 #' @param Y the sources of the latent-factor half-trek system.
-#' @param Z the nodes that a reached from Y via an latent-factor half-trek of the form
+#' @param Z the nodes that are reached from Y via an latent-factor half-trek of the form
 #'        \code{y <- h -> z} where \code{h} is an element of L.
 #' @param parents the parents of node v.
 #' @param reachableY the nodes in Y which are latent-factor half-trek reachable
@@ -252,10 +252,11 @@ lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, activeFroms
 #' Create an latent identifier base case
 #'
 #' Identifiers are functions that take as input a covariance matrix Sigma
-#' corresponding to some latent digraph G and, from that covariance matrix,
-#' identify some subset of the coefficients in the latent digraph G. This function
-#' takes as input the matrix L defining G and creates an identifier
-#' that does not identify any of the coefficients of G. This is useful as a
+#' corresponding to some latent digraph \code{G} and, from that covariance matrix,
+#' identify some subset of the coefficients coresponding to the direct causal effects
+#' in the latent digraph \code{G}. This function
+#' takes as input the digraph \code{G} and creates an identifier
+#' that does not identify any of the direct causal effects. This is useful as a
 #' base case when building more complex identification functions.
 #'
 #' @export
@@ -265,16 +266,16 @@ lfhtcIdentifyStep <- function(graph, unsolvedParents, solvedParents, activeFroms
 #'         source nodes (i.e. have no parents).
 #'
 #' @return a function that takes as input a covariance matrix compatible with
-#'         the latent digraph defined by L and returns a list with two
+#'         the latent digraph defined by \code{L} and returns a list with two
 #'         named components:
 #'         \describe{
-#'         \item{\code{Lambda}}{a matrix equal to the observed part of L but with NA values
+#'         \item{\code{Lambda}}{a matrix equal to the observed part of \code{graph$L()} but with \code{NA} values
 #'         instead of 1s}
-#'         \item{\code{Omega}}{a matrix equal to O but with NA values for coefficients
+#'         \item{\code{Omega}}{a matrix equal to \code{graph$O()} but with \code{NA} values for coefficients
 #'         not equal to zero.}
 #'         }
 #'         When building more complex identifiers these NAs will be replaced
-#'         by the value that can be identified from Sigma.
+#'         by the value that can be identified from the covariance matrix corresponding to \code{G}.
 createLFIdentifierBaseCase <- function(graph) {
 
   L <- graph$L()
@@ -332,7 +333,7 @@ latentDigraphHasSimpleNumbering <- function(graph) {
 #'         the latent-factor graph. All latent nodes in this graph should be
 #'         source nodes (i.e. have no parents).
 #'
-#' @return returns a list with 5 components:
+#' @return returns a list with 8 components:
 #' \describe{
 #'   \item{\code{solvedParents}}{a list whose ith element contains a vector
 #'   containing the subsets of parents of node i for which the edge j->i could
@@ -356,7 +357,7 @@ latentDigraphHasSimpleNumbering <- function(graph) {
 #' @references
 #' Barber, R. F., Drton, M., Sturma, N., and Weihs L. (2022).
 #' Half-Trek Criterion for Identifiability of Latent Variable Models.
-#' \emph{arXiv preprint} arXiv:2201.04457
+#' Ann. Statist. 50(6):3174--3196. <doi:10.1214/22-AOS2221>.
 lfhtcID <- function(graph){
 
   # Check the graph

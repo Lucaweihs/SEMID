@@ -13,22 +13,23 @@ source nodes (i.e. have no parents).}
 }
 \value{
 a function that takes as input a covariance matrix compatible with
-        the latent digraph defined by L and returns a list with two
+        the latent digraph defined by \code{L} and returns a list with two
         named components:
         \describe{
-        \item{\code{Lambda}}{a matrix equal to the observed part of L but with NA values
+        \item{\code{Lambda}}{a matrix equal to the observed part of \code{graph$L()} but with \code{NA} values
         instead of 1s}
-        \item{\code{Omega}}{a matrix equal to O but with NA values for coefficients
+        \item{\code{Omega}}{a matrix equal to \code{graph$O()} but with \code{NA} values for coefficients
         not equal to zero.}
         }
         When building more complex identifiers these NAs will be replaced
-        by the value that can be identified from Sigma.
+        by the value that can be identified from the covariance matrix corresponding to \code{G}.
 }
 \description{
 Identifiers are functions that take as input a covariance matrix Sigma
-corresponding to some latent digraph G and, from that covariance matrix,
-identify some subset of the coefficients in the latent digraph G. This function
-takes as input the matrix L defining G and creates an identifier
-that does not identify any of the coefficients of G. This is useful as a
+corresponding to some latent digraph \code{G} and, from that covariance matrix,
+identify some subset of the coefficients coresponding to the direct causal effects
+in the latent digraph \code{G}. This function
+takes as input the digraph \code{G} and creates an identifier
+that does not identify any of the direct causal effects. This is useful as a
 base case when building more complex identification functions.
 }

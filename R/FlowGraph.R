@@ -15,7 +15,7 @@
 #'        be a matrix of the same dimensions as L with (i,j)th entry the
 #'        capacity of the i->j edge.
 #'
-#' @return An object representing the FlowGraph
+#' @return An object representing the FlowGraph.
 setConstructorS3("FlowGraph", function(L = matrix(0, 1, 1), vertexCaps = 1,
     edgeCaps = matrix(1, 1, 1)) {
     validateMatrices(L, L)

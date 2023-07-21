@@ -18,7 +18,7 @@ own.}
 
 \item{Y}{the sources of the latent-factor half-trek system.}
 
-\item{Z}{the nodes that a reached from Y via an latent-factor half-trek of the form
+\item{Z}{the nodes that are reached from Y via an latent-factor half-trek of the form
 \code{y <- h -> z} where \code{h} is an element of L.}
 
 \item{parents}{the parents of node v.}
