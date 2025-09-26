@@ -43,19 +43,19 @@ setConstructorS3("FlowGraph", function(L = matrix(0, 1, 1), vertexCaps = 1,
     igraph::E(flowGraph)$capacity <- 0
 
     # Set vertex capacities
-    vertexCapEdges <- igraph::get.edge.ids(flowGraph, rbind(1:m, 1:m + m))
+    vertexCapEdges <- igraph::get_edge_ids(flowGraph, c(rbind(1:m, 1:m + m)))
     igraph::E(flowGraph)$capacity[vertexCapEdges] <- vertexCaps
 
     # Set edge capacities
     edgeArrInds <- which(L != 0, arr.ind = T)
     numEdges <- nrow(edgeArrInds)
-    edgeInds <- igraph::get.edge.ids(flowGraph, t(edgeArrInds) + rbind(rep(m, numEdges),
-        rep(0, numEdges)))
+    edgeInds <- igraph::get_edge_ids(flowGraph, c(t(edgeArrInds) + rbind(rep(m, numEdges),
+        rep(0, numEdges))))
     igraph::E(flowGraph)$capacity[edgeInds] <- edgeCaps[edgeArrInds]
 
     # Edge indices for source to in-nodes and forom out-nodes to terminal node.
-    sOutIndices <- igraph::get.edge.ids(flowGraph, rbind(rep(s, m), 1:m))
-    tInIndices <- igraph::get.edge.ids(flowGraph, rbind(m + 1:m, rep(t, m)))
+    sOutIndices <- igraph::get_edge_ids(flowGraph, c(rbind(rep(s, m), 1:m)))
+    tInIndices <- igraph::get_edge_ids(flowGraph, c(rbind(m + 1:m, rep(t, m))))
 
     R.oo::extend(R.oo::Object(), "FlowGraph", .adjMat = adjMat, .m = m, .s = s, .t = t,
         .sOutIndices = sOutIndices, .tInIndices = tInIndices, .flowGraph = flowGraph,
@@ -134,7 +134,7 @@ setMethodS3("updateEdgeCapacities", "FlowGraph", function(this, edges,
     if (is.vector(edges)) {
         edges <- matrix(edges, nrow = 2)
     }
-    edgeIds <- igraph::get.edge.ids(this$.flowGraph, edges + rbind(rep(this$.m, ncol(edges)),
+    edgeIds <- igraph::get_edge_ids(this$.flowGraph, c(edges + rbind(rep(this$.m, ncol(edges))),
         0))
     igraph::E(this$.flowGraph)$capacity[edgeIds] <- newCaps
 }, appendVarArgs = F)
