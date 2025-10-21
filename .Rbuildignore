@@ -6,3 +6,6 @@ cran-comments.md
 .DS_Store
 ..Rcheck
 ^\.travis\.yml$
+.github*
+^revdep$
+^CRAN-SUBMISSION$

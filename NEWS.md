@@ -1,3 +1,6 @@
+# SEMID 0.4.2
+* Updated functions to accommodate changes in igraph’s get_edge_ids() behavior.
+
 # SEMID 0.4.1
 * Fixed bug in the globalID function.
 * Correction of some errors in the documentation.
