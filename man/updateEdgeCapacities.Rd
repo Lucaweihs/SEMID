@@ -12,7 +12,7 @@ updateEdgeCapacities(this, edges, newCaps)
 \arguments{
 \item{this}{the flow graph object}
 
-\item{edges}{the vertices to update (as a 2xr matrix with ith row
+\item{edges}{the vertices to update (as a 2xr matrix with ith column
 corresponding to the edge edges[1,i]->edges[2,i].}
 
 \item{newCaps}{the new capacities for the edges}

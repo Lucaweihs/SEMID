@@ -1,8 +1,8 @@
 Package: SEMID
 Type: Package
 Title: Identifiability of Linear Structural Equation Models
-Version: 0.4.1
-Date: 2023-07-19
+Version: 0.4.2
+Date: 2025-10-21
 Authors@R: c(person("Rina", "Foygel Barber", role=c("aut"), 
                    email="rina@uchicago.edu"), 
             person("Mathias", "Drton", role=c("aut"), 
@@ -10,8 +10,8 @@ Authors@R: c(person("Rina", "Foygel Barber", role=c("aut"),
             person("Luca", "Weihs", role=c("aut"), 
                    email="lucaw@allenai.org"), 
             person("Nils", "Sturma", role=c("cre", "aut"), 
-                    email="nils.sturma@tum.de"))
-Maintainer: Nils Sturma <nils.sturma@tum.de>
+                    email="nils.sturma@epfl.ch"))
+Maintainer: Nils Sturma <nils.sturma@epfl.ch>
 Description: Provides routines to check identifiability or non-identifiability
     of linear structural equation models as described in Drton, Foygel, and
     Sullivant (2011) <doi:10.1214/10-AOS859>, Foygel, Draisma, and Drton (2012) 
@@ -30,4 +30,4 @@ Suggests:
     testthat
 NeedsCompilation: no
 Repository: CRAN
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.3
