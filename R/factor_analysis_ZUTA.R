@@ -1,5 +1,16 @@
-# check whether a graph fulfills the Zero Upper Triangular Assumption
-checkZUTA <- function(lambda){
+#' Check the Zero Upper Triangular Assumption
+#'
+#' @param lambda adjacency matrix with number of cols = number of latent nodes,
+#'        number of rows = number of observed nodes
+#'
+#' @returns a Boolean, whether the graph fulfills ZUTA
+#' @export
+#'
+#' @references
+#' Sturma, N., Kranzlmüller, M., Portakal, I., and Drton, M.  (2025) Matching
+#' Criterion for Identifiability in Sparse Factor Analysis.
+#' arXiv:2502.02986
+ZUTA <- function(lambda){
 
   input <- transformLambda(lambda)
   adjMatrix <- input[1]
@@ -30,7 +41,7 @@ checkZUTA <- function(lambda){
 
 
   if(nrow(cleanMatrix)>1){
-    if(findColumnsWith1(cleanMatrix)){
+    if(findColumnsWithSumOne(cleanMatrix)){
       return(TRUE)
     } else {
       return(FALSE)
@@ -40,14 +51,21 @@ checkZUTA <- function(lambda){
   }
 }
 
-# find a column with sum=1,  delete the row with the 1 in that column, check smaller matrix
-findColumnsWith1 <- function(cleanMatrix){
+#' A Helper Function for Check ZUTA
+#'
+#' iterative function that tries to find a column with sum=1, delete the row
+#' with the 1 in that column, check smaller matrix
+#' @param cleanMatrix a matrix without zero columns and rows
+#'
+#' @returns a Boolean whether it finds a column with sum=1 and the new matrix,
+#'          without the row in which the entry is, fulfills ZUTA
+findColumnsWithSumOne <- function(cleanMatrix){
   if(any(colSums(cleanMatrix[])==1)){
     if(nrow(cleanMatrix) > 2){
       for(column in which(colSums(cleanMatrix[])==1)){
         row <- which(cleanMatrix[,column]==1)
         newMatrix <- cleanMatrix[-row, ]
-        if(findColumnsWith1(newMatrix)){
+        if(findColumnsWithSumOne(newMatrix)){
           isZUTA <- TRUE
           return(TRUE)
         }

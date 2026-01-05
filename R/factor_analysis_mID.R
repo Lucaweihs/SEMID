@@ -1,6 +1,18 @@
-# check M-identifiability
-# check sign-identifiability of a graph by iterating over all latent nodes
-checkMidentifiability <- function(lambda, maxCard = length(observedNodes)){
+#' Check M-Identifiability.
+#'
+#' @param lambda adjacency matrix with number of cols = number of latent nodes,
+#'        number of rows = number of observed nodes
+#' @param maxCard (optional) maximum size of set W in Corollary 4.4
+#'
+#' @return a list consisting of a Boolean, whether the graph is
+#'         sign-identifiable and if yes, a list consisting of the sets
+#' @export
+#'
+#' @references
+#' Sturma, N., Kranzlmüller, M., Portakal, I., and Drton, M.  (2025) Matching
+#' Criterion for Identifiability in Sparse Factor Analysis.
+#' arXiv:2502.02986
+mID <- function(lambda, maxCard = length(observedNodes)){
 
   input <- transformLambda(lambda)
   adjMatrix <- input[[1]]
@@ -33,6 +45,7 @@ checkMidentifiability <- function(lambda, maxCard = length(observedNodes)){
     foundIdentifiableNode <- FALSE
     for(h in notIdentifiedNodes){
       tupleForNode <- checkMatchingCriterion(flowGraphAdjMatrix, adjMatrix, h, latentNodes, observedNodes, maxCard)
+      print(tupleForNode)
       if(tupleForNode$found){
         foundIdentifiableNode <- TRUE
         latentNodes <- setdiff(latentNodes,h)

@@ -325,3 +325,36 @@ Generic Identifiability Summary
 # nr. of edges between observed nodes shown gen. identifiable: 3 
 # gen. identifiable edges: 1->2, 2->3, 4->5
 ```
+
+
+## Identifiability in Sparse Factor Analysis
+
+M-identifiability based on the matching criterion by Drton, Kranzlmüller, 
+Portakal and Sturma (2025) is a sufficient condition for generic 
+sign-identifiability of a latent node in a factor analysis graph. 
+M-identifiability is used to recursively certify identifiability by checking 
+generic sign-identifiability of the matrix lambda representing a factor analysis 
+graph. This matrix lambda describes the edges in the factor analysis graph, where 
+the columns represent latent nodes and the rows represent the observed nodes.
+
+```         
+> # The factor analysis graph is specified by the matrix lambda
+> library(SEMID)
+> lambda = matrix(c(1, 0, 0,
++                   1, 1, 0,
++                   0, 1, 1,
++                   1, 0, 1,
++                   0, 1, 0,
++                   0, 0, 1),6,3,byrow=TRUE)
+> # The latent nodes are nodes 1, 2, and 3, while the observed nodes are the 
+> # nodes 4, 5, 6, 7, 8, and 9
+```
+
+The function `mID` implements the algorithm to check
+M-identifiability as presented in
+
+TODO: paper richtig zitieren!
+```         
+> mID(lambda)
+
+```

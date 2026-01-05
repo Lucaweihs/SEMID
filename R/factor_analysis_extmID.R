@@ -1,6 +1,18 @@
-# extended M-identifiability check
-# check sign-identifiability of a graph
-checkExtendedMidentifiability <- function(lambda, maxCard = length(observedNodes)){
+#' Check Extended M-Identifiability
+#'
+#' @param lambda adjacency matrix with number of cols = number of latent nodes,
+#'        number of rows = number of observed nodes
+#' @param maxCard (optional) maximum size of set W in Corollary 4.4
+#'
+#' @return a list consisting of a Boolean, whether the graph is
+#'         sign-identifiable and if yes, a list consisting of the sets
+#' @export
+#'
+#' @references
+#' Sturma, N., Kranzlmüller, M., Portakal, I., and Drton, M. (2025) Matching
+#' Criterion for Identifiability in Sparse Factor Analysis.
+#' arXiv:2502.02986l
+extmID <- function(lambda, maxCard = length(observedNodes)){
 
   input <- transformLambda(lambda)
   adjMatrix <- input[[1]]

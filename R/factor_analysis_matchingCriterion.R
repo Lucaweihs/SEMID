@@ -1,5 +1,24 @@
-# implementation of the matching criterion
-# for a given latent node try to find a tuple satisfying the matching criterion
+#' Check Matching Criterion
+#'
+#' for a latent node h, find a single observed node v and two sets of observed
+#' nodes W and U so that the tuple satisfies the matching criterion
+#'
+#' @param adjMatrix of the graph
+#' @param latentNodes set of latent nodes
+#' @param observedNodes set of observed nodes
+#' @param flowGraphAdjMatrix matrix representing the basis flow graph for
+#' any latent node h
+#' @param h latent node for which a tuple satisfying the criterion is sought
+#' @param maxCard maximum size of set W in Corollary 4.4
+#'
+#' @returns a list consisting of a Boolean, whether the graph is
+#'         sign-identifiable and if yes, a list consisting of the sets
+#' @export
+#'
+#' @references
+#' Sturma, N., Kranzlmüller, M., Portakal, I., and Drton, M.  (2025) Matching
+#' Criterion for Identifiability in Sparse Factor Analysis.
+#' arXiv:2502.02986
 checkMatchingCriterion <- function(flowGraphAdjMatrix, adjMatrix, h, latentNodes, observedNodes, maxCard = length(observedNodes)){
   for(v in observedNodes){
     # find parents of v
@@ -13,10 +32,10 @@ checkMatchingCriterion <- function(flowGraphAdjMatrix, adjMatrix, h, latentNodes
     if(setequal(vParents,h)){
       observedNodesWithoutV <- setdiff(observedNodes, v)
       maxSizeW <- min(min(length(observedNodesWithoutV)/2,length(latentNodes)),maxCard)
-      for(W in powerSet(observedNodesWithoutV, maxSizeW)){
+      for(W in rje::powerSet(observedNodesWithoutV, maxSizeW)){
         if((length(W)>0) && (sum(adjMatrix[h,W])>=1)){
           observedNodesWithoutW <- setdiff(observedNodesWithoutV,W)
-          possibleU = children(adjMatrix, parents(adjMatrix, W, latentNodes), observedNodesWithoutW)
+          possibleU = childrenOfNodes(adjMatrix, parentsOfNodes(adjMatrix, W, latentNodes), observedNodesWithoutW)
           if (length(possibleU) >= length(W)){
             for(U in combn(possibleU,length(W),simplify=FALSE)){
               if(sum(adjMatrix[h,U])>=1){
@@ -31,7 +50,7 @@ checkMatchingCriterion <- function(flowGraphAdjMatrix, adjMatrix, h, latentNodes
       }
     }
   }
-  return(list(found = FALSE))
+  return(list(found = FALSE, h = h))
 }
 
 # check for a given tuple whether the matching criterion is fulfilled

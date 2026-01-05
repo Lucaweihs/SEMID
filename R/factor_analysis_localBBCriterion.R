@@ -1,16 +1,26 @@
-# implementation of the local BB-criterion
-# for a set of latent nodes, find a set of observed nodes U so that the tuple satisfies
-# the local BB-criterion and the inequality concerning the cardinalities of the sets
-checkLocalBBCriterion <- function(lambda){
-
-  input <- transformLambda(lambda)
-  adjMatrix <- input[[1]]
-  latentNodes <- input[[2]]
-  observedNodes <- input[[3]]
+#' Check Local BB-Criterion
+#'
+#' for a set of latent nodes, find a set of observed nodes U so that the tuple
+#' satisfies the local BB-criterion and the inequality concerning the
+#' cardinalities of the sets
+#'
+#' @param adjMatrix of the graph
+#' @param latentNodes set of latent nodes
+#' @param observedNodes set of observed nodes
+#'
+#' @returns a list consisting of a Boolean, whether the graph is
+#'         sign-identifiable and if yes, a list consisting of the sets
+#' @export
+#'
+#' @references
+#' Sturma, N., Kranzlmüller, M., Portakal, I., and Drton, M.  (2025) Matching
+#' Criterion for Identifiability in Sparse Factor Analysis.
+#' arXiv:2502.02986
+checkLocalBBCriterion <- function(adjMatrix, latentNodes, observedNodes){
 
   for(h in latentNodes){
-    childrenOfH <- children(adjMatrix, h, observedNodes)
-    for(U in powerSet(childrenOfH)){
+    childrenOfH <- childrenOfNodes(adjMatrix, h, observedNodes)
+    for(U in rje::powerSet(childrenOfH)){
       if(length(U)>2){
         jointParentsU <- jointParents(adjMatrix, U, latentNodes)
         p <- length(U)
@@ -41,7 +51,7 @@ fullFactorCriterion <- function(adjMatrix, U, jointParentsU, latentNodes, observ
   # criterion (ii)
   orderingZUTA <- checkFullFactorZUTA$ordering
   for(h in jointParentsU){
-    setOfV <- setdiff(children(adjMatrix, h, observedNodes), U)
+    setOfV <- setdiff(childrenOfNodes(adjMatrix, h, observedNodes), U)
     positionOfH <- match(h, orderingZUTA)
     setOfL <- orderingZUTA[1:positionOfH]
 
