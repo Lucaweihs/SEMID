@@ -332,9 +332,9 @@ Generic Identifiability Summary
 M-identifiability based on the matching criterion by Drton, Kranzlmüller, 
 Portakal and Sturma (2025) is a sufficient condition for generic 
 sign-identifiability of a latent node in a factor analysis graph. 
-M-identifiability is used to recursively certify identifiability by checking 
-generic sign-identifiability of the matrix lambda representing a factor analysis 
-graph. This matrix lambda describes the edges in the factor analysis graph, where 
+M-identifiability is used to recursively certify generic sign-identifiability 
+for all latent nodes of factor analysis graph represented by a matrix lambda. 
+This matrix lambda describes the edges in the factor analysis graph, where 
 the columns represent latent nodes and the rows represent the observed nodes.
 
 ```         
@@ -345,9 +345,9 @@ the columns represent latent nodes and the rows represent the observed nodes.
 +                   0, 1, 1,
 +                   1, 0, 1,
 +                   0, 1, 0,
-+                   0, 0, 1),6,3,byrow=TRUE)
++                   0, 0, 1), 6, 3, byrow=TRUE)
 > # The latent nodes are nodes 1, 2, and 3, while the observed nodes are the 
-> # nodes 4, 5, 6, 7, 8, and 9
+> # nodes 4, 5, 6, 7, 8, and 9.
 ```
 
 The function `mID` implements the algorithm to check
@@ -356,5 +356,88 @@ M-identifiability as presented in
 TODO: paper richtig zitieren!
 ```         
 > mID(lambda)
+Call: mID(lambda = lambda)
 
+Factor Analysis Graph Info:
+latent nodes:  1 2 3 
+observed nodes:  4 5 6 7 8 9 
+
+Generic Sign-Identifiability Summary:
+M-identifiable:    TRUE
+Tuple list:
+  Tuple 1 
+    h: 1
+    S: 
+    v: 4
+    W: 5
+    U: 7
+  Tuple 2 
+    h: 2
+    S: 1
+    v: 5
+    W: 6
+    U: 8
+  Tuple 3 
+    h: 3
+    S: 1, 2
+    v: 6
+    W: 7
+    U: 9
 ```
+
+The M-identifiabilty above can be extended by using a second criterion for 
+generic sign-identifiability, the local BB-criterion by Drton, Kranzlmüller, 
+Portakal and Sturma (2025) which is an generalization of the BB-identifiability 
+by 
+
+Bekker, P. A. and ten Berge, J. M. F. (1997). Generic global indentification 
+in factor analysis. Linear Algebra and its Applications, 264:255–263.
+
+The combination of both criteria yields that graphs can be verified as generic 
+sign-identifiable, which is not possible with the matching criterion alone. 
+```     
+> # The factor analysis graph is specified by the matrix lambda
+> library(SEMID)
+> lambda = matrix(c(1, 0, 0, 0, 0,
++                   1, 1, 0, 0, 0,
++                   1, 1, 1, 0, 0,
++                   1, 1, 1, 1, 0,
++                   1, 1, 1, 1, 0,
++                   1, 1, 1, 1, 0,
++                   1, 1, 1, 1, 1,
++                   1, 1, 1, 1, 0,
++                   0, 0, 0, 0, 1,
++                   0, 0, 0, 0, 1), 10, 5, byrow=TRUE)
+> # The latent nodes are nodes 1, 2, 3, 4, and 5, while the observed nodes are the 
+> # nodes 6, 7, 8, 9, 10, 11, 12, 13, 14, and 15.
+```     
+
+The function `extmID` implements the algorithm to check
+extended M-identifiability as presented in
+
+TODO: paper richtig zitieren!
+
+``` 
+> extmID(lambda)
+Call: extmID(lambda = lambda)
+
+Factor Analysis Graph Info:
+latent nodes:  1 2 3 4 5 
+observed nodes:  6 7 8 9 10 11 12 13 14 15 
+
+Generic Sign-Identifiability Summary:
+extM-identifiable:    TRUE
+Tuple list:
+  Tuple 1 
+    criterion: localBB
+    S: 
+    new nodes in S: 1, 2, 3, 4
+    U: 6, 7, 8, 9, 10, 11, 12, 13
+  Tuple 2 
+    criterion: matching
+    h: 5
+    S: 1, 2, 3, 4
+    v: 12
+    W: 14
+    U: 15
+``` 

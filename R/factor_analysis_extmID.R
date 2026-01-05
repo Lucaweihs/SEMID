@@ -18,6 +18,11 @@ extmID <- function(lambda, maxCard = length(observedNodes)){
   adjMatrix <- input[[1]]
   latentNodes <- input[[2]]
   observedNodes <- input[[3]]
+  result <- list()
+  result$latentNodes <- latentNodes
+  result$observedNodes <- observedNodes
+  result$call <- match.call()
+  class(result) <- "extmIDresult"
 
   S <- {}
 
@@ -55,7 +60,7 @@ extmID <- function(lambda, maxCard = length(observedNodes)){
     if(tupleForSolvedNodes$found){
       foundIdentifiableNode <- TRUE
 
-      tuple <- list(list("S"=S, "newNodesInS"=tupleForSolvedNodes$newNodesInS, "U"=tupleForSolvedNodes$U))
+      tuple <- list(list("criterion"="localBB", "S"=S, "new nodes in S"=tupleForSolvedNodes$newNodesInS, "U"=tupleForSolvedNodes$U))
       tupleList <- c(tupleList,tuple)
       latentNodes <- setdiff(latentNodes,tupleForSolvedNodes$newNodesInS)
       S <- union(S, tupleForSolvedNodes$newNodesInS)
@@ -72,10 +77,10 @@ extmID <- function(lambda, maxCard = length(observedNodes)){
         if(tupleForNode$found){
           foundIdentifiableNode <- TRUE
           latentNodes <- setdiff(latentNodes,h)
-          S <- union(S,h)
           notIdentifiedNodes <- notIdentifiedNodes[! notIdentifiedNodes %in% c(h)]
-          tuple <- list(list("h"=tupleForNode$h, "S"=S, "v"=tupleForNode$v, "W"=tupleForNode$W, "U"=tupleForNode$U))
+          tuple <- list(list("criterion"="matching", "h"=tupleForNode$h, "S"=S, "v"=tupleForNode$v, "W"=tupleForNode$W, "U"=tupleForNode$U))
           tupleList <- c(tupleList,tuple)
+          S <- union(S,h)
 
           adjMatrix[h,] = 0
 
@@ -85,8 +90,59 @@ extmID <- function(lambda, maxCard = length(observedNodes)){
       }
     }
     if(!foundIdentifiableNode){
-      return(list("identifiable" = FALSE, "tupleList" = list()))
+      result$identifiable <- FALSE
+      result$tupleList <- tupleList
     }
   }
-  return(list("identifiable" = TRUE, "tupleList" = tupleList))
+  result$identifiable <- TRUE
+  result$tupleList <- tupleList
+  return(result)
+}
+
+#' Prints a extmIDresult object
+#'
+#' Prints a extmIDresult object as returned by
+#' \code{\link{extmID}}. Invisibly returns its argument via
+#' \code{\link{invisible}(x)} as most print functions do.
+#'
+#' @export
+#'
+#' @param x the extmIDresult object
+#' @param ... optional parameters, currently unused.
+print.extmIDresult <- function(x, ...) {
+  cat("Call: ")
+  print(x$call)
+
+  cat("\nFactor Analysis Graph Info:\n")
+  cat("latent nodes: ", x$latentNodes, "\n")
+  cat("observed nodes: ", x$observedNodes, "\n\n")
+
+  cat("Generic Sign-Identifiability Summary:\n")
+  cat(sprintf("extM-identifiable:    %s\n", x$identifiable))
+  cat("Tuple list:\n")
+
+  for (i in seq_along(x$tupleList)) {
+    cat("  Tuple", i, ":\n")
+    for (nm in names(x$tupleList[[i]])) {
+      val <- x$tupleList[[i]][[nm]]
+
+      if (is.list(val)) {
+        cat("    ", nm, ": {\n", sep = "")
+        for (subnm in names(val)) {
+          subval <- val[[subnm]]
+          # recursively check if subval is list
+          if (is.list(subval)) {
+            cat("      ", subnm, ": { ... }\n", sep = "")
+          } else {
+            cat("      ", subnm, ": ", paste(subval, collapse = ", "), "\n", sep = "")
+          }
+        }
+        cat("    }\n")
+      } else {
+        cat("    ", nm, ": ", paste(val, collapse = ", "), "\n", sep = "")
+      }
+    }
+  }
+
+  invisible(x)
 }
