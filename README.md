@@ -329,6 +329,8 @@ Generic Identifiability Summary
 
 ## Identifiability in Sparse Factor Analysis
 
+TODO Paper an passender Stelle richtig zitieren!
+
 M-identifiability based on the matching criterion by Drton, Kranzlmüller, 
 Portakal and Sturma (2025) is a sufficient condition for generic 
 sign-identifiability of a latent node in a factor analysis graph. 
@@ -351,9 +353,8 @@ the columns represent latent nodes and the rows represent the observed nodes.
 ```
 
 The function `mID` implements the algorithm to check
-M-identifiability as presented in
+M-identifiability.
 
-TODO: paper richtig zitieren!
 ```         
 > mID(lambda)
 Call: mID(lambda = lambda)
@@ -385,6 +386,21 @@ Tuple list:
     U: 9
 ```
 
+M-identifiability can only establish identifiability of graphs that satisfy the 
+Zero Upper Triangular Assumption (ZUTA). The function 'ZUTA' implements an 
+algorithm to check ZUTA.
+
+```
+> ZUTA(lambda)
+Call: ZUTA(lambda = lambda)
+
+Factor Analysis Graph Info:
+latent nodes:  1 2 3 4 5 
+observed nodes:  6 7 8 9 10 11 12 13 14 15 
+
+ZUTA:    TRUE
+```
+
 The M-identifiabilty above can be extended by using a second criterion for 
 generic sign-identifiability, the local BB-criterion by Drton, Kranzlmüller, 
 Portakal and Sturma (2025) which is an generalization of the BB-identifiability 
@@ -413,9 +429,7 @@ sign-identifiable, which is not possible with the matching criterion alone.
 ```     
 
 The function `extmID` implements the algorithm to check
-extended M-identifiability as presented in
-
-TODO: paper richtig zitieren!
+extended M-identifiability.
 
 ``` 
 > extmID(lambda)

@@ -13,12 +13,18 @@
 ZUTA <- function(lambda){
 
   input <- transformLambda(lambda)
-  adjMatrix <- input[1]
-  latentNodes <- input[2]
-  observedNodes <- input[3]
+  adjMatrix <- input[[1]]
+  latentNodes <- input[[2]]
+  observedNodes <- input[[3]]
+
+  result <- list()
+  result$latentNodes <- latentNodes
+  result$observedNodes <- observedNodes
+  result$call <- match.call()
+  class(result) <- "ZUTAresult"
 
   # generate matrix with only latent rows and observed columns and no zero-rows or zero-columns
-  numberOfNodes <- nrow(adjMatrix)
+  numberOfNodes <- length(latentNodes) + length(observedNodes)
 
   allRows <- c(1:numberOfNodes)
   notLatentRows <- (setdiff(allRows,latentNodes)) * (-1)
@@ -27,13 +33,16 @@ ZUTA <- function(lambda){
   cleanMatrix <- adjMatrix[notLatentRows, notObservedColumns]
 
   if (sum(rowSums(cleanMatrix[])>0)==1){
-    return(TRUE)
+    result$zuta <- TRUE
+    return(result)
   }
   if (sum(colSums(cleanMatrix[])>0)==1){
     if (sum(cleanMatrix)==1){
-      return(TRUE)
+      result$zuta <- TRUE
+      return(result)
     } else {
-      return(FALSE)
+      result$zuta <- FALSE
+      return(result)
     }
   }
 
@@ -42,12 +51,15 @@ ZUTA <- function(lambda){
 
   if(nrow(cleanMatrix)>1){
     if(findColumnsWithSumOne(cleanMatrix)){
-      return(TRUE)
+      result$zuta <- TRUE
+      return(result)
     } else {
-      return(FALSE)
+      result$zuta <- FALSE
+      return(result)
     }
   } else {
-    return(TRUE)
+    result$zuta <- TRUE
+    return(result)
   }
 }
 
@@ -77,4 +89,27 @@ findColumnsWithSumOne <- function(cleanMatrix){
   } else {
     return(FALSE)
   }
+}
+
+#' Prints a ZUTAresult object
+#'
+#' Prints a ZUTAresult object as returned by
+#' \code{\link{ZUTA}}. Invisibly returns its argument via
+#' \code{\link{invisible}(x)} as most print functions do.
+#'
+#' @export
+#'
+#' @param x the ZUTAresult object
+#' @param ... optional parameters, currently unused.
+print.ZUTAresult <- function(x, ...) {
+  cat("Call: ")
+  print(x$call)
+
+  cat("\nFactor Analysis Graph Info:\n")
+  cat("latent nodes: ", x$latentNodes, "\n")
+  cat("observed nodes: ", x$observedNodes, "\n\n")
+
+  cat(sprintf("ZUTA:    %s\n", x$zuta))
+
+  invisible(x)
 }
