@@ -45,8 +45,8 @@ parentsOfNodes <- function(adjMatrix, nodes, possibleParents){
   return(setOfParents)
 }
 
-# transform the Lambda matrix into an adjacency matrix and the number of latent
-# and observed nodes
+# transform the Lambda matrix into a "large" adjacency matrix and also return
+# the latent and observed nodes
 transformLambda <- function(lambda){
   columns <- ncol(lambda)
   rows <- nrow(lambda)

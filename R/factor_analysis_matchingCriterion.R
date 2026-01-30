@@ -9,7 +9,7 @@
 #' @param flowGraphAdjMatrix matrix representing the basis flow graph for
 #' any latent node h
 #' @param h latent node for which a tuple satisfying the criterion is sought
-#' @param maxCard maximum size of set W in Corollary 4.4
+#' @param maxCard maximum size of set W
 #'
 #' @returns a list consisting of a Boolean, whether the graph is
 #'         sign-identifiable and if yes, a list consisting of the sets

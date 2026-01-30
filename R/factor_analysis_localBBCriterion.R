@@ -1,8 +1,7 @@
 #' Check Local BB-Criterion
 #'
-#' for a set of latent nodes, find a set of observed nodes U so that the tuple
-#' satisfies the local BB-criterion and the inequality concerning the
-#' cardinalities of the sets
+#' checks whether a graph is recursively identifiable by only using the local
+#' BB-criterion
 #'
 #' @param adjMatrix of the graph
 #' @param latentNodes set of latent nodes

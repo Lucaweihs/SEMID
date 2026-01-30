@@ -2,7 +2,7 @@
 #'
 #' @param lambda adjacency matrix with number of cols = number of latent nodes,
 #'        number of rows = number of observed nodes
-#' @param maxCard (optional) maximum size of set W in Corollary 4.4
+#' @param maxCard (optional) maximum size of set W
 #'
 #' @return a list consisting of a Boolean, whether the graph is
 #'         sign-identifiable and if yes, a list consisting of the sets
