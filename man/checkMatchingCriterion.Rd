@@ -25,7 +25,7 @@ any latent node h}
 
 \item{observedNodes}{set of observed nodes}
 
-\item{maxCard}{maximum size of set W in Corollary 4.4}
+\item{maxCard}{maximum size of set W}
 }
 \value{
 a list consisting of a Boolean, whether the graph is

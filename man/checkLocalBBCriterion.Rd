@@ -18,9 +18,8 @@ a list consisting of a Boolean, whether the graph is
         sign-identifiable and if yes, a list consisting of the sets
 }
 \description{
-for a set of latent nodes, find a set of observed nodes U so that the tuple
-satisfies the local BB-criterion and the inequality concerning the
-cardinalities of the sets
+checks whether a graph is recursively identifiable by only using the local
+BB-criterion
 }
 \references{
 Sturma, N., Kranzlmüller, M., Portakal, I., and Drton, M.  (2025) Matching

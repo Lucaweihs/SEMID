@@ -10,7 +10,7 @@ extmID(lambda, maxCard = length(observedNodes))
 \item{lambda}{adjacency matrix with number of cols = number of latent nodes,
 number of rows = number of observed nodes}
 
-\item{maxCard}{(optional) maximum size of set W in Corollary 4.4}
+\item{maxCard}{(optional) maximum size of set W}
 }
 \value{
 a list consisting of a Boolean, whether the graph is
