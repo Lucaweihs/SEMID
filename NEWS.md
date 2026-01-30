@@ -1,11 +1,17 @@
+# SEMID 0.5.0
+
+-   Algorithms (**mID** and **extmID**) that efficiently check M-identifiability and extended M-identifiability in sparse factor analysis graphs.
+
 # SEMID 0.4.2
-* Updated functions to accommodate changes in igraph’s get_edge_ids() behavior.
+
+-   Updated functions to accommodate changes in igraph’s get_edge_ids() behavior.
 
 # SEMID 0.4.1
-* Fixed bug in the globalID function.
-* Correction of some errors in the documentation.
+
+-   Fixed bug in the globalID function.
+-   Correction of some errors in the documentation.
 
 # SEMID 0.4.0
 
-* An algorithm (**lfhtcID**) that efficiently checks the latent-factor half-trek criterion to determine which edges in a latent digraph are generically identifiable.
-* Two new methods for the LatentDigraph class: **observedParents()**, **getMixedGraph()**.
+-   An algorithm (**lfhtcID**) that efficiently checks the latent-factor half-trek criterion to determine which edges in a latent digraph are generically identifiable.
+-   Two new methods for the LatentDigraph class: **observedParents()**, **getMixedGraph()**.
