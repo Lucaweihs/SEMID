@@ -92,6 +92,7 @@ extmID <- function(lambda, maxCard = length(observedNodes)){
     if(!foundIdentifiableNode){
       result$identifiable <- FALSE
       result$tupleList <- tupleList
+      return(result)
     }
   }
   result$identifiable <- TRUE
