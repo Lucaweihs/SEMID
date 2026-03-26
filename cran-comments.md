@@ -2,6 +2,6 @@
 
 0 errors \| 0 warnings \| 0 notes
 
-## Reverse dependencies
+## revdepcheck results
 
 There are currently no downstream dependencies for this package.
