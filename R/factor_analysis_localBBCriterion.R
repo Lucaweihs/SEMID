@@ -55,9 +55,9 @@ fullFactorCriterion <- function(adjMatrix, U, jointParentsU, latentNodes, observ
     setOfL <- orderingZUTA[1:positionOfH]
 
     remainingVtoCheck <- setOfV
+    setUWithCheckedV <- U
     while(length(remainingVtoCheck)>0){
       foundU <- FALSE
-      setUWithCheckedV <- U
       for(v in remainingVtoCheck){
         for(u in setUWithCheckedV){
           jointParentsVandU <- jointParents(adjMatrix, c(u,v), latentNodes)

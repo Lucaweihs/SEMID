@@ -1,3 +1,7 @@
+# SEMID 0.5.1
+
+- Fixed bugs in the fullFactorCriterion and extmID functions.
+
 # SEMID 0.5.0
 
 -   Algorithms (**mID** and **extmID**) that efficiently check M-identifiability and extended M-identifiability in sparse factor analysis graphs.
